@@ -1,0 +1,10 @@
+^C:\USERS\LOGIC\ONEDRIVE\DOCUMENTS\SCHOOL\GAMEPROG\NYP_SDM_GDT_FRAMEWORK\BUILD\CMAKEFILES\5A4C16AEE04151C19556025D7D8DB662\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/NYP_SDM_GDT_Framework.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

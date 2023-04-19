@@ -1,0 +1,10 @@
+^C:\USERS\LOGIC\ONEDRIVE\DOCUMENTS\SCHOOL\GAMEPROG\NYP_SDM_GDT_FRAMEWORK\APP\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build --check-stamp-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/App/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
