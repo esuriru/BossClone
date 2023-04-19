@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/App
+# Install script for directory: C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/App
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

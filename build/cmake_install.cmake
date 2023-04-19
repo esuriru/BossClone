@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework
+# Install script for directory: C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -34,12 +34,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/App/cmake_install.cmake")
+  include("C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/App/cmake_install.cmake")
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
-  include("C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/Library/cmake_install.cmake")
+  include("C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/Library/cmake_install.cmake")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\build\CMakeFiles\5a4c16aee04151c19556025d7d8db662\generate.stamp.rule">
+    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\build\CMakeFiles\3ed0fce88e0eaf739ed7efaf877c74c4\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{4C1AEF2A-DB24-316B-8AE7-120C9174DB66}</UniqueIdentifier>
+      <UniqueIdentifier>{D3BB0C86-66E4-300E-8EB7-6BA9846A967C}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

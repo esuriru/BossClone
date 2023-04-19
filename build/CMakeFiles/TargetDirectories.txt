@@ -1,4 +1,4 @@
-C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/CMakeFiles/ZERO_CHECK.dir
-C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/App/CMakeFiles/App.dir
-C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/Library/CMakeFiles/Library.dir
+C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/App/CMakeFiles/App.dir
+C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/Library/CMakeFiles/Library.dir

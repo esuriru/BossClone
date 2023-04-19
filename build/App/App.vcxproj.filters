@@ -1,393 +1,393 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\GameStateManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\GameStateManager.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\IntroState.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\IntroState.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\MenuState.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\MenuState.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\PauseState.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\PauseState.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\Play3DGameState.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\Play3DGameState.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\PlayGameState.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\PlayGameState.cpp">
       <Filter>GameStateManagement</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\BackgroundEntity.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\BackgroundEntity.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Enemy2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Enemy2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Enemy2DManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Enemy2DManager.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\GameManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\GameManager.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\GUI_Scene2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\GUI_Scene2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\InventoryItem.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\InventoryItem.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\InventoryManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\InventoryManager.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Map2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Map2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Physics2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Physics2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Player2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Player2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Scene2D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Scene2D.cpp">
       <Filter>Scene2D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Camera.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Camera.cpp">
       <Filter>Scene3D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\GUI_Scene3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\GUI_Scene3D.cpp">
       <Filter>Scene3D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Physics3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Physics3D.cpp">
       <Filter>Scene3D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Scene3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Scene3D.cpp">
       <Filter>Scene3D</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\BloodScreen.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\BloodScreen.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraEffects.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraEffects.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraEffectsManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraEffectsManager.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraShake.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraShake.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CrossHair.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CrossHair.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\ScopeScreen.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\ScopeScreen.cpp">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Enemy3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Enemy3D.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\EntityManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\EntityManager.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Hut_Concrete.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Hut_Concrete.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Player3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Player3D.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Rock3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Rock3D.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\SolidObject.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\SolidObject.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\SolidObjectManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\SolidObjectManager.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Structure3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Structure3D.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\TreeKabak3D.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\TreeKabak3D.cpp">
       <Filter>Scene3D\Entities</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\AI\FSM.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\AI\FSM.cpp">
       <Filter>Scene3D\FSM</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Minimap\Minimap.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Minimap\Minimap.cpp">
       <Filter>Scene3D\Minimap</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SceneGraph\SceneNode.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SceneGraph\SceneNode.cpp">
       <Filter>Scene3D\SceneGraph</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SceneGraph\SpinTower.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SceneGraph\SpinTower.cpp">
       <Filter>Scene3D\SceneGraph</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SkyBox\SkyBox.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SkyBox\SkyBox.cpp">
       <Filter>Scene3D\SkyBox</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\FrustumCulling.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\FrustumCulling.cpp">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\Grid.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\Grid.cpp">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\SpatialPartition.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\SpatialPartition.cpp">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\Terrain.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\Terrain.cpp">
       <Filter>Scene3D\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\TerrainManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\TerrainManager.cpp">
       <Filter>Scene3D\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\Texture.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\Texture.cpp">
       <Filter>Scene3D\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\vertexBufferObject.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\vertexBufferObject.cpp">
       <Filter>Scene3D\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Waypoint\Waypoint.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Waypoint\Waypoint.cpp">
       <Filter>Scene3D\WayPoint</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Waypoint\WaypointManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Waypoint\WaypointManager.cpp">
       <Filter>Scene3D\WayPoint</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\Pistol.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\Pistol.cpp">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\Projectile.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\Projectile.cpp">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\ProjectileManager.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\ProjectileManager.cpp">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\WeaponInfo.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\WeaponInfo.cpp">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Application.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\main.cpp">
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\GameStateBase.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\GameStateBase.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\GameStateManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\GameStateManager.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\IntroState.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\IntroState.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\MenuState.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\MenuState.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\PauseState.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\PauseState.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\Play3DGameState.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\Play3DGameState.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\GameStateManagement\PlayGameState.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\GameStateManagement\PlayGameState.h">
       <Filter>GameStateManagement</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Application.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\BackgroundEntity.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\BackgroundEntity.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Enemy2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Enemy2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Enemy2DManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Enemy2DManager.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\GameManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\GameManager.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\GUI_Scene2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\GUI_Scene2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\InventoryItem.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\InventoryItem.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\InventoryManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\InventoryManager.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Map2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Map2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Physics2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Physics2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Player2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Player2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene2D\Scene2D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene2D\Scene2D.h">
       <Filter>Scene2D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Camera.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Camera.h">
       <Filter>Scene3D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\GUI_Scene3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\GUI_Scene3D.h">
       <Filter>Scene3D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Physics3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Physics3D.h">
       <Filter>Scene3D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Scene3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Scene3D.h">
       <Filter>Scene3D</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\BloodScreen.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\BloodScreen.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraEffects.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraEffects.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraEffectsManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraEffectsManager.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CameraShake.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CameraShake.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\CrossHair.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\CrossHair.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\CameraEffects\ScopeScreen.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\CameraEffects\ScopeScreen.h">
       <Filter>Scene3D\CameraEffects</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Enemy3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Enemy3D.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\EntityManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\EntityManager.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Hut_Concrete.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Hut_Concrete.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Player3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Player3D.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Rock3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Rock3D.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\SolidObject.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\SolidObject.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\SolidObjectManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\SolidObjectManager.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\Structure3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\Structure3D.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Entities\TreeKabak3D.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Entities\TreeKabak3D.h">
       <Filter>Scene3D\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\AI\FSM.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\AI\FSM.h">
       <Filter>Scene3D\FSM</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Minimap\Minimap.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Minimap\Minimap.h">
       <Filter>Scene3D\Minimap</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SceneGraph\SceneNode.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SceneGraph\SceneNode.h">
       <Filter>Scene3D\SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SceneGraph\SpinTower.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SceneGraph\SpinTower.h">
       <Filter>Scene3D\SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SkyBox\SkyBox.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SkyBox\SkyBox.h">
       <Filter>Scene3D\SkyBox</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\FrustumCulling.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\FrustumCulling.h">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\Grid.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\Grid.h">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\SpatialPartition\SpatialPartition.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\SpatialPartition\SpatialPartition.h">
       <Filter>Scene3D\SpatialPartition</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\Terrain.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\Terrain.h">
       <Filter>Scene3D\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\TerrainManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\TerrainManager.h">
       <Filter>Scene3D\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\Texture.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\Texture.h">
       <Filter>Scene3D\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Terrain\vertexBufferObject.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Terrain\vertexBufferObject.h">
       <Filter>Scene3D\Terrain</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Waypoint\Waypoint.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Waypoint\Waypoint.h">
       <Filter>Scene3D\WayPoint</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\Waypoint\WaypointManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\Waypoint\WaypointManager.h">
       <Filter>Scene3D\WayPoint</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\Pistol.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\Pistol.h">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\Projectile.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\Projectile.h">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\ProjectileManager.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\ProjectileManager.h">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\Source\Scene3D\WeaponInfo\WeaponInfo.h">
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\Source\Scene3D\WeaponInfo\WeaponInfo.h">
       <Filter>Scene3D\WeaponInfo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\App\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\App\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GameStateManagement">
-      <UniqueIdentifier>{CD91E425-3B9F-3089-99EE-074F61AFDD86}</UniqueIdentifier>
+      <UniqueIdentifier>{9D9C4B86-BBF1-3E2B-A81B-CF3A5300E845}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{439836F8-225E-39E6-9EE7-C435F50E6251}</UniqueIdentifier>
+      <UniqueIdentifier>{0E4EDB53-A1BB-39F4-BDE1-26E7760784F8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene2D">
-      <UniqueIdentifier>{7B5620A6-7EF8-3B05-AA78-BC978ED7E1A0}</UniqueIdentifier>
+      <UniqueIdentifier>{9C96B142-F168-378D-BBF9-56A7A68020FE}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D">
-      <UniqueIdentifier>{3506D430-074A-3F7C-977B-1A781F349DF4}</UniqueIdentifier>
+      <UniqueIdentifier>{4783B47E-E9F7-31D7-A62E-CD3524D51676}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\CameraEffects">
-      <UniqueIdentifier>{94A1EF94-4B4B-3E83-B4C4-F54E62DD3400}</UniqueIdentifier>
+      <UniqueIdentifier>{222C483B-3ADF-36C5-ADAE-4129925A3CDB}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\Entities">
-      <UniqueIdentifier>{50C9AE87-2E49-3FD0-9F3B-4AB0D8866DFF}</UniqueIdentifier>
+      <UniqueIdentifier>{91FDA522-4859-3B15-94A2-75B207ADA4D6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\FSM">
-      <UniqueIdentifier>{5F9ABF97-A00C-3770-BE66-C471CB4134F9}</UniqueIdentifier>
+      <UniqueIdentifier>{EF06FD5A-4262-3274-8B95-9AB7CFE7CD9C}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\Minimap">
-      <UniqueIdentifier>{D5E628D3-9ECE-3999-8E52-69185E832013}</UniqueIdentifier>
+      <UniqueIdentifier>{2D80ECB9-AC60-343E-95C6-9A22ED5270EF}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\SceneGraph">
-      <UniqueIdentifier>{39562EF6-6D13-3B27-A1E0-962A63045D2C}</UniqueIdentifier>
+      <UniqueIdentifier>{6EBBDB79-1CB6-30E3-A563-B6AC4BFFBB6B}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\SkyBox">
-      <UniqueIdentifier>{BF9A0FEF-F752-37BC-AD93-BFBF20F3422E}</UniqueIdentifier>
+      <UniqueIdentifier>{149B4F1C-6B5A-3A47-9CBF-048B80FCD3A6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\SpatialPartition">
-      <UniqueIdentifier>{8D2642D4-F055-34A5-8EE0-440CDB0F2FC6}</UniqueIdentifier>
+      <UniqueIdentifier>{5BAA3548-CCB6-31C3-BB28-25E358E26C46}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\Terrain">
-      <UniqueIdentifier>{39489BAF-072A-350D-AAD2-58FE8CDDF2F5}</UniqueIdentifier>
+      <UniqueIdentifier>{69402286-0D63-3AD1-9460-BF9AA68C29CE}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\WayPoint">
-      <UniqueIdentifier>{84C3FECD-0B6D-36DB-A990-26CA1D602ABC}</UniqueIdentifier>
+      <UniqueIdentifier>{CC2B7FA7-FAAC-39B8-AAFA-9DCA2F1325E9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Scene3D\WeaponInfo">
-      <UniqueIdentifier>{8D1C2F1F-5ED8-3300-A72F-EE8A01D68200}</UniqueIdentifier>
+      <UniqueIdentifier>{F75368EA-E07B-3B13-A714-DF5330E33F1E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{CE2AECE6-35F5-389B-A22B-A6E8E5E7E2B4}</UniqueIdentifier>
+      <UniqueIdentifier>{D59C101B-78AC-3039-B719-AFD829617DE3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

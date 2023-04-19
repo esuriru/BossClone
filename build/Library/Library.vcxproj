@@ -14,7 +14,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{22E22E19-D185-31F3-A3C9-10B26DD48AB0}</ProjectGuid>
+    <ProjectGuid>{BA114859-1539-3E92-97F8-19611D2B63E8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
     <Platform>win32</Platform>
@@ -42,18 +42,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\win32\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\win32\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">Library.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">Library</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\win32\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\win32\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|win32'">Library.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|win32'">Library</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|win32'">.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -67,10 +67,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;UNICODE;_UNICODE;_VARIADIC_MAX=10;_LIB;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -80,7 +80,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -96,10 +96,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;NDEBUG;_MBCS;_VARIADIC_MAX=10;_LIB;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\freetype\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\Lua\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glew\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glfw\include;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\glm;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\..\SOIL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -108,11 +108,11 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">Building Custom Rule C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/Library/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">Building Custom Rule C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/Library/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build --check-stamp-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/Library/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build --check-stamp-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/Library/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -120,12 +120,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\CMake\Default.cmake;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\build\Library\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\CMake\Default.cmake;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\build\Library\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|win32'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|win32'">Building Custom Rule C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/Library/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|win32'">Building Custom Rule C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/Library/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|win32'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build --check-stamp-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/NYP_SDM_GDT_Framework/build/Library/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment -BC:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build --check-stamp-file C:/Users/logic/OneDrive/Documents/School/GAMEPROG/Assignment/build/Library/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -133,66 +133,66 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\CMake\Default.cmake;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\build\Library\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\CMake\Default.cmake;C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\CMake\DefaultCXX.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|win32'">C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\build\Library\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|win32'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\DesignPatterns\SingletonTemplate.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\backends\imgui_impl_glfw.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\backends\imgui_impl_glfw.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\backends\imgui_impl_opengl3.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imconfig.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui_demo.cpp" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui_draw.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui_internal.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui_tables.cpp" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GUI\imgui_widgets.cpp" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GameControl\Settings.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\GameControl\Settings.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Inputs\KeyboardController.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Inputs\KeyboardController.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Inputs\MouseController.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Inputs\MouseController.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Collider.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Collider.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\CollisionManager.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\CollisionManager.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Entity2D.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Entity2D.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Entity3D.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Entity3D.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\IDGenerator.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\IDGenerator.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\LevelOfDetails.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\LevelOfDetails.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Mesh.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\Mesh.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\MeshBuilder.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\MeshBuilder.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\SpriteAnimation.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\Primitives\SpriteAnimation.h" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\RenderControl\Shader.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\RenderControl\ShaderManager.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\RenderControl\ShaderManager.h" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\filesystem.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\ImageLoader.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\ImageLoader.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\LoadOBJ.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\LoadOBJ.h" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\System\rapidcsv.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\TimeControl\FPSCounter.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\TimeControl\FPSCounter.h" />
-    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\TimeControl\StopWatch.cpp" />
-    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\Library\Source\TimeControl\StopWatch.h" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\DesignPatterns\SingletonTemplate.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\backends\imgui_impl_glfw.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\backends\imgui_impl_glfw.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\backends\imgui_impl_opengl3.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imconfig.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui_demo.cpp" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui_draw.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui_internal.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui_tables.cpp" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GUI\imgui_widgets.cpp" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GameControl\Settings.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\GameControl\Settings.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Inputs\KeyboardController.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Inputs\KeyboardController.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Inputs\MouseController.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Inputs\MouseController.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Collider.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Collider.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\CollisionManager.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\CollisionManager.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Entity2D.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Entity2D.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Entity3D.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Entity3D.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\IDGenerator.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\IDGenerator.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\LevelOfDetails.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\LevelOfDetails.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Mesh.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\Mesh.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\MeshBuilder.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\MeshBuilder.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\SpriteAnimation.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\Primitives\SpriteAnimation.h" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\RenderControl\Shader.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\RenderControl\ShaderManager.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\RenderControl\ShaderManager.h" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\filesystem.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\ImageLoader.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\ImageLoader.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\LoadOBJ.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\LoadOBJ.h" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\System\rapidcsv.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\TimeControl\FPSCounter.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\TimeControl\FPSCounter.h" />
+    <ClCompile Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\TimeControl\StopWatch.cpp" />
+    <ClInclude Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\Library\Source\TimeControl\StopWatch.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\NYP_SDM_GDT_Framework\build\ZERO_CHECK.vcxproj">
-      <Project>{91196320-A306-35E4-8F25-4455389086A4}</Project>
+    <ProjectReference Include="C:\Users\logic\OneDrive\Documents\School\GAMEPROG\Assignment\build\ZERO_CHECK.vcxproj">
+      <Project>{CD328C4A-7231-3DFD-8218-C8DE1C0A7255}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
