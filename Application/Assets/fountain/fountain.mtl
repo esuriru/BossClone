@@ -1,0 +1,23 @@
+# Blender 3.4.1 MTL File: 'None'
+# www.blender.org
+
+newmtl Granite
+Ns 200.000000
+Ka 0.500000 0.500000 0.500000
+Ks 0.700000 0.700000 0.700000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:/Users/User/Downloads/uploads_files_910270_Fountain_08_fbx/Fountain_08_fbx/TEX/Granite.jpg
+
+newmtl Water
+Ns 200.000000
+Ka 0.300000 0.300000 0.700000
+Kd 0.866667 0.866667 0.966667
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.125490
+illum 1
+map_Bump -bm 1.000000 C:/Map #3

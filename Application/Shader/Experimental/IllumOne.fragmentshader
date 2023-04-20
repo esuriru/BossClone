@@ -1,0 +1,146 @@
+
+#version 330 core
+
+const int MAX_LIGHTS = 64;
+
+struct Light
+{
+    vec4 position_cameraspace;
+    vec4 direction_cameraspace;
+    vec4 color;
+    int type;
+    float power;
+    float kC;
+    float kL;
+    float kQ;
+    float cosCutoff;
+    float cosInner;
+    float exponent;
+};
+
+// Pass in things as vec4, because vec3 are intepreted size of vec4 (16 bytes), hence, to prevent offset confusion, just pass in as vec4
+layout(std140) uniform Material
+{
+    vec4 kAmbient;
+    vec4 kDiffuse;
+    vec4 kSpecular;
+    float kShininess;
+} material;
+
+layout(std140) uniform LightBlock
+{
+    Light lights[MAX_LIGHTS];
+} lightBlock;
+
+// Interpolated values from the vertex shaders
+in VERTEX_DATA{
+    vec2 texCoord;
+    vec3 fragmentPosition;
+    vec3 norm;
+}vertexDataIn;
+
+// Output data
+out vec4 frag_color;
+
+uniform int numLights;
+// uniform Light lights[MAX_LIGHTS];
+uniform bool lightEnabled;
+// uniform vec3 viewDir;
+
+uniform bool u_textureEnabled;
+
+uniform bool u_ambient_map_enabled;
+uniform sampler2D u_ambient_texture0;
+uniform sampler2D u_ambient_texture1;
+uniform sampler2D u_ambient_texture2;
+uniform sampler2D u_ambient_texture3;
+
+uniform bool u_diffuse_map_enabled;
+uniform sampler2D u_diffuse_texture0;
+uniform sampler2D u_diffuse_texture1;
+uniform sampler2D u_diffuse_texture2;
+uniform sampler2D u_diffuse_texture3;
+
+uniform bool u_specular_map_enabled;
+uniform sampler2D u_specular_texture0;
+uniform sampler2D u_specular_texture1;
+uniform sampler2D u_specular_texture2;
+uniform sampler2D u_specular_texture3;
+
+uniform bool u_normal_map_enabled;
+uniform sampler2D u_normal_texture0;
+uniform sampler2D u_normal_texture1;
+uniform sampler2D u_normal_texture2;
+uniform sampler2D u_normal_texture3;
+
+uniform bool u_textEnabled;
+uniform vec3 u_textColour;
+
+uniform float u_tilingFactor;
+
+float CalculateAttenuantion(Light light, float distance)
+{
+	if (light.type == 1)
+        return 1;
+	else
+        return 1/max(1,light.kC+light.kL*distance+light.kQ*distance*distance);
+}
+
+
+void main()
+{
+    // frag_color = texture(u_tex, vertexDataIn.texCoord * u_tilingFactor);
+    vec3 normal = normalize(vertexDataIn.norm);
+    vec3 color;
+    vec4 diffColor = u_diffuse_map_enabled ? texture(u_diffuse_texture0, vertexDataIn.texCoord * u_tilingFactor) : material.kDiffuse;
+
+    vec3 viewDir = normalize(-vertexDataIn.fragmentPosition);
+    vec3 vertexPos = vertexDataIn.fragmentPosition;
+
+    if (u_textEnabled == false)
+    {
+        color = material.kAmbient.rgb * diffColor.rgb;
+        if (lightEnabled)
+        {
+            for(int i=0;i<numLights;++i)
+            {
+                Light light=lightBlock.lights[i];
+                vec3 lightDir;
+                float dist = 0;
+                float attenuation;
+                // vec3 lightDir_tangentspace;
+                if(light.type==0)// Point light
+                {
+                    lightDir = normalize(vec3(light.position_cameraspace)-vertexPos);
+                    dist = length(vec3(light.position_cameraspace)-vertexPos);
+                    attenuation = CalculateAttenuantion(light, dist);
+                }
+                else if(light.type==1)// Directional light
+                {
+                    lightDir = -normalize(vec3(light.direction_cameraspace));
+                    attenuation = CalculateAttenuantion(light, dist);
+                }
+                else// Spot light
+                {
+                    lightDir = normalize(vec3(light.position_cameraspace)-vertexPos);
+                    dist = length(vec3(light.position_cameraspace)-vertexPos);
+                    float spot = dot(lightDir,normalize(vec3(-light.direction_cameraspace)));
+                    attenuation = spot > light.cosCutoff ? CalculateAttenuantion(light, dist) : 0.0;
+                }
+
+                float diff=max(dot(normal,lightDir),0.);
+                // View direction should be -vertexDataIn.fragmentPosition
+                attenuation *= light.power;
+                
+                color += (diffColor.rgb * diff)
+                    * light.color.rgb * attenuation;
+                // frag_color = vec4(.rgb, 1);
+            }
+        }
+        frag_color=vec4(color, diffColor.a);
+    }
+    else
+    {
+        frag_color = texture(u_diffuse_texture0, vertexDataIn.texCoord) * vec4(u_textColour, 1);
+    }
+}

@@ -1,0 +1,166 @@
+# Blender 3.4.1 MTL File: 'wheel.blend'
+# www.blender.org
+
+newmtl 1
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/1_texture.png
+map_Bump -bm 1.760000 source/1_normal.png
+
+newmtl 2
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/2_texture.png
+map_Bump -bm 1.080000 source/2_normal.png
+
+newmtl 3
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/3_texture1.png
+
+newmtl 3-legs
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/3-legs_texture.png
+map_Bump -bm 2.310000 source/3-legs_normal.001.jpg
+
+newmtl 4
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/4_texture.png
+
+newmtl 6
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/6-texture.001.png
+map_Bump -bm 3.100000 source/6-normal.jpg
+
+newmtl bolts1
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/bolts1_texture.png
+
+newmtl bolts2
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/bolts2_texture.png
+
+newmtl cab
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/cab_texture.png
+
+newmtl ladder
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/ladder_texture.jpg
+
+newmtl metal-construction
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/metal-construction2_texture.png
+
+newmtl metal_construction1
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/metal-construction1_texture.png
+
+newmtl metal_floor
+Ns 250.000000
+Ka 0.331818 0.331818 0.331818
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
+map_Kd source/metal-floor_texture.png
+
+newmtl other
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/other_texture.jpg
+
+newmtl seats
+Ns 36.446281
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/seats_texture.png
+
+newmtl wood
+Ns 36.446259
+Ka 0.200000 0.200000 0.200000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd source/wood_texture.png

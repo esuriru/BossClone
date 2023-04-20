@@ -1,0 +1,108 @@
+#version 330 core
+
+const int MAX_LIGHTS=64;
+
+struct Light{
+    vec4 position_cameraspace;
+    vec4 direction_cameraspace;
+    vec4 color;
+    int type;
+    float power;
+    float kC;
+    float kL;
+    float kQ;
+    float cosCutoff;
+    float cosInner;
+    float exponent;
+};
+
+// Pass in things as vec4, because vec3 are intepreted size of vec4 (16 bytes), hence, to prevent offset confusion, just pass in as vec4
+layout(std140)uniform Material{
+    vec4 kAmbient;
+    vec4 kDiffuse;
+    vec4 kSpecular;
+    float kShininess;
+}material;
+
+layout(std140)uniform LightBlock{
+    Light lights[MAX_LIGHTS];
+}lightBlock;
+
+// Interpolated values from the vertex shaders
+in VERTEX_DATA{
+    vec3 fragmentPosition;
+    vec3 norm;
+    vec2 texCoord;
+}vertexDataIn;
+
+// Output data
+out vec4 frag_color;
+
+uniform int numLights;
+// uniform Light lights[MAX_LIGHTS];
+uniform bool lightEnabled;
+// uniform vec3 viewDir;
+
+uniform bool u_textureEnabled;
+uniform sampler2D u_tex;
+
+uniform sampler2D u_rTex;
+uniform sampler2D u_gTex;
+uniform sampler2D u_bTex;
+
+uniform sampler2D u_blendMap;
+
+uniform vec3 u_textColour;
+
+uniform float u_tilingFactor;
+
+void main()
+{
+    vec4 blendMapColour = texture(u_blendMap, vertexDataIn.texCoord);
+    float backTextureAmount = 1 - (blendMapColour.r + blendMapColour.g + blendMapColour.b);
+    vec4 backgroundTextureColour = texture(u_tex, vertexDataIn.texCoord * u_tilingFactor) * backTextureAmount;
+    vec4 rTextureColour = texture(u_rTex, vertexDataIn.texCoord * u_tilingFactor) * backTextureAmount;
+    vec4 gTextureColour = texture(u_gTex, vertexDataIn.texCoord * u_tilingFactor) * backTextureAmount;
+    vec4 bTextureColour = texture(u_bTex, vertexDataIn.texCoord * u_tilingFactor) * backTextureAmount;
+
+    vec4 totalColour = backgroundTextureColour + rTextureColour + gTextureColour + bTextureColour;
+
+    vec3 normal=normalize(vertexDataIn.norm);
+    vec3 color;
+    
+    color = material.kAmbient.rgb * ((u_textureEnabled) ? totalColour.rgb : material.kColour.rgb);
+    if(lightEnabled)
+    {
+        for(int i=0;i<numLights;++i)
+        {
+            Light light=lightBlock.lights[i];
+            vec3 lightDir;
+            float attenuation;
+            if(light.type==0)// Point light
+            {
+                lightDir=normalize(vec3(light.position_cameraspace)-vertexDataIn.fragmentPosition);
+                float dist=length(vec3(light.position_cameraspace)-vertexDataIn.fragmentPosition);
+                attenuation=1./(light.kC+light.kL*dist+light.kQ*dist*dist);
+            }
+            else if(light.type==1)// Directional light
+            {
+                lightDir=-normalize(vec3(light.direction_cameraspace));
+                attenuation=1.;
+            }
+            else// Spot light
+            {
+                lightDir=normalize(vec3(light.position_cameraspace)-vertexDataIn.fragmentPosition);
+                float dist=length(vec3(light.position_cameraspace)-vertexDataIn.fragmentPosition);
+                float spot=dot(lightDir,normalize(vec3(-light.direction_cameraspace)));
+                attenuation=spot>light.cosCutoff?1./(light.kC+light.kL*dist+light.kQ*dist*dist):0.;
+            }
+            
+            float diff=max(dot(normal,lightDir),0.);
+            vec3 reflectDir=reflect(-lightDir,normal);
+            
+            float spec=pow(max(dot(normalize(-vertexDataIn.fragmentPosition),reflectDir),0.),material.kShininess);
+            color+=(material.kDiffuse.rgb*diff+material.kSpecular.rgb*spec)*light.color.rgb*attenuation;
+        }
+    }
+    frag_color=vec4(color,(u_textureEnabled ? totalColour.a : material.kColour.a));
+}

@@ -1,0 +1,35 @@
+# Blender 3.4.1 MTL File: 'uploads_files_1970932_pine.blend'
+# www.blender.org
+
+newmtl Bark_Branch_Mat
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Bark_Color.png
+map_d C:/Bark_Color.png
+map_Bump -bm 1.000000 C:/Bark_Normal.png
+
+newmtl Cap_Branch_Mat
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/Cap_Color.png
+map_d C:/Cap_Color.png
+map_Bump -bm 1.000000 C:/Cap_Normal.png
+
+newmtl conifer_macedonian_pine_Leaf_Mat
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+illum 2
+map_Kd C:/conifer_macedonian_pine_Color.png
+map_d C:/conifer_macedonian_pine_Color.png
+map_Bump -bm 1.000000 C:/conifer_macedonian_pine_Normal.png

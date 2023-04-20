@@ -1,0 +1,13 @@
+# Blender MTL File: 'claw_machine.blend'
+# Material Count: 1
+
+newmtl pink
+Ns 359.999993
+Ka 0.905882 0.329411 0.501960
+Kd 0.988235 0.556862 0.674509
+Ks 1.000000 0.431372 0.780392
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+
