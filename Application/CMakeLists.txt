@@ -186,6 +186,7 @@ set(Source_Files
     "Source/Renderer/ShaderLibrary.cpp"
     "Source/Renderer/Texture.cpp"
     "Source/Renderer/UniformBuffer.cpp"
+
     "Source/Scene/ArcadeScene.cpp"
     "Source/Scene/BottleThrowScene.cpp"
     "Source/Scene/BumperCarScene.cpp"
@@ -197,11 +198,23 @@ set(Source_Files
     "Source/Scene/PoolTableScene.cpp"
     "Source/Scene/SceneLayer.cpp"
     "Source/Scene/SceneManager.cpp"
+
+    "Source/ECS/Component.h"
+    "Source/ECS/ComponentArray.h"
+    "Source/ECS/IComponentArray.h"
+    "Source/ECS/Coordindator.cpp"
+    "Source/ECS/Coordindator.h"
+    "Source/ECS/Entity.h"
+    "Source/ECS/Entity.cpp"
+    "Source/ECS/System.h"
+    "Source/ECS/SystemManager.h"
+
     "Source/Utils/Font.cpp"
     "Source/Utils/Input.cpp"
     "Source/Utils/LoadOBJ.cpp"
     "Source/Utils/LoadTGA.cpp"
     "Source/Utils/TextureManager.cpp"
+    "Source/Utils/Singleton.h"
 )
 source_group("Source Files" FILES ${Source_Files})
 
