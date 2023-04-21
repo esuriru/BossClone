@@ -2,109 +2,53 @@
 
 #include <iostream>
 #include <string>
-#include <glad/glad.h>
-#include <glm/glm.hpp>
+#include "glad/glad.h"
 #include <map>
 #include <unordered_map>
-#include "Core/Core.h"
-
-
-enum ShaderFlag
-{
-	None = 0,
-	NORMAL_MAPPED = BIT(0), // 0 << x
-	AMBIENT_MAPPED = BIT(1), // 1 << x
-	DIFFUSE_MAPPED = BIT(2),
-	SPECULAR_MAPPED = BIT(3),
-	ENVIRONMENT_MAPPED = BIT(4),
-	MULTI_TEXTURING = BIT(5),
-};
-
-static std::string GetUniformNameFromShaderFlag(int flag)
-{
-	switch (flag)
-	{
-	case NORMAL_MAPPED:
-		return "u_normalMap";
-	case AMBIENT_MAPPED:
-		return "u_ambientMap";
-	case DIFFUSE_MAPPED:
-		return "u_diffuseMap";
-	case SPECULAR_MAPPED:
-		return "u_specularMap";
-	case ENVIRONMENT_MAPPED:
-		return "skybox";
-
-	default:
-		break;
-	}
-
-	CC_ERROR("Empty string returned from GetUniformNameFromShaderFlag\n");
-	return std::string();
-}
+#include <glm/glm.hpp>
 
 class Shader
 {
 public:
-	Shader(const char* v, const char* f);
+	Shader(std::string name, const std::string& v, const std::string& f);
+	Shader(std::string file_path); 
 	~Shader();
 
-	void Bind();
-	void Unbind();
+	auto Bind() -> void;
+	auto Unbind() -> void;
 
-	inline int GetFlags() const
-	{
-		return flags_;
-	}
+	auto SetMat4(const std::string& name, const glm::mat4& mat) -> void;
 
-	inline bool HasFlag(const ShaderFlag flag) const
-	{
-		return flags_ & flag;
-	}
+	auto SetFloat(const std::string& name, const float& val) -> void;
+	auto SetFloat2(const std::string& name, const glm::vec2& vec) -> void;
+	auto SetFloat3(const std::string& name, const glm::vec3& vec) -> void;
+	auto SetFloat4(const std::string& name, const glm::vec4& vec) -> void;
 
-	inline void AddFlag(const ShaderFlag flag)
-	{
-		flags_ = flags_ | flag;
-	}
+	auto SetInt(const std::string& name, const int& val) -> void;
+	auto SetIntArray(const std::string& name, int* values, uint32_t count) -> void;
 
-	inline void SetFlags(int flags)
-	{
-		flags_ = flags;
-	}
+    inline auto GetName() const -> const std::string&
+    {
+        return name_;
+    }
 
-	void SetMat4(const std::string& name, const glm::mat4& mat);
-
-	void SetFloat(const std::string& name, const float& val);
-	void SetFloat2(const std::string& name, const glm::vec2& vec);
-	void SetFloat3(const std::string& name, const glm::vec3& vec);
-	void SetFloat4(const std::string& name, const glm::vec4& vec);
-
-	void SetInt(const std::string& name, const int& val);
-	void SetIntArray(const std::string& name, int* values, uint32_t count);
-
-	static Shader* DefaultShader;
-	static Shader* MappedShader;
-	static Shader* MultitexturedShader;
-	static Shader* BillboardShader;
-
-	bool lit = false;
+    inline auto GetID() const -> uint32_t
+    {
+        return rendererID_; 
+    }
 
 private:
-	friend class UniformBuffer;
-	GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path);
-
-	bool loadedInLibrary_ = false;
-
-
 	uint32_t rendererID_;
+    std::string name_;
 
-	std::unordered_map<std::string, GLint> shaderLocationCache_;
-
-	std::pair<bool, GLint> TryGetLocation(const std::string& name);
+    auto ReadFile(const std::string& file_path) -> std::string;
+    auto Preprocess(const std::string& source) -> std::unordered_map<GLenum, std::string>;
+    auto Compile(std::unordered_map<GLenum, std::string> shaderSources) -> void;
+    static std::vector<std::string> s_validShaderTypes_;
 
 	friend class ShaderLibrary;
 
-	int flags_;
-
+	std::unordered_map<std::string, GLint> shaderLocationCache_;
+	std::pair<bool, GLint> TryGetLocation(const std::string& name);
 };
 

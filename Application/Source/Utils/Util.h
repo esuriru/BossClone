@@ -1,8 +1,14 @@
 #pragma once
 #include <glm/glm.hpp>
 
-namespace Util
+namespace Utility
 {
+    template<typename T1, typename T2>
+    bool Contains(T1 container, T2 val)
+    {
+        return std::find(container.begin(), container.end(), val) != container.end();
+    }
+
 	inline glm::vec3 Lerp(const glm::vec3& a, const glm::vec3& b, float t)
 	{
 		return a * (1.f - t) + b * t;
@@ -32,7 +38,7 @@ namespace Util
 
 	double constexpr sqrt(double x)
 	{
-    return x >= 0 && x < std::numeric_limits<double>::infinity()
+        return x >= 0 && x < std::numeric_limits<double>::infinity()
         ? sqrtNewtonRaphson(x, x, 0)
         : std::numeric_limits<double>::quiet_NaN();
 	}

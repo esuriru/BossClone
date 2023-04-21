@@ -1,37 +1,25 @@
 #pragma once
 #include <array>
+#include "Core/Core.h"
 #include "Shader.h"
-#include "UniformBuffer.h"
 #include "Singleton.h"
 
-#define MAX_ILLUM_MODELS 3 // TODO - Support '3' for now
-
-class ShaderLibrary : public Singleton<ShaderLibrary>
+class ShaderLibrary 
 {
 public:
 	ShaderLibrary() = default;
-	~ShaderLibrary();
-	void Add(const std::string& name, Shader* shader);
+	~ShaderLibrary() = default;
 
-	Shader* Load(const std::string& name, const char* v, const char* f);
+	auto Add(const Ref<Shader>& shader) -> void;
+	auto Add(const std::string& name, Ref<Shader> shader) -> void;
 
-	Shader* Get(const std::string& name);
+	auto Load(const std::string& name, const std::string& v, const std::string& f) -> Ref<Shader>;
+	auto Load(const std::string& file_path) -> Ref<Shader>;
 
-	UniformBuffer* RegisterUniformBuffer(const std::string& ubo_name);
-	UniformBuffer* GetUniformBuffer(const std::string& ubo_name);
-
-	static Shader* GetShaderFromIllumModel(int model);
-
+	auto Get(const std::string& name) -> Ref<Shader>;
 private:
-	void UpdateUniformBufferBindings();
+    std::unordered_map<std::string, Ref<Shader>> shaders_;
 
-	static std::array<Shader*, MAX_ILLUM_MODELS> illumModelShaders_;
-
-	bool Exists(const std::string& name) const;
-
-	std::unordered_map<std::string, Shader*> shaders_;
-	std::map<std::string, UniformBuffer*> uniformBuffers_;
-
-	friend class Application;
+    auto Exists(const std::string& name) -> bool;
 };
 

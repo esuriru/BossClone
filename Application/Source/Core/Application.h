@@ -5,7 +5,6 @@
 #include "Window.h"
 #include <memory>
 #include <Scene/Scene.h>
-#include <Scene/SceneLayer.h>
 
 #include "LayerStack.h"
 #include "Singleton.h"
@@ -14,37 +13,30 @@
 #include "Events/ApplicationEvent.h"
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
-#include "Scene/GameObject.h"
 
-class LoadingScene;
+#include "Utils/Singleton.h"
+#include "Renderer/OrthographicCamera.h"
+
+#include "Game/MainLayer.h"
+
 struct GLFWwindow;
 
-class Application : public Singleton<Application>
+class Application : public Utility::Singleton<Application>
 {
 public:
 	Application();
 	~Application();
 
-	void Init();
-	void Run();
-	void Exit();
+	auto Run() -> void;
 
-	// Use this
-	void QueueSceneLoad(const std::string& name);
+	auto OnEvent(Event& e) -> void;
 
-	void LoadScene(const std::string& name);
-
-	void OnEvent(Event& e);
-
-	inline Window& GetWindow()
+	inline auto GetWindow() -> Window&
 	{
 		return *window_;
 	}
 
-	static bool IsKeyPressed(unsigned short key);
-
-	void UpdateLoadingScene(std::string text = "");
-	void PerformRunCycle();
+	auto PerformRunCycle() -> void;
 
 #pragma region EVENTS
 
@@ -73,24 +65,21 @@ public:
 
 #pragma endregion EVENTS
 
-	int GetWindowWidth() const;
-	int GetWindowHeight() const;
+	inline auto GetWindowWidth() const -> uint32_t 
+    {
+        return window_->GetWidth();
+    }
 
-	void PushLayer(Layer* layer);
-	void PushOverlay(Layer* overlay);
+	inline auto GetWindowHeight() const -> uint32_t 
+    {
+        return window_->GetHeight();
+    }
 
-	void AttachScene(SceneLayer* scene);
-	void DetachScene(SceneLayer* scene);
+	auto PushLayer(Layer* layer) -> void;
+	auto PushOverlay(Layer* overlay) -> void;
 
-	inline Scene& GetActiveScene() const
-	{
-		return *activeScene_;
-	}
-
-	std::shared_ptr<GameObject> CreateGameObject();
-
-	bool loading;
 private:
+    OrthographicCamera camera_;
 
 	StopWatch timer_;
 	LayerStack layerStack_;
@@ -99,10 +88,7 @@ private:
 	bool minimized_;
 	bool windowCursor_;
 	
-	SceneLayer* sceneLayer_;
-	std::shared_ptr<Scene> activeScene_;
 	std::shared_ptr<Window> window_;
-	std::shared_ptr<LoadingScene> loadingScene_;
 
 };
 

@@ -66,7 +66,7 @@ void Window::Init(const WindowProps& props)
 
 		glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
 		glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
-		CC_ASSERT(versionMajor > 4 || (versionMajor == 4 && versionMinor >= 5), "Crystalline Carnival requires at least OpenGL version 3.3!");
+		CC_ASSERT(versionMajor > 4 || (versionMajor == 4 && versionMinor >= 5), "Boss Clone requires at least OpenGL version 4.5!");
 #endif
 
 	if (!window_)

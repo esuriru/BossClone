@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <bitset>
 
-class Input : public Singleton<Input>
+class Input : public Utility::Singleton<Input>
 {
 public:
 #pragma region MOUSE

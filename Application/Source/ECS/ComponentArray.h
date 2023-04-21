@@ -1,6 +1,11 @@
 #pragma once
 
+#include "Core/Core.h"
+#include <array>
+#include "Entity.h"
 #include "IComponentArray.h"
+#include <unordered_map>
+#include <cstdint>
 
 template<typename T>
 class ComponentArray : public IComponentArray
@@ -8,7 +13,7 @@ class ComponentArray : public IComponentArray
 public:
 	inline void InsertData(Entity entity, T component)
 	{
-		NR_CORE_ASSERT(entityToIndexMap_.find(entity) == entityToIndexMap_.end(), "Component added to the same entity more than once.")
+		CC_ASSERT(entityToIndexMap_.find(entity) == entityToIndexMap_.end(), "Component added to the same entity more than once.");
 
 		size_t newIndex = size_;
 		entityToIndexMap_[entity] = newIndex;
@@ -20,7 +25,7 @@ public:
 
 	inline void RemoveData(Entity entity)
 	{
-		NR_CORE_ASSERT(entityToIndexMap_.find(entity) != entityToIndexMap_.end(), "Removing non-existent component.")
+		CC_ASSERT(entityToIndexMap_.find(entity) != entityToIndexMap_.end(), "Removing non-existent component.");
 
 		// Copy the element at the end into the deleted element's place to remain density
 		size_t indexOfRemovedEntity = entityToIndexMap_[entity];
@@ -40,7 +45,7 @@ public:
 
 	inline T& GetData(Entity entity)
 	{
-		NR_CORE_ASSERT(entityToIndexMap_.find(entity) != entityToIndexMap_.end(), "Retrieving a component that does not exist.")
+		CC_ASSERT(entityToIndexMap_.find(entity) != entityToIndexMap_.end(), "Retrieving a component that does not exist.");
 
 		return componentArray_[entityToIndexMap_[entity]];
 	}

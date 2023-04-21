@@ -19,7 +19,7 @@ struct WindowProps
 	/// <param name="width">: Window width</param>
 	/// <param name="height">: Window height</param>
 	WindowProps(
-		std::string title = "Crystalline Carnival",
+		std::string title = "Boss Clone",
 		unsigned int width = 1280,
 		unsigned int height = 720
 		)

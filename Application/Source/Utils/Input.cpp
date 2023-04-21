@@ -6,10 +6,8 @@
 
 glm::vec2 Input::GetMouseOffset()
 {
-	//static glm::vec2 lastMouseCoords{};
-	if (Application::GetInstance()->GetWindow().IsCursorEnabled())
+	if (Application::Instance()->GetWindow().IsCursorEnabled())
 	{
-		CC_TRACE("Cursor is enabled.");
 		return { 0, 0 };
 	}
 

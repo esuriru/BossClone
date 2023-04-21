@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-#include "Core/Layer.h"
-#include "GameObject.h"
+#include "ECS/Entity.h"
 
 class Camera;
 
@@ -16,23 +15,8 @@ public:
 	virtual void Render() = 0;
 	virtual void Exit() = 0;
 
-	inline virtual std::shared_ptr<GameObject> CreateGameObject()
-	{
-		std::shared_ptr<GameObject> temp = std::make_shared<GameObject>();
-		objects_.push_back(temp);
-		return temp;
-	}
-
-	// For loading
-	int applicationRefreshes_;
-
 protected:
-	Camera* sceneCamera_;
-	std::vector<std::shared_ptr<GameObject>> objects_;
-	friend class Application;
-
-	bool isChangingScene_ = false;
-	std::string sceneNameToChangeTo_;
+    std::vector<Entity> entities_;
 
 };
 

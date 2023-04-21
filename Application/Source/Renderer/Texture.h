@@ -1,47 +1,61 @@
 #pragma once
-#include <cstdint>
-#include <vector>
+
 #include <string>
 #include <glad/glad.h>
+#include "Core/Core.h"
+#include <cstdint>
+#include <glm/glm.hpp>
 
-/// <summary>
-/// All textures are bound to 0.
-/// </summary>
 class Texture
 {
 public:
-	Texture(const char* tga_file_path, bool tga_file = true);
-	virtual ~Texture();
+    virtual ~Texture() = default;
+    virtual auto GetWidth() const -> uint32_t = 0;
+    virtual auto GetHeight() const -> uint32_t = 0;
+    
+    virtual void SetData(void* data, uint32_t size) = 0;
 
-	void Release();
-	
-	Texture(const Texture &) = delete;
-	Texture &operator=(const Texture &) = delete;
+    inline virtual auto GetSize() -> glm::vec2
+    {
+        return { GetWidth(), GetHeight() };
+    }
 
-	Texture(Texture&& other);
-	Texture& operator=(Texture&& other);
+    virtual auto Bind(uint32_t slot = 0) const -> void = 0;
 
-	void Bind(uint32_t slot = 0);
-	void Unbind();
-
-	static Texture* LoadTGATexture(const char* tga_file_path);
-	static Texture* LoadTexture(const char* file_path_for_stb, bool managed = true);
-	static Texture* LoadCubemap(const std::vector<std::string>& file_paths);
-
-	inline std::string GetPath()
-	{
-		return path_;
-	}
-
-private:
-	friend class Font;
-	Texture() = default;
-	std::string path_;
-	uint32_t id_;
-
-	uint32_t width_;
-	uint32_t height_;
-	
-	GLenum internalFormat_, dataFormat_;
+    virtual auto operator==(const Texture& other) const -> bool = 0;
 };
 
+class Texture2D : public Texture
+{
+public:
+    Texture2D(const std::string& path);
+    Texture2D(uint32_t width, uint32_t height);
+    ~Texture2D();
+
+    auto SetData(void* data, uint32_t size) -> void;
+
+    inline virtual auto GetWidth() const -> uint32_t override
+    {
+        return width_;
+    }
+
+    inline virtual auto GetHeight() const -> uint32_t override
+    {
+        return height_;
+    }
+
+    virtual auto Bind(uint32_t slot = 0) const -> void override;
+
+    inline virtual auto operator==(const Texture& other) const -> bool override
+    {
+        // NOTE - for debugging only?
+        return rendererID_ == dynamic_cast<const Texture2D&>(other).rendererID_;
+    }
+
+private:
+    std::string path_;
+    uint32_t rendererID_;
+
+    uint32_t width_, height_;
+    GLenum internalFormat_, dataFormat_;
+};

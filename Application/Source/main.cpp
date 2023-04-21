@@ -3,9 +3,7 @@
 
 int main()
 {
-	Application* app = Application::GetInstance();
-	app->Init();
+	Application* app = Application::Instance();
 	app->Run();
-	app->Exit();
 	app->Destroy();
 }

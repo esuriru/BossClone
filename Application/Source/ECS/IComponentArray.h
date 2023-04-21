@@ -1,12 +1,9 @@
 #pragma once
 #include "Entity.h"
 
-namespace Nare
+class IComponentArray
 {
-	class IComponentArray
-	{
-	public:
-		virtual ~IComponentArray() = default;
-		virtual void EntityDestroyed(Entity entity) = 0;
-	};
-}
+public:
+    virtual ~IComponentArray() = default;
+    virtual void EntityDestroyed(Entity entity) = 0;
+};

@@ -10,13 +10,13 @@ class EventDispatcher
 public:
 	EventDispatcher(Event& event) : event_(event) {}
 
-	template<typename T>
-	bool Dispatch(EventHandler<T> callback)
+	template<typename T, typename F>
+	bool Dispatch(const F& func)
 	{
 		if (event_.GetEventType() == T::GetStaticType())
 		{
 			// Use the handler argument to handle the event.
-			event_.Handled = callback(*(T*)&event_);
+			event_.Handled = func(static_cast<T&>(event_));
 			return true;
 		}
 		return false;

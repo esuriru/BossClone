@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include "Scene/GameObject.h"
 
 #include "Timestep.h"
 

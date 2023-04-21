@@ -1,25 +1,22 @@
 #include "Coordinator.h"
 
-namespace Nare
+void Coordinator::Init()
 {
-	void Coordinator::Init()
-	{
-		componentManager_ = std::make_unique<ComponentManager>();
-		entityManager_ = std::make_unique<EntityManager>();
-		systemManager_ = std::make_unique<SystemManager>();
-	}
+    componentManager_ = std::make_unique<ComponentManager>();
+    entityManager_ = std::make_unique<EntityManager>();
+    systemManager_ = std::make_unique<SystemManager>();
+}
 
-	Entity Coordinator::CreateEntity()
-	{
-		return entityManager_->CreateEntity();
-	}
+Entity Coordinator::CreateEntity()
+{
+    return entityManager_->CreateEntity();
+}
 
-	void Coordinator::DestroyEntity(Entity entity)
-	{
-		entityManager_->DestroyEntity(entity);
+void Coordinator::DestroyEntity(Entity entity)
+{
+    entityManager_->DestroyEntity(entity);
 
-		componentManager_->EntityDestroyed(entity);
+    componentManager_->EntityDestroyed(entity);
 
-		systemManager_->EntityDestroyed(entity);
-	}
+    systemManager_->EntityDestroyed(entity);
 }
