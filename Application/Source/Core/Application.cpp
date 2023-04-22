@@ -3,6 +3,8 @@
 //#define _CRTDBG_MAP_ALLOC
 //#include <stdlib.h>
 //#include <crtdbg.h>
+#include "ECS/Component.h"
+#include "ECS/Coordinator.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/Renderer2D.h"
 
@@ -12,7 +14,6 @@
 #include "Timestep.h"
 #include "Layer.h"
 #include "Events/EventDispatcher.h"
-#include "Scene/SceneLayer.h"
 #include "Scene/Scene.h"
 
 #include <glad/glad.h>
@@ -78,6 +79,7 @@ auto Application::OnWindowResize(WindowResizeEvent& e) -> bool
 	minimized_ = false;
 
 	// Maybe this needs to be in the renderer?
+    RenderCommand::SetViewport(0, 0, e.GetWidth(), e.GetHeight());
 #if 0
 	static SceneRenderer* sr = SceneRenderer::Instance();
 	sr->OnWindowResize(e.GetWidth(), e.GetHeight());
@@ -147,11 +149,13 @@ auto Application::OnKeyRelease(KeyReleasedEvent& e) -> bool
 auto Application::PushLayer(Layer* layer) -> void
 {
 	layerStack_.PushLayer(layer);
+    layer->OnAttach();
 }
 
 auto Application::PushOverlay(Layer* overlay) -> void
 {
 	layerStack_.PushOverlay(overlay);
+    overlay->OnAttach();
 }
 
 Application::Application()
@@ -182,6 +186,9 @@ Application::~Application()
 {
 	//Finalize and clean up GLFW
 	glfwTerminate();
+
+    Input::Destroy();
+    Coordinator::Destroy();
 }
 
 auto Application::Run() -> void

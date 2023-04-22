@@ -2,11 +2,31 @@
 #include "Renderer/RenderCommand.h"
 #include "Renderer/Renderer2D.h"
 
+#include "ECS/Coordinator.h"
+#include "ECS/Component.h"
+
 MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
+
+    // Register components
+    static Coordinator* coordinator = Coordinator::Instance();
+
+    coordinator->Init();
+
+    coordinator->RegisterComponent<TransformComponent>();
+    coordinator->RegisterComponent<TagComponent>();
+
+    spriteRenderSystem = coordinator->RegisterSystem<SpriteRenderSystem>();
+
+    Signature spriteRenderSystemSignature;
+    spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    coordinator->SetSystemSignature<SpriteRenderSystem>(spriteRenderSystemSignature);
+
+
 }
 
 auto MainLayer::OnAttach() -> void 

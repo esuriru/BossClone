@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+
+#include "ECS/Component.h"
 #include "Texture.h"
 #include "SubTexture2D.h"
 #include "OrthographicCamera.h"
@@ -20,13 +22,18 @@ public:
 #pragma region QUAD
     // Flat colours
     static auto DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const glm::vec4 &colour) -> void;
+    static auto DrawQuad(const glm::mat4 &transform, const glm::vec4& colour) -> void;
     static auto DrawRotatedQuad(const glm::vec3 &pos, const glm::vec2 &size, float rotation, const glm::vec4 &colour) -> void;
 
     // Textures
     static auto DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor = 1.0f) -> void;
     static auto DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<SubTexture2D> &subtexture, float tilingFactor = 1.0f) -> void;
+    static auto DrawQuad(const glm::mat4 &model, const Ref<Texture2D>& texture, float tilingFactor = 1.0f, const glm::vec4& tintColour = glm::vec4(1.0f)) -> void;
     static auto DrawRotatedQuad(const glm::vec3 &pos, const glm::vec2 &size, float rotation, const Ref<Texture2D> &texture, float tilingFactor = 1.0f) -> void;
     static auto DrawRotatedQuad(const glm::vec3 &pos, const glm::vec2 &size, float rotation, const Ref<SubTexture2D> &subtexture, float tilingFactor = 1.0f) -> void;
+
+    static auto DrawSprite(const glm::mat4& model, SpriteRendererComponent& spriteComponent) -> void;
+
 #pragma endregion QUAD
 
     struct Stats

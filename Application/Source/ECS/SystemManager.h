@@ -3,6 +3,7 @@
 #include "System.h"
 #include <memory>
 #include <unordered_map>
+#include "Core/Core.h"
 class SystemManager
 {
 public:
@@ -11,7 +12,7 @@ public:
     {
         const char* typeName = typeid(T).name();
 
-        NR_CORE_ASSERT(systems_.find(typeName) == systems_.end(), "Registering system more than once.");
+        CC_ASSERT(systems_.find(typeName) == systems_.end(), "Registering system more than once.");
 
         auto system = std::make_shared<T>();
         systems_.insert({ typeName, system });
@@ -23,7 +24,7 @@ public:
     {
         const char* typeName = typeid(T).name();
 
-        NR_CORE_ASSERT(systems_.find(typeName) != systems_.end(), "System used before registered.");
+        CC_ASSERT(systems_.find(typeName) != systems_.end(), "System used before registered.");
 
         signatures_.insert({ typeName, signature });
     }
@@ -34,7 +35,7 @@ public:
         {
             const auto& system = pair.second;
 
-            system->Entities.erase(entity);
+            system->entities.erase(entity);
         }
     }
 
@@ -49,9 +50,9 @@ public:
             // If the signatures match, insert
             if ((entitySignature & systemSignature) == systemSignature)
             {
-                system->Entities.insert(entity);
+                system->entities.insert(entity);
             }
-            system->Entities.erase(entity);
+            system->entities.erase(entity);
         }
     }
 

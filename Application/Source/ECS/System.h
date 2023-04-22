@@ -6,7 +6,7 @@
 class System
 {
 public:
-	std::set<Entity> Entities;
+	std::set<Entity> entities;
 
 
 };

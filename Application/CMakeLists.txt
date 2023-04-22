@@ -35,8 +35,18 @@ set(Header_Files
     "Source/Game/OrthographicCameraController.h"
 
     "Source/Scene/Scene.h"
-    "Source/Scene/SceneLayer.h"
     "Source/Scene/SceneManager.h"
+
+    "Source/ECS/System.h"
+    "Source/ECS/SystemManager.h"
+    "Source/ECS/Coordinator.h"
+    "Source/ECS/Entity.h"
+    "Source/ECS/Component.h"
+    "Source/ECS/ComponentArray.h"
+    "Source/ECS/IComponentArray.h"
+
+    "Source/ECS/Systems/RenderSystem.h"
+
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
@@ -65,21 +75,16 @@ set(Source_Files
     "Source/Renderer/SubTexture2D.cpp"
     "Source/Renderer/OrthographicCamera.cpp"
 
-    "Source/Scene/SceneLayer.cpp"
     "Source/Scene/SceneManager.cpp"
+    "Source/Scene/Scene.cpp"
 
     "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
 
-    "Source/ECS/Component.h"
-    "Source/ECS/ComponentArray.h"
-    "Source/ECS/IComponentArray.h"
     "Source/ECS/Coordinator.cpp"
-    "Source/ECS/Coordinator.h"
-    "Source/ECS/Entity.h"
     "Source/ECS/Entity.cpp"
-    "Source/ECS/System.h"
-    "Source/ECS/SystemManager.h"
+
+    "Source/ECS/Systems/RenderSystem.cpp"
 
     "Source/Utils/Input.cpp"
 )
