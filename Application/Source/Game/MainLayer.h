@@ -4,6 +4,7 @@
 #include "ECS/Systems/RenderSystem.h"
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
+#include "Tilemap.h"
 
 class MainLayer : public Layer
 {
@@ -22,5 +23,11 @@ private:
 
     Ref<Texture2D> nareLogoTexture_;
     Ref<Scene> activeScene_;
-    Ref<SpriteRenderSystem> spriteRenderSystem;
+    
+    // Systems
+    Ref<SpriteRenderSystem> spriteRenderSystem_;
+    Ref<TileRenderSystem> tileRenderSystem_;
+
+    // Tilemaps
+    Ref<Tilemap> testTilemap_;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <bitset>
 #include "ComponentManager.h"
 #include "SystemManager.h"
 #include "Entity.h"
@@ -28,7 +29,7 @@ public:
         componentManager_->AddComponent<T>(entity, component);
 
         auto signature = entityManager_->GetSignature(entity);
-        signature.set(componentManager_->GetComponentType<T>, false);
+        signature.set(componentManager_->GetComponentType<T>(), true);
         entityManager_->SetSignature(entity, signature);
 
         systemManager_->EntitySignatureChanged(entity, signature);

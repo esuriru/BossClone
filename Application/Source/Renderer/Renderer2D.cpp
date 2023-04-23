@@ -325,6 +325,11 @@ auto Renderer2D::DrawQuad(const glm::mat4 &transform, const glm::vec4 &colour) -
     ++s_data.stats.QuadCount;
 }
 
+auto Renderer2D::DrawQuad(const glm::mat4 &model, const Ref<SubTexture2D>& texture, float tilingFactor, const glm::vec4& tintColour) -> void
+{
+    DrawQuad(model, texture->GetTexture(), tilingFactor, tintColour);
+}
+
 auto Renderer2D::DrawRotatedQuad(const glm::vec3 &pos, const glm::vec2 &size, float rotationDegrees, const glm::vec4 &colour) -> void
 {
     constexpr size_t quadVertexCount = 4;

@@ -52,7 +52,8 @@ public:
             {
                 system->entities.insert(entity);
             }
-            system->entities.erase(entity);
+            else
+                system->entities.erase(entity);
         }
     }
 

@@ -33,6 +33,8 @@ set(Header_Files
 
     "Source/Game/MainLayer.h"
     "Source/Game/OrthographicCameraController.h"
+    "Source/Game/Tilemap.h"
+    "Source/Game/GameManager.h"
 
     "Source/Scene/Scene.h"
     "Source/Scene/SceneManager.h"
@@ -46,7 +48,6 @@ set(Header_Files
     "Source/ECS/IComponentArray.h"
 
     "Source/ECS/Systems/RenderSystem.h"
-
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
@@ -80,6 +81,8 @@ set(Source_Files
 
     "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
+    "Source/Game/Tilemap.cpp"
+    "Source/Game/GameManager.cpp"
 
     "Source/ECS/Coordinator.cpp"
     "Source/ECS/Entity.cpp"
@@ -128,6 +131,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     )
 elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     target_include_directories(${PROJECT_NAME} PUBLIC
+        "${CMAKE_SOURCE_DIR}/vendor/rapidcsv;"
         "${CMAKE_SOURCE_DIR}/vendor/glad/include;"
         "${CMAKE_SOURCE_DIR}/Application/Source;"
         "${CMAKE_SOURCE_DIR}/vendor/glm;"

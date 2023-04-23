@@ -9,3 +9,10 @@ public:
 
 private:
 };
+
+class TileRenderSystem : public System
+{
+public:
+    auto Update(Timestep ts) -> void;
+
+};

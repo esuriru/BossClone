@@ -17,16 +17,35 @@ MainLayer::MainLayer()
     coordinator->Init();
 
     coordinator->RegisterComponent<TransformComponent>();
+    coordinator->RegisterComponent<SpriteRendererComponent>();
+    coordinator->RegisterComponent<TileRendererComponent>();
     coordinator->RegisterComponent<TagComponent>();
 
-    spriteRenderSystem = coordinator->RegisterSystem<SpriteRenderSystem>();
+    spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
+    tileRenderSystem_ = coordinator->RegisterSystem<TileRenderSystem>();
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
-    spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    spriteRenderSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
     coordinator->SetSystemSignature<SpriteRenderSystem>(spriteRenderSystemSignature);
 
+    Signature tileRenderSystemSignature;
+    tileRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    tileRenderSystemSignature.set(coordinator->GetComponentType<TileRendererComponent>());
+    coordinator->SetSystemSignature<TileRenderSystem>(tileRenderSystemSignature);
 
+    // for (int i = 0; i < 5; ++i)
+    // {
+    //     auto entity = coordinator->CreateEntity();  
+    //     coordinator->AddComponent(entity, TransformComponent {
+    //         glm::vec3(30.f + 10.f * i, 0, 0),
+    //     });
+
+    //     coordinator->AddComponent(entity, SpriteRendererComponent());
+    // }
+
+    testTilemap_ = CreateRef<Tilemap>();
+    testTilemap_->GenerateEntities();
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -45,9 +64,10 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
-    Renderer2D::DrawQuad({0, 0, 0}, {20, 20}, { 0.8f, 0.2f, 0.2f, 1.0f });
-    Renderer2D::DrawQuad({0, 20, 0}, {10, 10}, nareLogoTexture_);
+    // Renderer2D::DrawQuad({0, 0, 0}, {20, 20}, { 0.8f, 0.2f, 0.2f, 1.0f });
+    // Renderer2D::DrawQuad({0, 20, 0}, {10, 10}, nareLogoTexture_);
 
+    spriteRenderSystem_->Update(ts);
     Renderer2D::EndScene();
 }
 
