@@ -10,34 +10,31 @@
 #include "rapidcsv.h"
 
 #include "ECS/Entity.h"
+#include "glm/glm.hpp"
 
-struct TilemapData
+namespace TilemapData
 {
     constexpr static uint32_t TILEMAP_MAX_X_LENGTH = 128;
     constexpr static uint32_t TILEMAP_MAX_Y_LENGTH = 72;
 };
 
-// NOTE - An instance of a Tilemap is like a chunk that will be shown to the screen.
-class Tilemap
+// NOTE - An instance of a TilemapComponent is like a chunk that will be shown to the screen.
+struct TilemapComponent
 {
-public:
-    Tilemap() : tilemapEntities_(TilemapData::TILEMAP_MAX_X_LENGTH * TilemapData::TILEMAP_MAX_Y_LENGTH), isFirstInit_(true) {}
-    Tilemap(const std::string& csv_file_path);
-
-    auto SetSubTexture(uint8_t tileID, const Ref<SubTexture2D>& texture, bool generateEntities = false) -> void;
-    auto ImportTilemapCSV(const std::string& csv_file_path) -> void;
-
-    auto GenerateEntities() -> void;
-
-private:
     // The map of textures
-    std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_ {};
+    std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> SubTextureMap {};
 
     // The map represented in a 2D array.
-    std::array<std::array<uint8_t, TilemapData::TILEMAP_MAX_X_LENGTH>, TilemapData::TILEMAP_MAX_Y_LENGTH> mapData_{};
-    std::vector<Entity> tilemapEntities_ {};
+    std::array<std::array<uint8_t, TilemapData::TILEMAP_MAX_X_LENGTH>, TilemapData::TILEMAP_MAX_Y_LENGTH> MapData{};
 
-    bool isFirstInit_;
+    glm::vec4 Colour = glm::vec4(1.0f);
+    glm::vec2 TileSize = glm::vec2(1.0f);
+    float TilingFactor = 1.0f;
+    bool Collidable = true;
 
+    TilemapComponent() = default;
+    TilemapComponent(const std::string& csv_file_path);
+
+    auto ImportTilemapCSV(const std::string& csv_file_path) -> void;
 
 };

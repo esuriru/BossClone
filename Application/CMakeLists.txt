@@ -52,6 +52,8 @@ set(Header_Files
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
     "Source/Utils/Singleton.h"
+
+    "Source/Physics/PhysicsSystem.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -90,6 +92,8 @@ set(Source_Files
     "Source/ECS/Systems/RenderSystem.cpp"
 
     "Source/Utils/Input.cpp"
+
+    "Source/Physics/PhysicsSystem.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

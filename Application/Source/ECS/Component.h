@@ -19,6 +19,19 @@ struct TransformComponent
 	TransformComponent() = default;
 	TransformComponent(const glm::vec3& pos)
 		: Position(pos) {};
+    
+    TransformComponent(const glm::vec3& pos, const glm::vec3& rot)
+        : Position(pos), Rotation(rot) {}
+
+    TransformComponent(const glm::vec3& pos, const glm::vec3& rot, const glm::vec3& scl)
+        : Position(pos), Rotation(rot), Scale(scl) {}
+
+    glm::mat4 GetTransformMatrix() const
+    {
+        return glm::translate(glm::mat4(1.0f), Position)
+            * glm::mat4_cast(glm::quat(Rotation))
+            * glm::scale(glm::mat4(1.0f), Scale);
+    }
 };
 
 struct TagComponent

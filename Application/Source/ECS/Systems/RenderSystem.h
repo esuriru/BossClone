@@ -10,7 +10,7 @@ public:
 private:
 };
 
-class TileRenderSystem : public System
+class TilemapRenderSystem : public System
 {
 public:
     auto Update(Timestep ts) -> void;

@@ -168,10 +168,8 @@ auto Renderer2D::StartBatch() -> void
     s_data.TextureSlotIndex = 1;
 }
 
-auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<SubTexture2D> &subtexture, float tilingFactor) -> void
+auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<SubTexture2D> &subtexture, float tilingFactor, const glm::vec4& tintColour) -> void
 {
-    // TODO - make this a static colour, or even make a helper class that stores a glm::vec4.
-    constexpr glm::vec4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
     constexpr size_t quadVertexCount = 4;
     const glm::vec2* texCoords = subtexture->GetTexCoords();
     const Ref<Texture2D> texture = subtexture->GetTexture();
@@ -201,7 +199,7 @@ auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref
     for (size_t i = 0; i < quadVertexCount; ++i)
     {
         s_data.QuadVertexBufferPtr->position = model * s_data.QuadVertexPositions[i];
-        s_data.QuadVertexBufferPtr->colour = white;
+        s_data.QuadVertexBufferPtr->colour = tintColour;
         s_data.QuadVertexBufferPtr->texCoord = texCoords[i];
         s_data.QuadVertexBufferPtr->texIndex = textureIndex;
         s_data.QuadVertexBufferPtr->tilingFactor = tilingFactor;
@@ -509,10 +507,9 @@ auto Renderer2D::DrawTile(const glm::mat4 &model, TileRendererComponent &tileCom
         DrawQuad(model, tileComponent.Colour);
 }
 
-auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor) -> void
+auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4& tintColour) -> void
 {
     // TODO - make this a static colour, or even make a helper class that stores a glm::vec4.
-    constexpr glm::vec4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
     constexpr size_t quadVertexCount = 4;
     constexpr std::array<glm::vec2, 4> texCoords {
         {
@@ -550,7 +547,7 @@ auto Renderer2D::DrawQuad(const glm::vec3 &pos, const glm::vec2 &size, const Ref
     for (size_t i = 0; i < quadVertexCount; ++i)
     {
         s_data.QuadVertexBufferPtr->position = model * s_data.QuadVertexPositions[i];
-        s_data.QuadVertexBufferPtr->colour = white;
+        s_data.QuadVertexBufferPtr->colour = tintColour;
         s_data.QuadVertexBufferPtr->texCoord = texCoords[i];
         s_data.QuadVertexBufferPtr->texIndex = textureIndex;
         s_data.QuadVertexBufferPtr->tilingFactor = tilingFactor;

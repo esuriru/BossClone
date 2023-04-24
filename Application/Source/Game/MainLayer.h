@@ -29,8 +29,8 @@ private:
     
     // Systems
     Ref<SpriteRenderSystem> spriteRenderSystem_;
-    Ref<TileRenderSystem> tileRenderSystem_;
+    Ref<TilemapRenderSystem> tilemapRenderSystem_;
 
     // Tilemaps
-    Ref<Tilemap> testTilemap_;
+    Ref<TilemapComponent> testTilemap_;
 };
