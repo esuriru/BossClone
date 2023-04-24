@@ -2,6 +2,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
+#define CC_TILEMAP_FLIP
+
 Tilemap::Tilemap(const std::string &csv_file_path)
     : tilemapEntities_(TilemapData::TILEMAP_MAX_X_LENGTH * TilemapData::TILEMAP_MAX_Y_LENGTH)
     , isFirstInit_(true)
@@ -21,20 +23,20 @@ auto Tilemap::ImportTilemapCSV(const std::string &csv_file_path) -> void
 {
     rapidcsv::Document tilemapDoc(csv_file_path);
 
-    if ((TilemapData::TILEMAP_MAX_Y_LENGTH) != static_cast<unsigned int>(tilemapDoc.GetColumnCount()) || 
-        (TilemapData::TILEMAP_MAX_X_LENGTH) != static_cast<unsigned int>(tilemapDoc.GetRowCount()))
+    if ((TilemapData::TILEMAP_MAX_X_LENGTH) != static_cast<unsigned int>(tilemapDoc.GetColumnCount()) || 
+        (TilemapData::TILEMAP_MAX_Y_LENGTH) != static_cast<unsigned int>(tilemapDoc.GetRowCount()))
     {
-        CC_ERROR("Could not load Tilemap with file path ", csv_file_path, ". Not abiding by tilemap standards");
+        CC_ERROR("Could not load Tilemap with file path ", csv_file_path, ". Not abiding by tilemap standards. CSV has ", tilemapDoc.GetColumnCount(), " columns and ", tilemapDoc.GetRowCount(), " rows.");
         return;
     }
 
     for (int i = 0; i < TilemapData::TILEMAP_MAX_Y_LENGTH; ++i)
     {
-        std::vector<uint8_t> row = tilemapDoc.GetRow<uint8_t>(i);
+        std::vector<int> row = tilemapDoc.GetRow<int>(i);
 
         for (int j = 0; j < TilemapData::TILEMAP_MAX_X_LENGTH; ++j)
         {
-            mapData_[i][j] = row[j];
+            mapData_[i][j] = static_cast<uint8_t>(row[j]);
         }
     }
 }
@@ -65,7 +67,11 @@ auto Tilemap::GenerateEntities() -> void
             coordinator->AddComponent(
                 entity,
                 TransformComponent {
-                    glm::vec3(i, j, 0)
+#ifdef CC_TILEMAP_FLIP
+                    glm::vec3(j, TilemapData::TILEMAP_MAX_Y_LENGTH - i, 0)
+#else
+                    glm::vec3(j, i, 0)
+#endif
                 });
 
             coordinator->AddComponent(

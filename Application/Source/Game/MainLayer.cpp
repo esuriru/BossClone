@@ -10,6 +10,7 @@ MainLayer::MainLayer()
     , cameraController_(1280.0f/ 720.0f)
 {
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
+    terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
 
     // Register components
     static Coordinator* coordinator = Coordinator::Instance();
@@ -44,8 +45,26 @@ MainLayer::MainLayer()
     //     coordinator->AddComponent(entity, SpriteRendererComponent());
     // }
 
+    auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), glm::vec2(16, 16));
+    auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), glm::vec2(16, 16));
+    auto grassTileTopRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), glm::vec2(16, 16));
+    auto grassTileMiddleLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), glm::vec2(16, 16));
+    auto grassTileMiddleMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), glm::vec2(16, 16));
+    auto grassTileMiddleRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), glm::vec2(16, 16));
+
     testTilemap_ = CreateRef<Tilemap>();
+    testTilemap_->ImportTilemapCSV("Assets/Maps/TestMap.csv");
+
+    // Grass/dirt tiles
+    testTilemap_->SetSubTexture(1, grassTileTopLeft);
+    testTilemap_->SetSubTexture(2, grassTileTopMiddle);
+    testTilemap_->SetSubTexture(3, grassTileTopRight);
+    testTilemap_->SetSubTexture(4, grassTileMiddleLeft);
+    testTilemap_->SetSubTexture(5, grassTileMiddleMiddle);
+    testTilemap_->SetSubTexture(6, grassTileMiddleRight);
+
     testTilemap_->GenerateEntities();
+
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -64,10 +83,9 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
-    // Renderer2D::DrawQuad({0, 0, 0}, {20, 20}, { 0.8f, 0.2f, 0.2f, 1.0f });
-    // Renderer2D::DrawQuad({0, 20, 0}, {10, 10}, nareLogoTexture_);
 
     spriteRenderSystem_->Update(ts);
+    tileRenderSystem_->Update(ts);
     Renderer2D::EndScene();
 }
 

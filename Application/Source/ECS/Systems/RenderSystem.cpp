@@ -35,9 +35,7 @@ auto TileRenderSystem::Update(Timestep ts) -> void
                                     * glm::mat4_cast(glm::quat(transform.Rotation))
                                     * glm::scale(glm::mat4(1.0f), transform.Scale);
 
-        if (tile.Texture)
-            Renderer2D::DrawQuad(transformMatrix, tile.Texture, tile.TilingFactor, tile.Colour);
-        else
-            Renderer2D::DrawQuad(transformMatrix, tile.Colour);
+        
+        Renderer2D::DrawTile(transformMatrix, tile);
     }
 }

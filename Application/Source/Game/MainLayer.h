@@ -23,6 +23,9 @@ private:
 
     Ref<Texture2D> nareLogoTexture_;
     Ref<Scene> activeScene_;
+
+    // Spritesheet
+    Ref<Texture2D> terrainSpritesheet_;
     
     // Systems
     Ref<SpriteRenderSystem> spriteRenderSystem_;
