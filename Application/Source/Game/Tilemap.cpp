@@ -47,8 +47,7 @@ auto Tilemap::GenerateEntities() -> void
     if (isFirstInit_)
         isFirstInit_ = false;
     else
-    {
-        // Destory the existing entities.
+    {        // Destory the existing entities.
         for (auto& e : tilemapEntities_)
         {
             coordinator->DestroyEntity(e);

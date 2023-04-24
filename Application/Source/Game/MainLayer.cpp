@@ -35,15 +35,17 @@ MainLayer::MainLayer()
     tileRenderSystemSignature.set(coordinator->GetComponentType<TileRendererComponent>());
     coordinator->SetSystemSignature<TileRenderSystem>(tileRenderSystemSignature);
 
-    // for (int i = 0; i < 5; ++i)
-    // {
-    //     auto entity = coordinator->CreateEntity();  
-    //     coordinator->AddComponent(entity, TransformComponent {
-    //         glm::vec3(30.f + 10.f * i, 0, 0),
-    //     });
+    for (int i = 0; i < 5; ++i)
+    {
+        auto entity = coordinator->CreateEntity();  
+        coordinator->AddComponent(entity, TransformComponent {
+            glm::vec3(10.f + 1.f * i, 0, 0),
+        });
 
-    //     coordinator->AddComponent(entity, SpriteRendererComponent());
-    // }
+        coordinator->AddComponent(entity, SpriteRendererComponent{
+            glm::vec4(0.8f, 0.f, 0.f, 1.0f)
+        });
+    }
 
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), glm::vec2(16, 16));
     auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), glm::vec2(16, 16));
