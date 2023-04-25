@@ -6,6 +6,8 @@
 #include "Renderer/Texture.h"
 #include "Tilemap.h"
 
+#include "Physics/PhysicsSystem.h"
+
 class MainLayer : public Layer
 {
 public:
@@ -30,6 +32,7 @@ private:
     // Systems
     Ref<SpriteRenderSystem> spriteRenderSystem_;
     Ref<TilemapRenderSystem> tilemapRenderSystem_;
+    Ref<PhysicsSystem> physicsSystem_;
 
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;

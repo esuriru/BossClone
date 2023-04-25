@@ -5,6 +5,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
+#include "Physics/PhysicsComponent.h"
+
 #include "Utils/Input.h"
 
 MainLayer::MainLayer()
@@ -24,9 +26,12 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<TileRendererComponent>();
     coordinator->RegisterComponent<TagComponent>();
     coordinator->RegisterComponent<TilemapComponent>();
+    coordinator->RegisterComponent<RigidBody2DComponent>();
+    coordinator->RegisterComponent<PlayerController2DComponent>();
 
     spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
+    physicsSystem_ = coordinator->RegisterSystem<PhysicsSystem>();
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -38,17 +43,10 @@ MainLayer::MainLayer()
     tileRenderSystemSignature.set(coordinator->GetComponentType<TilemapComponent>());
     coordinator->SetSystemSignature<TilemapRenderSystem>(tileRenderSystemSignature);
 
-    // for (int i = 0; i < 5; ++i)
-    // {
-    //     auto entity = coordinator->CreateEntity();  
-    //     coordinator->AddComponent(entity, TransformComponent {
-    //         glm::vec3(10.f + 1.f * i, 0, 0),
-    //     });
-
-    //     coordinator->AddComponent(entity, SpriteRendererComponent{
-    //         glm::vec4(0.8f, 0.f, 0.f, 1.0f)
-    //     });
-    // }
+    Signature physicsSystemSignature;
+    physicsSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    physicsSystemSignature.set(coordinator->GetComponentType<RigidBody2DComponent>());
+    coordinator->SetSystemSignature<PhysicsSystem>(physicsSystemSignature);
 
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), glm::vec2(16, 16));
     auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), glm::vec2(16, 16));
@@ -78,6 +76,17 @@ MainLayer::MainLayer()
     tilemapComponent.SubTextureMap[9] = grassTileBottomRight;
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
+
+    auto playerEntity = coordinator->CreateEntity();
+
+    coordinator->AddComponent(playerEntity, TransformComponent{
+
+    });
+
+    coordinator->AddComponent(playerEntity, RigidBody2DComponent());
+
+    coordinator->AddComponent(playerEntity, SpriteRendererComponent());
+    coordinator->AddComponent(playerEntity, PlayerController2DComponent());
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -93,6 +102,7 @@ auto MainLayer::OnDetach() -> void
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
     cameraController_.OnUpdate(ts);
+    physicsSystem_->Update(ts);
 
     RenderCommand::SetClearColour(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
     RenderCommand::Clear();

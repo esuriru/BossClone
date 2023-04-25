@@ -6,6 +6,7 @@
 #include "Entity.h"
 #include "Utils/Singleton.h"
 #include <memory>
+#include <vector>
 
 class Coordinator : public Utility::Singleton<Coordinator>
 {
@@ -70,6 +71,13 @@ public:
     {
         systemManager_->SetSignature<T>(signature);
     }
+
+    template<typename T>
+    inline auto View() -> std::vector<Entity>
+    {
+        return componentManager_->View<T>();
+    }
+
 #pragma endregion TEMPLATE_FUNCTIONS
 private:
     std::unique_ptr<EntityManager> entityManager_;

@@ -78,6 +78,7 @@
         "xutility": "cpp",
         "codecvt": "cpp",
         "cwctype": "cpp",
-        "numbers": "cpp"
+        "numbers": "cpp",
+        "*.tcc": "cpp"
     }
 }

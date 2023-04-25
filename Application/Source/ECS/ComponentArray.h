@@ -58,6 +58,16 @@ public:
 		}
 	}
 
+    inline auto GetEntities() -> std::vector<Entity>
+    {
+        std::vector<Entity> entities(entityToIndexMap_.size());
+        for (const auto& kv_pair : entityToIndexMap_)
+        {
+            entities.emplace_back(kv_pair.first);
+        }
+        return entities;
+    }
+
 private:
 	// Packed array of components set to MaxEntities
 	std::array<T, MaxEntities> componentArray_;

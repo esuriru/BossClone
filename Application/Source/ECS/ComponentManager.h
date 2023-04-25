@@ -61,6 +61,13 @@ public:
         }
     }
 
+    template <typename T>
+    auto View() -> std::vector<Entity>
+    {
+        return GetComponentArray<T>()->GetEntities();
+    }
+
+
 private:
     std::unordered_map<const char *, ComponentType> componentTypes_{};
     std::unordered_map<const char *, std::shared_ptr<IComponentArray>> componentArrays_{};

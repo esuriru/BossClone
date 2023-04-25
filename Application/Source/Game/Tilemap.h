@@ -12,6 +12,8 @@
 #include "ECS/Entity.h"
 #include "glm/glm.hpp"
 
+#include <glm/gtx/string_cast.hpp>
+
 namespace TilemapData
 {
     constexpr static uint32_t TILEMAP_MAX_X_LENGTH = 128;
@@ -36,5 +38,13 @@ struct TilemapComponent
     TilemapComponent(const std::string& csv_file_path);
 
     auto ImportTilemapCSV(const std::string& csv_file_path) -> void;
+
+    inline auto GetTileData(const glm::vec2& localPosition) -> uint8_t
+    {
+        CC_TRACE("Local position: ", glm::to_string(localPosition));
+        const float verticalSpan = TilemapData::TILEMAP_MAX_Y_LENGTH * TileSize.y;
+        const float horizontalSpan = TilemapData::TILEMAP_MAX_X_LENGTH * TileSize.x;
+        return MapData.at(static_cast<size_t>(glm::clamp(localPosition.y / verticalSpan, 0.f, verticalSpan))).at(static_cast<size_t>(glm::clamp(localPosition.x / horizontalSpan, 0.f, horizontalSpan)));
+    }
 
 };

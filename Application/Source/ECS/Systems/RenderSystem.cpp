@@ -35,14 +35,15 @@ auto TilemapRenderSystem::Update(Timestep ts) -> void
                 if (tile.MapData[i][j] == 0)
                     continue;
 
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), 
-                    glm::vec3(j * tile.TileSize.x,
+                glm::mat4 model = transformMatrix * glm::translate(glm::mat4(1.0f), 
+                    glm::vec3(
+                        (j - (0.5f * TilemapData::TILEMAP_MAX_X_LENGTH)) * tile.TileSize.x,
 #ifdef CC_TILEMAP_FLIP
-                        TilemapData::TILEMAP_MAX_Y_LENGTH - (i * tile.TileSize.y),
+                        ((TilemapData::TILEMAP_MAX_Y_LENGTH - i) - 0.5f * TilemapData::TILEMAP_MAX_Y_LENGTH) * tile.TileSize.y,
 #else
-                    i * tile.TileSize.y
+                        i * tile.TileSize.y,
 #endif
-                    0)) * transformMatrix;
+                    0));
 
                 Renderer2D::DrawQuad(
                     model,

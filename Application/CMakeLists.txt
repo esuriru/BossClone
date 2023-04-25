@@ -48,12 +48,15 @@ set(Header_Files
     "Source/ECS/IComponentArray.h"
 
     "Source/ECS/Systems/RenderSystem.h"
+    "Source/ECS/Systems/PlayerSystem.h"
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
     "Source/Utils/Singleton.h"
 
     "Source/Physics/PhysicsSystem.h"
+    "Source/Physics/PhysicsComponent.h"
+
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -89,11 +92,15 @@ set(Source_Files
     "Source/ECS/Coordinator.cpp"
     "Source/ECS/Entity.cpp"
 
+
     "Source/ECS/Systems/RenderSystem.cpp"
+    "Source/ECS/Systems/PlayerSystem.cpp"
 
     "Source/Utils/Input.cpp"
 
     "Source/Physics/PhysicsSystem.cpp"
+    "Source/Physics/PhysicsComponent.cpp"
+
 )
 source_group("Source Files" FILES ${Source_Files})
 
