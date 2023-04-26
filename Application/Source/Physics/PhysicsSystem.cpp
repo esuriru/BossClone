@@ -35,7 +35,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
     constexpr int8_t velocityIterations = 6;
     constexpr int8_t positionIterations = 2;
 
-    constexpr float step = 1 / 60.f;
+    constexpr float step = 1 / 120.f;
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
@@ -80,7 +80,8 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             auto localTilemapPosition = TransformPositionToTilemapLocal(proposedPosition);
             auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
 
-            if (nearestTilemap.GetTileData(localTilemapPosition) != 0)
+            auto tilemapData = nearestTilemap.GetTileData(localTilemapPosition);
+            if (tilemapData != 0)
             {
                 CC_TRACE("Collision detected.");
             }

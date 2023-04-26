@@ -41,10 +41,21 @@ struct TilemapComponent
 
     inline auto GetTileData(const glm::vec2& localPosition) -> uint8_t
     {
-        CC_TRACE("Local position: ", glm::to_string(localPosition));
         const float verticalSpan = TilemapData::TILEMAP_MAX_Y_LENGTH * TileSize.y;
         const float horizontalSpan = TilemapData::TILEMAP_MAX_X_LENGTH * TileSize.x;
-        return MapData.at(static_cast<size_t>(glm::clamp(localPosition.y / verticalSpan, 0.f, verticalSpan))).at(static_cast<size_t>(glm::clamp(localPosition.x / horizontalSpan, 0.f, horizontalSpan)));
+
+        // CC_TRACE("Array position: x: ",
+        //     static_cast<float>(
+        //     glm::clamp(localPosition.x, 0.f, horizontalSpan))
+        //     , " y: ",
+        //     static_cast<float>(
+        //     glm::clamp((TilemapData::TILEMAP_MAX_Y_LENGTH - localPosition.y), 0.f, verticalSpan)));
+
+        return MapData.at(static_cast<size_t>(
+            glm::ceil(glm::clamp((TilemapData::TILEMAP_MAX_Y_LENGTH - localPosition.y), 0.f, verticalSpan)))
+                ).at(static_cast<size_t>(
+            glm::ceil(glm::clamp(localPosition.x, 0.f, horizontalSpan)))
+        );
     }
 
 };
