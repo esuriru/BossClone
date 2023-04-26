@@ -1,16 +1,24 @@
 cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
-project(NYP_SDM_GDT_Framework CXX)
+set(CMAKE_SYSTEM_VERSION 10.0 CACHE STRING "" FORCE)
+
+project(BossClone C CXX)
 
 ################################################################################
 # Set target arch type if empty. Visual studio solution generator provides it.
 ################################################################################
-if(NOT CMAKE_VS_PLATFORM_NAME)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    # 64 bit
     set(CMAKE_VS_PLATFORM_NAME "x64")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    # 32 bit
+    set(CMAKE_VS_PLATFORM_NAME "x86")
 endif()
+
 message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
 
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "win32"))
+if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
 endif()
 
@@ -28,6 +36,9 @@ set(CMAKE_CONFIGURATION_TYPES
 ################################################################################
 if(MSVC)
     # remove default flags provided with CMake for MSVC
+    set(CMAKE_C_FLAGS "")
+    set(CMAKE_C_FLAGS_DEBUG "")
+    set(CMAKE_C_FLAGS_RELEASE "")
     set(CMAKE_CXX_FLAGS "")
     set(CMAKE_CXX_FLAGS_DEBUG "")
     set(CMAKE_CXX_FLAGS_RELEASE "")
@@ -79,6 +90,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 ################################################################################
 # Sub-projects
 ################################################################################
-add_subdirectory(App)
-add_subdirectory(Library)
+add_subdirectory(Application)
+add_subdirectory(Common)
 
