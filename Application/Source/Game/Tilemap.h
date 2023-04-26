@@ -51,10 +51,10 @@ struct TilemapComponent
         //     static_cast<float>(
         //     glm::clamp((TilemapData::TILEMAP_MAX_Y_LENGTH - localPosition.y), 0.f, verticalSpan)));
 
-        return MapData.at(static_cast<size_t>(
-            glm::ceil(glm::clamp((TilemapData::TILEMAP_MAX_Y_LENGTH - localPosition.y), 0.f, verticalSpan)))
-                ).at(static_cast<size_t>(
-            glm::ceil(glm::clamp(localPosition.x, 0.f, horizontalSpan)))
+        return MapData.at(
+            (glm::clamp(static_cast<int32_t>(glm::ceil(TilemapData::TILEMAP_MAX_Y_LENGTH - localPosition.y)), 0, static_cast<int32_t>(TilemapData::TILEMAP_MAX_Y_LENGTH - 1)))
+            ).at(
+            (glm::clamp(static_cast<int32_t>(glm::ceil(localPosition.x)), 0, static_cast<int32_t>(TilemapData::TILEMAP_MAX_X_LENGTH - 1)))
         );
     }
 
