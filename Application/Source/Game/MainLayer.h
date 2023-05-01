@@ -2,6 +2,7 @@
 #include "Scene/Scene.h"
 #include "Core/Core.h"
 #include "ECS/Systems/RenderSystem.h"
+#include "ECS/Systems/PlayerSystem.h"
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
 #include "Tilemap.h"
@@ -33,6 +34,7 @@ private:
     Ref<SpriteRenderSystem> spriteRenderSystem_;
     Ref<TilemapRenderSystem> tilemapRenderSystem_;
     Ref<PhysicsSystem> physicsSystem_;
+    Ref<PlayerSystem> playerSystem_;
 
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;

@@ -23,14 +23,14 @@ private:
     auto OnWindowResized(WindowResizeEvent& e) -> bool;
 
     float aspectRatio_ = 0.f;
-    float zoomLevel_ = 1.0f;
+    float zoomLevel_ = 150.0f;
 
     bool rotationEnabled_ = false;
 
     glm::vec3 cameraPosition_{};
     float cameraRotation_ = 0.f;
 
-    float cameraTranslationSpeed_ = 25.f, cameraRotationSpeed_ = 25.f;
+    float cameraTranslationSpeed_ = 100.f, cameraRotationSpeed_ = 100.f;
 
     OrthographicCamera camera_;
 };

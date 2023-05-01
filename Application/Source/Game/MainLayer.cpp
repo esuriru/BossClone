@@ -27,11 +27,17 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<TagComponent>();
     coordinator->RegisterComponent<TilemapComponent>();
     coordinator->RegisterComponent<RigidBody2DComponent>();
+    coordinator->RegisterComponent<BoxCollider2DComponent>();
     coordinator->RegisterComponent<PlayerController2DComponent>();
 
     spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
     physicsSystem_ = coordinator->RegisterSystem<PhysicsSystem>();
+
+    // NOTE - Don't need to update this tilemap system for now.
+    physicsSystem_->tilemapSystem = coordinator->RegisterSystem<ActiveTilemapSystem>();
+    playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
+    playerSystem_->physicsSystem = physicsSystem_;
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -46,7 +52,19 @@ MainLayer::MainLayer()
     Signature physicsSystemSignature;
     physicsSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
     physicsSystemSignature.set(coordinator->GetComponentType<RigidBody2DComponent>());
+    physicsSystemSignature.set(coordinator->GetComponentType<BoxCollider2DComponent>());
     coordinator->SetSystemSignature<PhysicsSystem>(physicsSystemSignature);
+
+    Signature activeTilemapSystemSignature;
+    activeTilemapSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    activeTilemapSystemSignature.set(coordinator->GetComponentType<TilemapComponent>());
+    coordinator->SetSystemSignature<ActiveTilemapSystem>(activeTilemapSystemSignature);
+
+    Signature playerSystemSignature;
+    playerSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    playerSystemSignature.set(coordinator->GetComponentType<RigidBody2DComponent>());
+    playerSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
+    coordinator->SetSystemSignature<PlayerSystem>(playerSystemSignature);
 
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), glm::vec2(16, 16));
     auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), glm::vec2(16, 16));
@@ -60,11 +78,7 @@ MainLayer::MainLayer()
 
     auto tilemapEntity = coordinator->CreateEntity();
 
-    coordinator->AddComponent(tilemapEntity, TransformComponent {
-        glm::vec3(0.f),
-    });
-
-    TilemapComponent tilemapComponent("Assets/Maps/TestMap.csv");
+    TilemapComponent tilemapComponent("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv");
     tilemapComponent.SubTextureMap[1] = grassTileTopLeft;
     tilemapComponent.SubTextureMap[2] = grassTileTopMiddle;
     tilemapComponent.SubTextureMap[3] = grassTileTopRight;
@@ -75,15 +89,28 @@ MainLayer::MainLayer()
     tilemapComponent.SubTextureMap[8] = grassTileBottomMiddle;
     tilemapComponent.SubTextureMap[9] = grassTileBottomRight;
 
+    coordinator->AddComponent(tilemapEntity, TransformComponent {
+        // glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, TilemapData::TILEMAP_MAX_Y_LENGTH * -0.5f * tilemapComponent.TileSize.y, 0),
+        glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, -70, 0),
+
+    });
+
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
 
     auto playerEntity = coordinator->CreateEntity();
 
     coordinator->AddComponent(playerEntity, TransformComponent{
-
+        glm::vec3(), 
+        glm::vec3(), 
+        glm::vec3(12, 12, 1), 
     });
-
-    coordinator->AddComponent(playerEntity, RigidBody2DComponent());
+    auto rigidbody = RigidBody2DComponent();
+    rigidbody.SetMass(5.f);
+    coordinator->AddComponent(playerEntity, rigidbody);
+    coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
+        glm::vec2(),
+        glm::vec2(6.f, 6.f)
+    ));
 
     coordinator->AddComponent(playerEntity, SpriteRendererComponent());
     coordinator->AddComponent(playerEntity, PlayerController2DComponent());
@@ -103,6 +130,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 {
     cameraController_.OnUpdate(ts);
     physicsSystem_->Update(ts);
+    playerSystem_->Update(ts);
 
     RenderCommand::SetClearColour(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
     RenderCommand::Clear();

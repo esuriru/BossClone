@@ -4,7 +4,8 @@
 EntityManager::EntityManager()
     : livingEntityCount_(0)
 {
-    for (Entity entity = 0; entity < MaxEntities; ++entity)
+    // We want to leave the 0 for error checking.
+    for (Entity entity = 1; entity < MaxEntities; ++entity)
     {
         availableEntities_.push(entity);
     }
