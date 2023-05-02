@@ -178,10 +178,10 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
 
     const glm::vec2 bottomLeftOffset = boxCollider.Extents - glm::vec2(1, -1);
 
-    glm::vec2 oldBottomLeft = oldCentre - bottomLeftOffset;
+    glm::vec2 oldBottomLeft = glm::round(oldCentre - bottomLeftOffset);
 
-    glm::vec2 newBottomLeft = newCentre - bottomLeftOffset; 
-    glm::vec2 newBottomRight = glm::vec2(newBottomLeft.x + boxCollider.Extents.x * 2.0f - 2.0f, newBottomLeft.y);
+    glm::vec2 newBottomLeft = glm::round(newCentre - bottomLeftOffset); 
+    glm::vec2 newBottomRight = glm::round(glm::vec2(newBottomLeft.x + boxCollider.Extents.x * 2.0f - 2.0f, newBottomLeft.y));
 
     size_t destinationY = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomLeft.y);
     size_t fromY = glm::max(GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.y) - 1, destinationY);
@@ -241,10 +241,10 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
     ceilingLevel = 0.0f; 
 
     const glm::vec2 topRightOffset = boxCollider.Extents + glm::vec2(-1, 1);
-    glm::vec2 oldTopRight = oldCentre + topRightOffset;
+    glm::vec2 oldTopRight = glm::round(oldCentre + topRightOffset);
 
-    glm::vec2 newTopRight = newCentre + topRightOffset;
-    glm::vec2 newTopLeft = glm::vec2(newTopRight.x - boxCollider.Extents.x * 2.0f + 2.0f, newTopRight.y);
+    glm::vec2 newTopRight = glm::round(newCentre + topRightOffset);
+    glm::vec2 newTopLeft = glm::round(glm::vec2(newTopRight.x - boxCollider.Extents.x * 2.0f + 2.0f, newTopRight.y));
 
     size_t destinationY = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, newTopRight.y);
     size_t fromY = glm::min(GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, oldTopRight.y) + 1, destinationY);
@@ -293,10 +293,10 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
     wallX = 0.f;
 
     const glm::vec2 bottomLeftOffset = boxCollider.Extents + glm::vec2(1, 0);
-    glm::vec2 oldBottomLeft = oldCentre - bottomLeftOffset; 
+    glm::vec2 oldBottomLeft = glm::round(oldCentre - bottomLeftOffset);
 
-    glm::vec2 newBottomLeft = newCentre - bottomLeftOffset;
-    glm::vec2 newTopLeft = newBottomLeft + glm::vec2(0, boxCollider.Extents.y * 2.0f);
+    glm::vec2 newBottomLeft = glm::round(newCentre - bottomLeftOffset);
+    glm::vec2 newTopLeft = glm::round(newBottomLeft + glm::vec2(0, boxCollider.Extents.y * 2.0f));
 
     size_t index_y;
 
@@ -346,14 +346,14 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
     wallX = 0.f;
 
     const glm::vec2 bottomRightOffset = glm::vec2(boxCollider.Extents.x, -boxCollider.Extents.y) + glm::vec2(1, 0);
-    glm::vec2 oldBottomRight = oldCentre + bottomRightOffset; 
-    glm::vec2 newBottomRight = newCentre + bottomRightOffset;
-    glm::vec2 newTopRight = newBottomRight + glm::vec2(0, boxCollider.Extents.y * 2.0f);
+    glm::vec2 oldBottomRight = glm::round(oldCentre + bottomRightOffset);
+    glm::vec2 newBottomRight = glm::round(newCentre + bottomRightOffset);
+    glm::vec2 newTopRight = glm::round(newBottomRight + glm::vec2(0, boxCollider.Extents.y * 2.0f));
 
     size_t index_y;
 
     size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomRight.x);
-    size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
+    size_t fromX = glm::min(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
     
     for (int index_x = fromX; index_x <= destinationX; ++index_x)
