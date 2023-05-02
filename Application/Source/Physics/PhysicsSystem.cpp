@@ -97,6 +97,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
             glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
 
+            bool resolved = false;
             float groundLevel = 0.f;
             bool onPlatform = false;
             auto tilemapGroundCollisionDetectionResult = 
@@ -107,6 +108,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             {
                 proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
                 rigidbody.LinearVelocity.y = 0.f;
+                resolved = true;
                 onGroundBitset.set(e, true);
                 if (onPlatform)
                 {
@@ -117,22 +119,43 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             {
                 onGroundBitset.set(e, false);
                 onPlatformBitset.set(e, false);
+            }
 
+            float leftTileX = 0.f, rightTileX = 0.f;
+
+            auto tilemapLeftCollisionDetectionResult = 
+                CheckTilemapCollisionLeft(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                    nearestTilemap, tilemapPosition, leftTileX);
+            if (rigidbody.LinearVelocity.x <= 0.f && tilemapLeftCollisionDetectionResult)
+            {
+                if ((position_vec2.x - box_collider.Extents.x + box_collider.Offset.x) >= leftTileX)
+                {
+                    proposedPosition.x = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
+                }
+                rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
+            }
+
+            auto tilemapRightCollisionDetectionResult = 
+                CheckTilemapCollisionRight(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                    nearestTilemap, tilemapPosition, rightTileX);
+            if (rigidbody.LinearVelocity.x >= 0.f && tilemapRightCollisionDetectionResult)
+            {
+                if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
+                {
+                    proposedPosition.x = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
+                }
+                rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
             }
 
             float ceilingLevel = 0.f;
             auto tilemapCeilingCollisionDetectionResult = 
-                CheckTilemapCollisionCeiling(position_vec2, proposedPosition, box_collider,
+                CheckTilemapCollisionCeiling(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, ceilingLevel);
             if (rigidbody.LinearVelocity.y >= 0.f && tilemapCeilingCollisionDetectionResult)
             {
                 proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
                 rigidbody.LinearVelocity.y = 0.f;
             }
-
-            // if (!entityOnGround && !onPlatform)
-            // {
-            // }
 
             transform.Position = glm::vec3(proposedPosition, 0);
         }
@@ -259,6 +282,111 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
             }
         }
     }
+    return false;
+}
+
+auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, float &wallX) -> bool
+{
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+
+    wallX = 0.f;
+
+    const glm::vec2 bottomLeftOffset = boxCollider.Extents + glm::vec2(1, 0);
+    glm::vec2 oldBottomLeft = oldCentre - bottomLeftOffset; 
+
+    glm::vec2 newBottomLeft = newCentre - bottomLeftOffset;
+    glm::vec2 newTopLeft = newBottomLeft + glm::vec2(0, boxCollider.Extents.y * 2.0f);
+
+    size_t index_y;
+
+    size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomLeft.x);
+    size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.x) - 1, destinationX);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
+    
+    for (int index_x = fromX; index_x >= destinationX; --index_x)
+    {
+        glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
+        glm::vec2 topLeft = bottomLeft + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
+
+        for (glm::vec2 checkedTile = bottomLeft; ; checkedTile.y += tilemap.TileSize.y)
+        {
+            checkedTile.y = glm::min(checkedTile.y, topLeft.y);
+
+            index_y = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.y);
+
+            // Check if it is in bounds.
+            if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+            {
+                break;
+            }
+
+            auto& tileType = tilemap.MapData[index_y][index_x].Type;
+            if (tileType == Tile::TileType::Solid)
+            {
+                wallX = static_cast<float>(index_x) * tilemap.TileSize.x + tilemap.TileSize.x * 0.5f + tilemapPosition.x;
+                return true;
+            }
+            
+            if (checkedTile.y >= topLeft.y)
+            {
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
+auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, float &wallX) -> bool
+{
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+
+    wallX = 0.f;
+
+    const glm::vec2 bottomRightOffset = glm::vec2(boxCollider.Extents.x, -boxCollider.Extents.y) + glm::vec2(1, 0);
+    glm::vec2 oldBottomRight = oldCentre + bottomRightOffset; 
+    glm::vec2 newBottomRight = newCentre + bottomRightOffset;
+    glm::vec2 newTopRight = newBottomRight + glm::vec2(0, boxCollider.Extents.y * 2.0f);
+
+    size_t index_y;
+
+    size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomRight.x);
+    size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
+    
+    for (int index_x = fromX; index_x <= destinationX; ++index_x)
+    {
+        glm::vec2 bottomRight = Utility::Lerp(newBottomRight, oldBottomRight, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
+        glm::vec2 topRight = bottomRight + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
+
+        for (glm::vec2 checkedTile = bottomRight;; checkedTile.y += tilemap.TileSize.y)
+        {
+            checkedTile.y = glm::min(checkedTile.y, topRight.y);
+
+            index_y = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.y);
+
+            // Check if it is in bounds.
+            if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+            {
+                break;
+            }
+
+            auto& tileType = tilemap.MapData[index_y][index_x].Type;
+            if (tileType == Tile::TileType::Solid)
+            {
+                wallX = static_cast<float>(index_x) * tilemap.TileSize.x - tilemap.TileSize.x * 0.5f + tilemapPosition.x;
+                return true;
+            }
+            
+            if (checkedTile.y >= topRight.y)
+            {
+                break;
+            }
+        }
+    }
+
     return false;
 }
 
