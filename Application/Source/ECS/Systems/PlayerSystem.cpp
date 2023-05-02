@@ -44,7 +44,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
             {
                 if (physicsSystem->onPlatformBitset.test(e))
                 {
-                    transform.Position.y -= Physics::PlatformCollisionDetectionThreshold;
+                    transform.Position.y -= Physics::PlatformCollisionDetectionThreshold + 1.0f;
                 }
             }
         }

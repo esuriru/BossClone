@@ -44,9 +44,13 @@ public:
 private:
     Timestep currentTimestep_;
 
-    auto CheckTilemapCollision(const glm::vec2& oldPosition, const glm::vec2& newPosition,
+    auto CheckTilemapCollisionGround(const glm::vec2& oldPosition, const glm::vec2& newPosition,
         const BoxCollider2DComponent& boxCollider, const TilemapComponent& tilemap, const glm::vec3& tilemapPosition,
         float& groundLevel, bool& onPlatform) -> bool;
+
+    auto CheckTilemapCollisionCeiling(const glm::vec2& oldPosition, const glm::vec2& newPosition,
+        const BoxCollider2DComponent& boxCollider, const TilemapComponent& tilemap, const glm::vec3& tilemapPosition,
+        float& ceilingLevel) -> bool;
 
     auto AddForce(RigidBody2DComponent& rigidbody, const glm::vec2& force, Physics::ForceMode mode = Physics::ForceMode::Force) -> void;
     auto TransformPositionToTilemapLocal(const glm::vec2& worldPos) -> glm::vec2;
