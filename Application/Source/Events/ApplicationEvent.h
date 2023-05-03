@@ -1,8 +1,12 @@
 #pragma once
 
 #include "Event.h"
+#include "ECS/Entity.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
+
+#include "ECS/Component.h"
 
 class WindowResizeEvent : public Event
 {
@@ -71,6 +75,24 @@ public:
 
 	NR_EVENT_CLASS_TYPE(AppRender)
 	NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+};
+
+class AnimationEvent : public Event
+{
+public:
+    AnimationEvent(bool animationEnabled) : animationEnabled_(animationEnabled) {}
+
+	NR_EVENT_CLASS_TYPE(Animation)
+	NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline bool IsAnimationEnabled() const { return animationEnabled_; }
+    inline Entity GetEntityAffected() const { return entityAffected_; }
+    inline Animation::AnimationType GetAnimationType() const { return animationType_; }
+
+private:
+    Animation::AnimationType animationType_;
+    bool animationEnabled_;
+    Entity entityAffected_;
 };
 
 

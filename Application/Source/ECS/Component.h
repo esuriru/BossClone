@@ -68,12 +68,18 @@ struct TileRendererComponent
 
 struct Animation
 {
-    std::set<size_t> AnimationIndices;
+    enum AnimationType
+    {
+        None = 0,
+        Running,
+    };
+    std::vector<size_t> AnimationIndices;
     std::vector<Ref<SubTexture2D>> SpriteTextures;
     uint32_t FramesBetweenTransition = 8;
 };
 
-struct SpriteAnimationComponent
+struct RunningAnimationComponent 
 {
-    
+    Animation Animation;  
+    bool Enabled = false;
 };
