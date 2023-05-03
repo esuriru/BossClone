@@ -6,7 +6,7 @@ auto RenderCommand::Init() -> void
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 
-    glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_DEPTH_TEST);
 }
 
 auto RenderCommand::SetClearColour(const glm::vec4 &colour) -> void

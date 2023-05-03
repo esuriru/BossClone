@@ -66,15 +66,18 @@ MainLayer::MainLayer()
     playerSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
     coordinator->SetSystemSignature<PlayerSystem>(playerSystemSignature);
 
-    auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), glm::vec2(16, 16));
-    auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), glm::vec2(16, 16));
-    auto grassTileTopRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), glm::vec2(16, 16));
-    auto grassTileMiddleLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), glm::vec2(16, 16));
-    auto grassTileMiddleMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), glm::vec2(16, 16));
-    auto grassTileMiddleRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), glm::vec2(16, 16));
-    auto grassTileBottomLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), glm::vec2(16, 16));
-    auto grassTileBottomMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 8), glm::vec2(16, 16));
-    auto grassTileBottomRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), glm::vec2(16, 16));
+    constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
+    auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
+    auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);
+    auto grassTileTopRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), pixelAdventureTileSize);
+    auto grassTileMiddleLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), pixelAdventureTileSize);
+    auto grassTileMiddleMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), pixelAdventureTileSize);
+    auto grassTileMiddleRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), pixelAdventureTileSize);
+    auto grassTileBottomLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), pixelAdventureTileSize);
+    auto grassTileBottomMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 8),pixelAdventureTileSize);
+    auto grassTileBottomRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
+    auto platformStart = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
+    auto platformEnd = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
 
     auto tilemapEntity = coordinator->CreateEntity();
 
@@ -88,6 +91,8 @@ MainLayer::MainLayer()
     tilemapComponent.SubTextureMap[7] = grassTileBottomLeft;
     tilemapComponent.SubTextureMap[8] = grassTileBottomMiddle;
     tilemapComponent.SubTextureMap[9] = grassTileBottomRight;
+    tilemapComponent.SubTextureMap[10] = platformStart;
+    tilemapComponent.SubTextureMap[11] = platformEnd;
 
     coordinator->AddComponent(tilemapEntity, TransformComponent {
         // glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, TilemapData::TILEMAP_MAX_Y_LENGTH * -0.5f * tilemapComponent.TileSize.y, 0),
@@ -102,17 +107,20 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, TransformComponent{
         glm::vec3(), 
         glm::vec3(), 
-        glm::vec3(12, 12, 1), 
+        glm::vec3(32, 32, 1), 
     });
     auto rigidbody = RigidBody2DComponent();
     rigidbody.SetMass(5.f);
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
-        glm::vec2(),
-        glm::vec2(6.f, 6.f)
+        glm::vec2(0, -3.f),
+        glm::vec2(16.f, 13.f)
     ));
 
-    coordinator->AddComponent(playerEntity, SpriteRendererComponent());
+    playerIdleSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Main Characters/Ninja Frog/Idle (32x32).png");
+    auto playerSpriteRendererComponent = SpriteRendererComponent();
+    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerIdleSpritesheet_, glm::vec2(1, 1), glm::vec2(32, 32)));
+    coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
     coordinator->AddComponent(playerEntity, PlayerController2DComponent());
 }
 
@@ -132,13 +140,14 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
 
-    RenderCommand::SetClearColour(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+    RenderCommand::SetClearColour(glm::vec4(135.f/255.f, 206.f/255.f, 250.f/255.f, 1.0f));
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
-    spriteRenderSystem_->Update(ts);
     tilemapRenderSystem_->Update(ts);
+    spriteRenderSystem_->Update(ts);
+
     Renderer2D::EndScene();
 }
 
