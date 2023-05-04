@@ -80,6 +80,8 @@ struct Animation
 
 struct RunningAnimationComponent 
 {
+    RunningAnimationComponent() = default;
+
     Animation Animation;  
     bool Enabled = false;
 };

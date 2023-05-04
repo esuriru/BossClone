@@ -6,6 +6,8 @@
 #include "Core/Core.h"
 #include <functional>
 
+using EventCallback = std::function<void(Event&)>;
+
 struct WindowProps
 {
 	std::string Title;
@@ -32,7 +34,6 @@ struct GLFWwindow;
 class Window
 {
 public:
-	using EventCallback = std::function<void(Event&)>;
 
 	explicit Window(const WindowProps& props = WindowProps());
 	virtual ~Window();

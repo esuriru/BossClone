@@ -8,6 +8,8 @@
 #include "Physics/PhysicsSystem.h"
 #include "Utils/Input.h"
 
+#include "Events/ApplicationEvent.h"
+
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
 
@@ -33,12 +35,32 @@ auto PlayerSystem::Update(Timestep ts) -> void
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
 
             if (input->IsKeyDown(Key::J))
+            {
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(-player_controller.HorizontalForce, 0), step);
+                AnimationEvent event(Animation::AnimationType::Running, e, true);
+                eventCallback(event);
+                runningBitset_.set(e, true);
+            }
             else if (input->IsKeyDown(Key::L))
+            {
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(player_controller.HorizontalForce, 0), step);
+                AnimationEvent event(Animation::AnimationType::Running, e, true);
+                eventCallback(event);
+                runningBitset_.set(e, true);
+            }
+            else
+            {
+                if (runningBitset_.test(e))
+                {
+                    runningBitset_.set(e, false);
+                    AnimationEvent event(Animation::AnimationType::Running, e, false);
+                }
+            }
 
             if (input->IsKeyDown(Key::Space) && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
+            {
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
+            }
 
             if (input->IsKeyDown(Key::K))
             {

@@ -80,7 +80,8 @@ public:
 class AnimationEvent : public Event
 {
 public:
-    AnimationEvent(bool animationEnabled) : animationEnabled_(animationEnabled) {}
+    AnimationEvent(Animation::AnimationType type, Entity entity, bool animationEnabled) : 
+        animationEnabled_(animationEnabled), animationType_(type), entityAffected_(entity) {}
 
 	NR_EVENT_CLASS_TYPE(Animation)
 	NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)

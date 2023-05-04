@@ -21,6 +21,7 @@ MainLayer::MainLayer()
 
     coordinator->Init();
 
+    // Register components
     coordinator->RegisterComponent<TransformComponent>();
     coordinator->RegisterComponent<SpriteRendererComponent>();
     coordinator->RegisterComponent<TileRendererComponent>();
@@ -29,6 +30,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<RigidBody2DComponent>();
     coordinator->RegisterComponent<BoxCollider2DComponent>();
     coordinator->RegisterComponent<PlayerController2DComponent>();
+    coordinator->RegisterComponent<RunningAnimationComponent>();
 
     spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
@@ -38,6 +40,9 @@ MainLayer::MainLayer()
     physicsSystem_->tilemapSystem = coordinator->RegisterSystem<ActiveTilemapSystem>();
     playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
     playerSystem_->physicsSystem = physicsSystem_;
+    playerSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
+
+    runningAnimationSystem_ = coordinator->RegisterSystem<RunningAnimationSystem>();
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -65,6 +70,11 @@ MainLayer::MainLayer()
     playerSystemSignature.set(coordinator->GetComponentType<RigidBody2DComponent>());
     playerSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
     coordinator->SetSystemSignature<PlayerSystem>(playerSystemSignature);
+
+    Signature runningAnimationSystemSignature;
+    runningAnimationSystemSignature.set(coordinator->GetComponentType<RunningAnimationComponent>());
+    runningAnimationSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
+    coordinator->SetSystemSignature<RunningAnimationSystem>(runningAnimationSystemSignature);
 
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
@@ -122,6 +132,29 @@ MainLayer::MainLayer()
     playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerIdleSpritesheet_, glm::vec2(1, 1), glm::vec2(32, 32)));
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
     coordinator->AddComponent(playerEntity, PlayerController2DComponent());
+    auto runningAnimationComponent = RunningAnimationComponent();
+
+    auto playerRunSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Main Characters/Ninja Frog/Run (32x32).png");
+    auto& runningAnimation = runningAnimationComponent.Animation;
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(1 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(2 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(3 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(4 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(5 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(6 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(7 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(8 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(9 , 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(10, 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(11, 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(12, 1), glm::vec2(32, 32)));
+
+    for (int i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
+    {
+        runningAnimation.AnimationIndices.emplace_back(i);
+    }
+
+    coordinator->AddComponent(playerEntity, runningAnimationComponent);
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -154,4 +187,5 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
     cameraController_.OnEvent(e);
+    runningAnimationSystem_->OnEvent(e);    
 }

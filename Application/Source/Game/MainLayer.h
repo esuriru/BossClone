@@ -37,6 +37,9 @@ private:
     Ref<PhysicsSystem> physicsSystem_;
     Ref<PlayerSystem> playerSystem_;
 
+    // Animation systems
+    Ref<RunningAnimationSystem> runningAnimationSystem_;
+
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;
 };
