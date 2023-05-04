@@ -226,7 +226,7 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
                 onPlatform = false;
                 return true;
             }
-            else if (tileType == Tile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold)
+            else if (tileType == Tile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
             {
                 onPlatform = true;  
             }
