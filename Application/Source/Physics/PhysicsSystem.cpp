@@ -115,8 +115,10 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
             }
 
+            glm::vec2 newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+
             auto tilemapRightCollisionDetectionResult = 
-                CheckTilemapCollisionRight(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                CheckTilemapCollisionRight(proposedPosition, newProposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, rightTileX);
             if (rigidbody.LinearVelocity.x >= 0.f && tilemapRightCollisionDetectionResult)
             {
@@ -127,18 +129,24 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
             }
 
+            newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+
             float ceilingLevel = 0.f;
             auto tilemapCeilingCollisionDetectionResult = 
-                CheckTilemapCollisionCeiling(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                CheckTilemapCollisionCeiling(proposedPosition, newProposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, ceilingLevel);
             if (rigidbody.LinearVelocity.y >= 0.f && tilemapCeilingCollisionDetectionResult)
             {
                 proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
                 rigidbody.LinearVelocity.y = 0.f;
+                onGroundBitset.set(e, false);
             }
 
+            newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+
+            CC_TRACE("Velocity before checking for ground collision : " + glm::to_string(rigidbody.LinearVelocity));
             auto tilemapGroundCollisionDetectionResult = 
-                CheckTilemapCollisionGround(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                CheckTilemapCollisionGround(proposedPosition, newProposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, groundLevel, onPlatform);
 
             if (rigidbody.LinearVelocity.y <= 0.f && tilemapGroundCollisionDetectionResult)
