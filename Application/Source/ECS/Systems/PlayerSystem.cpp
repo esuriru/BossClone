@@ -44,8 +44,8 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
                     eventCallback(event);
                     runningBitset_.set(e, true);
-                    transform.Scale.x = -fabs(transform.Scale.x);
                 }
+                transform.Scale.x = -fabs(transform.Scale.x);
             }
             else if (input->IsKeyDown(Key::L))
             {
@@ -57,8 +57,8 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
                     eventCallback(event);
                     runningBitset_.set(e, true);
-                    transform.Scale.x = fabs(transform.Scale.x);
                 }
+                transform.Scale.x = fabs(transform.Scale.x);
             }
             else
             {
