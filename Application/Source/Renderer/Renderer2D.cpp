@@ -364,6 +364,46 @@ auto Renderer2D::DrawQuad(const glm::mat4 &model, const Ref<SubTexture2D>& subte
 
 }
 
+// auto Renderer2D::DrawQuad(const glm::mat4 &model, const Ref<SubTexture2D> &subtexture, float tilingFactor, bool horizontalFlip, const glm::vec4 &tintColour) -> void
+// {
+//     constexpr glm::vec4 white = { 1.0f, 1.0f, 1.0f, 1.0f };
+//     constexpr size_t quadVertexCount = 4;
+//     const glm::vec2* texCoords = subtexture->GetTexCoords();
+//     const Ref<Texture2D> texture = subtexture->GetTexture();
+
+//     if (s_data.QuadIndexCount >= Renderer2DData::MaxIndices)
+//         FlushAndReset();
+
+//     float textureIndex = 0.0f;
+//     for (uint32_t i = 1; i < s_data.TextureSlotIndex; ++i)
+//     {
+//         if (*s_data.TextureSlots[i].get() == *texture.get())
+//         {
+//             textureIndex = static_cast<float>(i);
+//             break;
+//         }
+//     }
+
+//     if (textureIndex == 0.0f)
+//     {
+//         textureIndex = static_cast<float>(s_data.TextureSlotIndex);
+//         s_data.TextureSlots[s_data.TextureSlotIndex] = texture;
+//         ++s_data.TextureSlotIndex;
+//     }
+
+//     for (size_t i = 0; i < quadVertexCount; ++i)
+//     {
+//         s_data.QuadVertexBufferPtr->position = model * s_data.QuadVertexPositions[i];
+//         s_data.QuadVertexBufferPtr->colour = white;
+//         s_data.QuadVertexBufferPtr->texCoord = texCoords[i];
+//         s_data.QuadVertexBufferPtr->texIndex = textureIndex;
+//         s_data.QuadVertexBufferPtr->tilingFactor = tilingFactor;
+//         ++(s_data.QuadVertexBufferPtr);
+//     }
+//     s_data.QuadIndexCount += 6;
+//     ++s_data.stats.QuadCount;
+// }
+
 auto Renderer2D::DrawRotatedQuad(const glm::vec3 &pos, const glm::vec2 &size, float rotationDegrees, const glm::vec4 &colour) -> void
 {
     constexpr size_t quadVertexCount = 4;

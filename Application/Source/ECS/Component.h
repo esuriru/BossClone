@@ -45,6 +45,7 @@ struct SpriteRendererComponent
     glm::vec4 Colour { 1.0f, 1.0f, 1.0f, 1.0f };
     Ref<SubTexture2D> Texture = nullptr;
     float TilingFactor = 1.0f;
+    bool FlippedHorizontally = false;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const glm::vec4& colour)

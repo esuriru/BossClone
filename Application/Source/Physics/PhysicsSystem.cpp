@@ -144,7 +144,6 @@ auto PhysicsSystem::Update(Timestep ts) -> void
 
             newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
 
-            CC_TRACE("Velocity before checking for ground collision : " + glm::to_string(rigidbody.LinearVelocity));
             auto tilemapGroundCollisionDetectionResult = 
                 CheckTilemapCollisionGround(proposedPosition, newProposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, groundLevel, onPlatform);
