@@ -80,7 +80,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             }
             else
             {
-                rigidbody.LinearVelocity.x = 0.98f * rigidbody.LinearVelocity.x;
+                rigidbody.LinearVelocity.x = Physics::FrictionCoefficient * rigidbody.LinearVelocity.x;
                 // TODO - Maybe make it go all the way to 0 after it reaches a certain threshhold, do I need to introduce sleeping?
             }
 
@@ -100,31 +100,11 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             bool resolved = false;
             float groundLevel = 0.f;
             bool onPlatform = false;
-            auto tilemapGroundCollisionDetectionResult = 
-                CheckTilemapCollisionGround(position_vec2, proposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, groundLevel, onPlatform);
-
-            if (rigidbody.LinearVelocity.y <= 0.f && tilemapGroundCollisionDetectionResult)
-            {
-                proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
-                rigidbody.LinearVelocity.y = 0.f;
-                resolved = true;
-                onGroundBitset.set(e, true);
-                if (onPlatform)
-                {
-                    onPlatformBitset.set(e, true);
-                }
-            }
-            else
-            {
-                onGroundBitset.set(e, false);
-                onPlatformBitset.set(e, false);
-            }
 
             float leftTileX = 0.f, rightTileX = 0.f;
 
             auto tilemapLeftCollisionDetectionResult = 
-                CheckTilemapCollisionLeft(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
                     nearestTilemap, tilemapPosition, leftTileX);
             if (rigidbody.LinearVelocity.x <= 0.f && tilemapLeftCollisionDetectionResult)
             {
@@ -155,6 +135,27 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             {
                 proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
                 rigidbody.LinearVelocity.y = 0.f;
+            }
+
+            auto tilemapGroundCollisionDetectionResult = 
+                CheckTilemapCollisionGround(resolved ? proposedPosition : position_vec2, proposedPosition, box_collider,
+                    nearestTilemap, tilemapPosition, groundLevel, onPlatform);
+
+            if (rigidbody.LinearVelocity.y <= 0.f && tilemapGroundCollisionDetectionResult)
+            {
+                proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
+                rigidbody.LinearVelocity.y = 0.f;
+                resolved = true;
+                onGroundBitset.set(e, true);
+                if (onPlatform)
+                {
+                    onPlatformBitset.set(e, true);
+                }
+            }
+            else
+            {
+                onGroundBitset.set(e, false);
+                onPlatformBitset.set(e, false);
             }
 
             transform.Position = glm::vec3(proposedPosition, 0);

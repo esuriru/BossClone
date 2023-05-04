@@ -23,7 +23,7 @@ namespace Physics
 
 struct PlayerController2DComponent
 {
-    float HorizontalForce = 50.f;
+    float HorizontalForce = 80.f;
     float JumpForce = 500.f; 
 };
 

@@ -94,6 +94,7 @@ auto RunningAnimationSystem::Update(Timestep ts) -> void
             {
                 ++spriteIterators_[e];
             }
+            frameCounters_[e] -= animation.FramesBetweenTransition;
         }
     }
 }
@@ -110,7 +111,12 @@ auto RunningAnimationSystem::OnAnimationEvent(AnimationEvent &e) -> bool
         return false;
 
     Entity entity = e.GetEntityAffected(); 
+
+    auto& runningAnimation = coordinator->GetComponent<RunningAnimationComponent>(entity); 
+    runningAnimation.Enabled = e.IsAnimationEnabled();
+
     auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(entity); 
+
     if (!e.IsAnimationEnabled())
     {
         // Reset everything back to what it was.

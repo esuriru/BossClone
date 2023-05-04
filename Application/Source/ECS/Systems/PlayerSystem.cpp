@@ -34,19 +34,32 @@ auto PlayerSystem::Update(Timestep ts) -> void
             auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
 
+            // TODO - Remove this.
+            constexpr float InAirForceModifier = 0.15f;
+
             if (input->IsKeyDown(Key::J))
             {
-                PhysicsSystem::AddForce(rigidbody, glm::vec2(-player_controller.HorizontalForce, 0), step);
-                AnimationEvent event(Animation::AnimationType::Running, e, true);
-                eventCallback(event);
-                runningBitset_.set(e, true);
+                PhysicsSystem::AddForce(rigidbody,
+                    glm::vec2(physicsSystem->onGroundBitset.test(e) ? -player_controller.HorizontalForce : InAirForceModifier * -player_controller.HorizontalForce, 0),
+                    step);
+                if (!runningBitset_.test(e))
+                {
+                    AnimationEvent event(Animation::AnimationType::Running, e, true);
+                    eventCallback(event);
+                    runningBitset_.set(e, true);
+                }
             }
             else if (input->IsKeyDown(Key::L))
             {
-                PhysicsSystem::AddForce(rigidbody, glm::vec2(player_controller.HorizontalForce, 0), step);
-                AnimationEvent event(Animation::AnimationType::Running, e, true);
-                eventCallback(event);
-                runningBitset_.set(e, true);
+                PhysicsSystem::AddForce(rigidbody,
+                    glm::vec2(physicsSystem->onGroundBitset.test(e) ? player_controller.HorizontalForce : InAirForceModifier * player_controller.HorizontalForce, 0),
+                    step);
+                if (!runningBitset_.test(e))
+                {
+                    AnimationEvent event(Animation::AnimationType::Running, e, true);
+                    eventCallback(event);
+                    runningBitset_.set(e, true);
+                }
             }
             else
             {
@@ -54,6 +67,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 {
                     runningBitset_.set(e, false);
                     AnimationEvent event(Animation::AnimationType::Running, e, false);
+                    eventCallback(event);
                 }
             }
 

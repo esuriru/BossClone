@@ -120,7 +120,7 @@ MainLayer::MainLayer()
         glm::vec3(32, 32, 1), 
     });
     auto rigidbody = RigidBody2DComponent();
-    rigidbody.SetMass(5.f);
+    rigidbody.SetMass(3.f);
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
         glm::vec2(0, -3.f),
@@ -149,10 +149,12 @@ MainLayer::MainLayer()
     runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(11, 1), glm::vec2(32, 32)));
     runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(12, 1), glm::vec2(32, 32)));
 
-    for (int i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
+    for (size_t i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
     {
         runningAnimation.AnimationIndices.emplace_back(i);
     }
+
+    runningAnimation.FramesBetweenTransition = 120;
 
     coordinator->AddComponent(playerEntity, runningAnimationComponent);
 }
@@ -178,6 +180,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
+    runningAnimationSystem_->Update(ts);
     tilemapRenderSystem_->Update(ts);
     spriteRenderSystem_->Update(ts);
 
