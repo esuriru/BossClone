@@ -4,6 +4,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <set>
 
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
@@ -42,13 +43,14 @@ struct TagComponent
 struct SpriteRendererComponent
 {
     glm::vec4 Colour { 1.0f, 1.0f, 1.0f, 1.0f };
-    Ref<Texture2D> Texture = nullptr;
+    Ref<SubTexture2D> Texture = nullptr;
     float TilingFactor = 1.0f;
+    bool FlippedHorizontally = false;
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const glm::vec4& colour)
         : Colour(colour) {}
-    SpriteRendererComponent(const Ref<Texture2D>& texture)
+    SpriteRendererComponent(const Ref<SubTexture2D>& texture)
         : Texture(texture) {}
 };
 
@@ -63,4 +65,24 @@ struct TileRendererComponent
         : Colour(colour) {}
     TileRendererComponent(const Ref<SubTexture2D>& texture)
         : Texture(texture) {}
+};
+
+struct Animation
+{
+    enum AnimationType
+    {
+        None = 0,
+        Running,
+    };
+    std::vector<size_t> AnimationIndices;
+    std::vector<Ref<SubTexture2D>> SpriteTextures;
+    uint32_t FramesBetweenTransition = 8;
+};
+
+struct RunningAnimationComponent 
+{
+    RunningAnimationComponent() = default;
+
+    Animation Animation;  
+    bool Enabled = false;
 };

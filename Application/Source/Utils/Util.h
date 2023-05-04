@@ -14,6 +14,11 @@ namespace Utility
 		return a * (1.f - t) + b * t;
 	}
 
+	inline glm::vec2 Lerp(const glm::vec2& a, const glm::vec2& b, float t)
+	{
+		return a * (1.f - t) + b * t;
+	}
+
 	inline glm::vec2 PerpendicularClockwise(const glm::vec2& lhs)
 	{
 		return glm::normalize(glm::vec2( lhs.y, -lhs.x));
@@ -39,7 +44,7 @@ namespace Utility
 	double constexpr sqrt(double x)
 	{
         return x >= 0 && x < std::numeric_limits<double>::infinity()
-        ? sqrtNewtonRaphson(x, x, 0)
-        : std::numeric_limits<double>::quiet_NaN();
+            ? sqrtNewtonRaphson(x, x, 0)
+            : std::numeric_limits<double>::quiet_NaN();
 	}
 }

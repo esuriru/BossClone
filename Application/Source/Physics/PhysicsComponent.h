@@ -1,4 +1,5 @@
 #pragma once
+
 #include <glm/glm.hpp>
 #include "Core/Timestep.h"
 
@@ -22,8 +23,9 @@ namespace Physics
 
 struct PlayerController2DComponent
 {
-    float HorizontalForce = 5.f;
-    float JumpForce = 5.f; 
+    float HorizontalForce = 80.f;
+    float JumpForce = 500.f; 
+    float AirHorizontalForce = 8.f;
 };
 
 struct RigidBody2DComponent
@@ -52,4 +54,14 @@ private:
     float mass_ = 1.0f;
     float inverseMass_ = 1.0f;
 
+};
+
+struct BoxCollider2DComponent
+{
+    glm::vec2 Offset = glm::vec2(0.f);
+    glm::vec2 Extents = glm::vec2(0.5f);
+
+    BoxCollider2DComponent(const glm::vec2& offset, const glm::vec2& extents)
+        : Offset(offset), Extents(extents) {}
+    BoxCollider2DComponent() = default;
 };

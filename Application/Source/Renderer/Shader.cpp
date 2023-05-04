@@ -39,7 +39,7 @@ auto Shader::ReadFile(const std::string &file_path) -> std::string
     if (in)
     {
         in.seekg(0, std::ios::end);
-        result.resize(in.tellg());
+        result.resize(static_cast<const unsigned int>(in.tellg()));
         in.seekg(0, std::ios::beg);
         in.read(&result[0], result.size());
         in.close();
