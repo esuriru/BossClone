@@ -5,11 +5,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <set>
+#include "ECS/Entity.h"
 
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
 
 // NOTE - Components are mainly for storing data. All the logic processes will be done in Systems.
+
+using std::string;
+using std::vector;
 
 struct TransformComponent
 {
@@ -37,7 +41,7 @@ struct TransformComponent
 
 struct TagComponent
 {
-    std::string Tag;
+    string Tag;
 };
 
 struct SpriteRendererComponent
@@ -74,8 +78,8 @@ struct Animation
         None = 0,
         Running,
     };
-    std::vector<size_t> AnimationIndices;
-    std::vector<Ref<SubTexture2D>> SpriteTextures;
+    vector<size_t> AnimationIndices;
+    vector<Ref<SubTexture2D>> SpriteTextures;
     uint32_t FramesBetweenTransition = 8;
 };
 
@@ -85,4 +89,20 @@ struct RunningAnimationComponent
 
     Animation Animation;  
     bool Enabled = false;
+};
+
+struct InventoryComponent
+{
+    vector<Entity> Items;
+    Entity CurrentlyHolding;
+};
+
+struct DescriptionComponent
+{
+    string Description;
+};
+
+struct MeleeWeaponComponent
+{
+    float MeleeDamage = 0;
 };

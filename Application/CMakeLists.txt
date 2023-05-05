@@ -49,6 +49,7 @@ set(Header_Files
 
     "Source/ECS/Systems/RenderSystem.h"
     "Source/ECS/Systems/PlayerSystem.h"
+    "Source/ECS/Systems/GameSystem.h"
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
@@ -95,12 +96,12 @@ set(Source_Files
 
     "Source/ECS/Systems/RenderSystem.cpp"
     "Source/ECS/Systems/PlayerSystem.cpp"
+    "Source/ECS/Systems/GameSystem.cpp"
 
     "Source/Utils/Input.cpp"
 
     "Source/Physics/PhysicsSystem.cpp"
     "Source/Physics/PhysicsComponent.cpp"
-
 )
 source_group("Source Files" FILES ${Source_Files})
 

@@ -124,7 +124,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
         glm::vec2(0, -3.f),
-        glm::vec2(16.f, 13.f)
+        glm::vec2(13.f, 13.f)
     ));
 
     playerIdleSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Main Characters/Ninja Frog/Idle (32x32).png");
