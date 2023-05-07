@@ -86,14 +86,33 @@ public:
 	NR_EVENT_CLASS_TYPE(Animation)
 	NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
 
-    inline bool IsAnimationEnabled() const { return animationEnabled_; }
-    inline Entity GetEntityAffected() const { return entityAffected_; }
-    inline Animation::AnimationType GetAnimationType() const { return animationType_; }
+    inline auto IsAnimationEnabled() -> bool const { return animationEnabled_; }
+    inline auto GetEntityAffected() -> Entity const { return entityAffected_; }
+    inline auto GetAnimationType() -> Animation::AnimationType const { return animationType_; }
 
 private:
     Animation::AnimationType animationType_;
     bool animationEnabled_;
     Entity entityAffected_;
+};
+
+class WeaponUseEvent : public Event
+{
+public:
+    WeaponUseEvent(Entity owner, Entity item, bool mouseDown)
+       : owner_(owner), weapon_(item), mouseDown_(mouseDown){}
+
+    NR_EVENT_CLASS_TYPE(WeaponUse)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication | EventCategoryInput)
+
+    inline auto GetOwner() -> Entity const { return owner_; }
+    inline auto GetWeapon() -> Entity const { return weapon_; }
+    inline auto IsMouseDown() -> bool const { return mouseDown_; }
+
+private:
+    Entity owner_;
+    Entity weapon_;
+    bool mouseDown_;
 };
 
 

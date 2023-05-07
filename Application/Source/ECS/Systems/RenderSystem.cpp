@@ -133,3 +133,74 @@ auto RunningAnimationSystem::OnAnimationEvent(AnimationEvent &e) -> bool
 
     return true;
 }
+
+auto SwingingAnimationSystem::Update(Timestep ts) -> void
+{
+    for (auto& e : entities)
+    {
+        auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        auto& swingingAnimation = coordinator->GetComponent<SwingingAnimationComponent>(e);
+
+        if (!swingingAnimation.Enabled)
+        {
+            return;
+        }
+
+        auto& animation = swingingAnimation.Animation;
+        if (animation.AnimationIndices.empty())
+        {
+            return;
+        }
+
+        spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
+
+        if (++frameCounters_[e] >= animation.FramesBetweenTransition)
+        {
+            // If the sprite shown is already the last sprite, go back to the first loop.
+            if (animation.AnimationIndices.size() - 1 == spriteIterators_[e])
+            {
+                spriteIterators_[e] = 0;    
+            }
+            else
+            {
+                ++spriteIterators_[e];
+            }
+            frameCounters_[e] -= animation.FramesBetweenTransition;
+        }
+    }
+}
+
+auto SwingingAnimationSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<AnimationEvent>(CC_BIND_EVENT_FUNC(SwingingAnimationSystem::OnAnimationEvent));
+}
+
+auto SwingingAnimationSystem::OnAnimationEvent(AnimationEvent &e) -> bool
+{
+    if (e.GetAnimationType() != Animation::AnimationType::Swinging)
+        return false;
+
+    Entity entity = e.GetEntityAffected(); 
+
+    auto& runningAnimation = coordinator->GetComponent<RunningAnimationComponent>(entity); 
+    runningAnimation.Enabled = e.IsAnimationEnabled();
+
+    auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(entity); 
+
+    if (!e.IsAnimationEnabled())
+    {
+        // Reset everything back to what it was.
+        spriteIterators_[entity] = 0;
+        frameCounters_[entity] = 0;
+
+        spriteRenderer.Texture = originalTextures_[entity];
+    }
+    else
+    {
+        // Cache the texture so we can restore it back when the animation is cancelled/stopped.
+        originalTextures_[entity] = spriteRenderer.Texture;
+    }
+
+    return true;
+}

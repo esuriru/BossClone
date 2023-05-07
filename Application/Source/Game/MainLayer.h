@@ -29,7 +29,7 @@ private:
 
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;
-    Ref<Texture2D> playerIdleSpritesheet_;
+    Ref<Texture2D> playerSpritesheet_;
     
     // Systems
     Ref<SpriteRenderSystem> spriteRenderSystem_;

@@ -10,6 +10,8 @@
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
 
+class WeaponUseEvent;
+
 // NOTE - Components are mainly for storing data. All the logic processes will be done in Systems.
 
 using std::string;
@@ -77,6 +79,7 @@ struct Animation
     {
         None = 0,
         Running,
+        Swinging,
     };
     vector<size_t> AnimationIndices;
     vector<Ref<SubTexture2D>> SpriteTextures;
@@ -86,6 +89,14 @@ struct Animation
 struct RunningAnimationComponent 
 {
     RunningAnimationComponent() = default;
+
+    Animation Animation;  
+    bool Enabled = false;
+};
+
+struct SwingingAnimationComponent 
+{
+    SwingingAnimationComponent() = default;
 
     Animation Animation;  
     bool Enabled = false;
@@ -102,7 +113,21 @@ struct DescriptionComponent
     string Description;
 };
 
-struct MeleeWeaponComponent
+enum class WeaponType
 {
-    float MeleeDamage = 0;
+    Melee,
+    Ranged,
+};
+
+struct WeaponComponent;
+using WeaponBehaviour = void(*)(Entity, WeaponUseEvent&);
+struct WeaponComponent
+{
+    float Damage = 0.f;
+    WeaponBehaviour Behaviour;  
+};
+
+struct OwnedByComponent
+{
+    Entity Owner;
 };

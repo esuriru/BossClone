@@ -8,6 +8,7 @@
 #include "Physics/PhysicsComponent.h"
 
 #include "Utils/Input.h"
+#include "Utils/Util.h"
 
 MainLayer::MainLayer()
     : Layer("Main")
@@ -15,6 +16,7 @@ MainLayer::MainLayer()
 {
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
+    playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
 
     // Register components
     static Coordinator* coordinator = Coordinator::Instance();
@@ -123,38 +125,31 @@ MainLayer::MainLayer()
     rigidbody.SetMass(3.f);
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
-        glm::vec2(0, -3.f),
-        glm::vec2(13.f, 13.f)
+        // glm::vec2(0, -3.f),
+        // glm::vec2(13.f, 13.f)
+        glm::vec2(0, 0),
+        glm::vec2(8.5f, 16.f)
     ));
 
-    playerIdleSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Main Characters/Ninja Frog/Idle (32x32).png");
+    constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);
     auto playerSpriteRendererComponent = SpriteRendererComponent();
-    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerIdleSpritesheet_, glm::vec2(1, 1), glm::vec2(32, 32)));
+    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1, 8), playerTextureSize));
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
     coordinator->AddComponent(playerEntity, PlayerController2DComponent());
     auto runningAnimationComponent = RunningAnimationComponent();
 
-    auto playerRunSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Main Characters/Ninja Frog/Run (32x32).png");
     auto& runningAnimation = runningAnimationComponent.Animation;
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(1 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(2 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(3 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(4 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(5 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(6 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(7 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(8 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(9 , 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(10, 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(11, 1), glm::vec2(32, 32)));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerRunSpritesheet, glm::vec2(12, 1), glm::vec2(32, 32)));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 6), playerTextureSize));
 
     for (size_t i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
     {
         runningAnimation.AnimationIndices.emplace_back(i);
     }
 
-    runningAnimation.FramesBetweenTransition = 120;
+    runningAnimation.FramesBetweenTransition = 240;
 
     coordinator->AddComponent(playerEntity, runningAnimationComponent);
 }
@@ -175,7 +170,8 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
 
-    RenderCommand::SetClearColour(glm::vec4(135.f/255.f, 206.f/255.f, 250.f/255.f, 1.0f));
+    constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
+    RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());

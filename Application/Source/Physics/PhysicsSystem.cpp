@@ -312,7 +312,7 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
     size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.x) - 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
     
-    for (int index_x = fromX; index_x >= destinationX; --index_x)
+    for (size_t index_x = fromX; index_x >= destinationX; --index_x)
     {
         glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
         glm::vec2 topLeft = bottomLeft + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
@@ -364,7 +364,7 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
     size_t fromX = glm::min(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
     
-    for (int index_x = fromX; index_x <= destinationX; ++index_x)
+    for (size_t index_x = fromX; index_x <= destinationX; ++index_x)
     {
         glm::vec2 bottomRight = Utility::Lerp(newBottomRight, oldBottomRight, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
         glm::vec2 topRight = bottomRight + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);

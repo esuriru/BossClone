@@ -3,6 +3,11 @@
 
 namespace Utility
 {
+    glm::vec4 constexpr Colour32BitConvert(const glm::vec4& colour)
+    {
+        return glm::vec4(colour.r / 255.f, colour.g / 255.f, colour.b / 255.f, colour.a);
+    }
+
     template<typename T1, typename T2>
     bool Contains(T1 container, T2 val)
     {

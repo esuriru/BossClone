@@ -82,6 +82,13 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     transform.Position.y -= Physics::PlatformCollisionDetectionThreshold + 1.0f;
                 }
             }
+
+            if (input->GetMouseButtonDown(0))
+            {
+                auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    
+                WeaponUseEvent event(e, inventory.CurrentlyHolding, true); 
+                eventCallback(event);
+            }
         }
         accumulator -= step;
     }
