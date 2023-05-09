@@ -34,16 +34,21 @@ template<>
 struct AnimationTypeMap<RunningAnimationComponent>
 {
     static constexpr AnimType value = AnimType::Running;
+    static constexpr const char* debug_name = "RunningAnimationComponent";
 };
 
 template<>
 struct AnimationTypeMap<SwingingAnimationComponent>
 {
     static constexpr AnimType value = AnimType::Swinging;
+    static constexpr const char* debug_name = "SwingingAnimationComponent";
 };
 
 template<typename T>
-auto GetEnumValue() -> AnimType { return AnimationTypeMap<T>::value; }
+constexpr auto GetEnumValue() -> AnimType { return AnimationTypeMap<T>::value; }
+
+template<typename T>
+auto GetDebugName() -> std::string { return std::string(AnimationTypeMap<T>::debug_name); }
 
 template<typename T>
 class AnimationSystem : public System
@@ -55,6 +60,7 @@ public:
         for (auto& e : entities)
         {
             auto& animationComponent = coordinator->GetComponent<T>(e);
+            // CC_TRACE(GetDebugName<T>(), " : ", animationComponent.Enabled);
             if (!animationComponent.Enabled)
             {
                 return;
@@ -107,8 +113,8 @@ private:
 
         Entity entity = e.GetEntityAffected(); 
 
-        auto& runningAnimation = coordinator->GetComponent<RunningAnimationComponent>(entity); 
-        runningAnimation.Enabled = e.IsAnimationEnabled();
+        auto& animation = coordinator->GetComponent<T>(entity); 
+        animation.Enabled = e.IsAnimationEnabled();
 
         auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(entity); 
 
@@ -119,13 +125,13 @@ private:
             frameCounters_[entity] = 0;
 
             // NOTE - If the original texture was nothing, then this will set a different texture.
-            if (!originalTextures_[entity])
-                spriteRenderer.Texture = originalTextures_[entity];
+            spriteRenderer.Texture = originalTextures_[entity];
         }
         else
         {
             // Cache the texture so we can restore it back when the animation is cancelled/stopped.
-            originalTextures_[entity] = spriteRenderer.Texture;
+            if (!originalTextures_[entity])
+                originalTextures_[entity] = spriteRenderer.Texture;
         }
 
         return true;

@@ -1,8 +1,11 @@
 #include "Core/Layer.h"
 #include "Scene/Scene.h"
 #include "Core/Core.h"
+
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Systems/PlayerSystem.h"
+#include "ECS/Systems/GameSystem.h"
+
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
 #include "Tilemap.h"
@@ -39,6 +42,9 @@ private:
 
     // Animation systems
     Ref<RunningAnimationSystem> runningAnimationSystem_;
+    Ref<SwingingAnimationSystem> swingingAnimationSystem_;
+
+    Ref<WeaponSystem> weaponSystem_;
 
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;

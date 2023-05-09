@@ -129,5 +129,8 @@ struct WeaponComponent
 
 struct OwnedByComponent
 {
+    OwnedByComponent() = default;
+    OwnedByComponent(Entity owner) : Owner(owner) {}
+
     Entity Owner;
 };

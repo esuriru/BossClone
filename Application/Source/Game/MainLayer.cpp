@@ -33,6 +33,12 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<BoxCollider2DComponent>();
     coordinator->RegisterComponent<PlayerController2DComponent>();
     coordinator->RegisterComponent<RunningAnimationComponent>();
+    coordinator->RegisterComponent<SwingingAnimationComponent>();
+    coordinator->RegisterComponent<WeaponComponent>();
+    coordinator->RegisterComponent<OwnedByComponent>();
+    coordinator->RegisterComponent<InventoryComponent>();
+
+    // System registry
 
     spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
@@ -45,6 +51,10 @@ MainLayer::MainLayer()
     playerSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     runningAnimationSystem_ = coordinator->RegisterSystem<RunningAnimationSystem>();
+    swingingAnimationSystem_ = coordinator->RegisterSystem<SwingingAnimationSystem>();
+
+    weaponSystem_ = coordinator->RegisterSystem<WeaponSystem>();
+    weaponSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -77,6 +87,16 @@ MainLayer::MainLayer()
     runningAnimationSystemSignature.set(coordinator->GetComponentType<RunningAnimationComponent>());
     runningAnimationSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
     coordinator->SetSystemSignature<RunningAnimationSystem>(runningAnimationSystemSignature);
+
+    Signature swingingAnimationSystemSignature;
+    swingingAnimationSystemSignature.set(coordinator->GetComponentType<SwingingAnimationComponent>());
+    swingingAnimationSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
+    coordinator->SetSystemSignature<SwingingAnimationSystem>(swingingAnimationSystemSignature);
+
+    Signature weaponSystemSignature;
+    weaponSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
+    weaponSystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
+    coordinator->SetSystemSignature<WeaponSystem>(weaponSystemSignature);
 
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
@@ -132,17 +152,23 @@ MainLayer::MainLayer()
     ));
 
     constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);
+
     auto playerSpriteRendererComponent = SpriteRendererComponent();
-    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1, 8), playerTextureSize));
+    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0, 8), playerTextureSize));
+    runningAnimationSystem_->SetOriginalTexture(playerSpriteRendererComponent.Texture, playerEntity);
+    swingingAnimationSystem_->SetOriginalTexture(playerSpriteRendererComponent.Texture, playerEntity);
+
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
     coordinator->AddComponent(playerEntity, PlayerController2DComponent());
-    auto runningAnimationComponent = RunningAnimationComponent();
+
+    // Running animation
+    RunningAnimationComponent runningAnimationComponent;
 
     auto& runningAnimation = runningAnimationComponent.Animation;
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.push_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 6), playerTextureSize));
+    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 6), playerTextureSize));
 
     for (size_t i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
     {
@@ -152,6 +178,42 @@ MainLayer::MainLayer()
     runningAnimation.FramesBetweenTransition = 240;
 
     coordinator->AddComponent(playerEntity, runningAnimationComponent);
+
+    // Swinging animation
+    SwingingAnimationComponent swingingAnimationComponent;
+    auto& swingingAnimation = swingingAnimationComponent.Animation;
+
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(4 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(5 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(6 , 0), playerTextureSize));
+    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(7 , 0), playerTextureSize));
+
+    for (size_t i = 0; i < swingingAnimation.SpriteTextures.size(); ++i)
+    {
+        swingingAnimation.AnimationIndices.emplace_back(i);
+    }
+
+    swingingAnimation.FramesBetweenTransition = 240;
+
+    coordinator->AddComponent(playerEntity, swingingAnimationComponent);
+
+    auto inventoryComponent = InventoryComponent();
+
+    auto meleeWeaponEntity = coordinator->CreateEntity();
+
+    WeaponComponent meleeWeaponComponent;
+    meleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
+    coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
+
+    inventoryComponent.Items.emplace_back(meleeWeaponEntity);
+    inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
+
+    coordinator->AddComponent(playerEntity, inventoryComponent);
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -169,6 +231,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     cameraController_.OnUpdate(ts);
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
+    weaponSystem_->Update(ts);
 
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
@@ -177,6 +240,8 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
     runningAnimationSystem_->Update(ts);
+    swingingAnimationSystem_->Update(ts);
+
     tilemapRenderSystem_->Update(ts);
     spriteRenderSystem_->Update(ts);
 
@@ -185,6 +250,11 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 
 auto MainLayer::OnEvent(Event &e) -> void 
 {
+    // Process all the logic stuff first before rendering.
+    weaponSystem_->OnEvent(e);
+
+    // All the render stuff should be after.
     cameraController_.OnEvent(e);
     runningAnimationSystem_->OnEvent(e);    
+    swingingAnimationSystem_->OnEvent(e);
 }

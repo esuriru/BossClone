@@ -32,7 +32,6 @@ auto WeaponSystem::MeleeBehaviour(Entity e, WeaponUseEvent& event) -> void
     // Do the swing animation
     AnimationEvent animationEvent(Animation::AnimationType::Swinging, owned_by.Owner, event.IsMouseDown());
     eventCallback(animationEvent);
-
 }
 
 auto WeaponSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool 

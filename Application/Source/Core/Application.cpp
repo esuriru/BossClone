@@ -51,7 +51,6 @@ auto Application::PerformRunCycle() -> void
 	static Input* input = Input::Instance();
 	if (!minimized_)
 	{
-        input->Update();
 		const Timestep deltaTime = Timestep(static_cast<float>(timer_.getElapsedTime()));
 
 		for (const auto& layer : layerStack_)

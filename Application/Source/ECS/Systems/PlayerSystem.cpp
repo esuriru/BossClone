@@ -18,6 +18,7 @@ static Coordinator* coordinator = Coordinator::Instance();
 auto PlayerSystem::Update(Timestep ts) -> void
 {
     if (entities.empty()) return;
+    CC_ASSERT(entities.size() <= 1, "There should be no more than one player.");
 
     static Input* input = Input::Instance();
 
@@ -83,11 +84,25 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 }
             }
 
+            // Using the item that the player currently holds.
+            auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    
             if (input->GetMouseButtonDown(0))
             {
-                auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    
-                WeaponUseEvent event(e, inventory.CurrentlyHolding, true); 
-                eventCallback(event);
+                if (!mouseDown_)
+                {
+                    WeaponUseEvent event(e, inventory.CurrentlyHolding, true); 
+                    eventCallback(event);
+                    mouseDown_ = true;
+                }
+            }
+            else
+            {
+                if (mouseDown_)
+                {
+                    mouseDown_ = false;
+                    WeaponUseEvent event(e, inventory.CurrentlyHolding, false); 
+                    eventCallback(event);
+                }
             }
         }
         accumulator -= step;
