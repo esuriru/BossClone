@@ -3,6 +3,7 @@
 #include "ECS/Entity.h"
 #include "ECS/Component.h"
 #include "ECS/System.h"
+#include "ECS/Coordinator.h"
 
 #include "Core/Timestep.h"
 #include "Events/Event.h"
@@ -25,20 +26,24 @@ public:
 
 };
 
+using std::array;
+
 using AnimType = Animation::AnimationType;
 template<typename T> struct AnimationTypeMap;
-template<> struct AnimationTypeMap<RunningAnimationComponent>
+template<>
+struct AnimationTypeMap<RunningAnimationComponent>
 {
     static constexpr AnimType value = AnimType::Running;
 };
 
-template<> struct AnimationTypeMap<SwingingAnimationComponent>
+template<>
+struct AnimationTypeMap<SwingingAnimationComponent>
 {
     static constexpr AnimType value = AnimType::Swinging;
 };
 
 template<typename T>
-AnimType GetEnumValue() { return AnimationTypeMap<T>::value; }
+auto GetEnumValue() -> AnimType { return AnimationTypeMap<T>::value; }
 
 template<typename T>
 class AnimationSystem : public System
@@ -46,6 +51,7 @@ class AnimationSystem : public System
 public:
     inline auto Update(Timestep ts) -> void
     {
+        static Coordinator* coordinator = Coordinator::Instance(); 
         for (auto& e : entities)
         {
             auto& animationComponent = coordinator->GetComponent<T>(e);
@@ -56,7 +62,7 @@ public:
 
             auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(e);
 
-            auto& animation = swingingAnimation.Animation;
+            auto& animation = animationComponent.Animation;
             if (animation.AnimationIndices.empty())
             {
                 return;
@@ -82,7 +88,7 @@ public:
     } 
     inline auto OnEvent(Event& e) -> void
     {
-        EventDispatcher dispatcher;
+        EventDispatcher dispatcher(e);
         dispatcher.Dispatch<AnimationEvent>(CC_BIND_EVENT_FUNC(AnimationSystem::OnAnimationEvent));
     }
 
@@ -94,6 +100,8 @@ public:
 private:
     auto OnAnimationEvent(AnimationEvent& e) -> bool
     {
+        static Coordinator* coordinator = Coordinator::Instance(); 
+
         if (e.GetAnimationType() != GetEnumValue<T>())
             return false;
 
@@ -111,7 +119,7 @@ private:
             frameCounters_[entity] = 0;
 
             // NOTE - If the original texture was nothing, then this will set a different texture.
-            if (originalTextures_ == nullptr)
+            if (!originalTextures_[entity])
                 spriteRenderer.Texture = originalTextures_[entity];
         }
         else
@@ -123,39 +131,27 @@ private:
         return true;
     }
 
-    std::array<size_t, MaxEntities> spriteIterators_{};
-    std::array<size_t, MaxEntities> frameCounters_{};
-    std::array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
-    static Coordinator* coordinator = Coordinator::Instance();
+    array<size_t, MaxEntities> spriteIterators_{};
+    array<size_t, MaxEntities> frameCounters_{};
+    array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
 };
 
-class RunningAnimationSystem : public System
-{
-public:
-    auto Update(Timestep ts) -> void;
-    auto OnEvent(Event& e) -> void;
+using RunningAnimationSystem = AnimationSystem<RunningAnimationComponent>;
+using SwingingAnimationSystem = AnimationSystem<SwingingAnimationComponent>;
 
-private:
-    auto OnAnimationEvent(AnimationEvent& e) -> bool;
+// class RunningAnimationSystem : public System
+// {
+// public:
+//     auto Update(Timestep ts) -> void;
+//     auto OnEvent(Event& e) -> void;
 
-    std::array<size_t, MaxEntities> spriteIterators_{};
-    std::array<size_t, MaxEntities> frameCounters_{};
-    std::array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
+// private:
+//     auto OnAnimationEvent(AnimationEvent& e) -> bool;
 
-};
+//     std::array<size_t, MaxEntities> spriteIterators_{};
+//     std::array<size_t, MaxEntities> frameCounters_{};
+//     std::array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
 
-class SwingingAnimationSystem : public System
-{
-public:
-    auto Update(Timestep ts) -> void;
-    auto OnEvent(Event& e) -> void;
+// };
 
-private:
-    auto OnAnimationEvent(AnimationEvent& e) -> bool;
-
-    std::array<size_t, MaxEntities> spriteIterators_{};
-    std::array<size_t, MaxEntities> frameCounters_{};
-    std::array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
-
-};
 
