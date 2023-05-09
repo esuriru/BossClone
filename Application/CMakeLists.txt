@@ -57,6 +57,7 @@ set(Header_Files
 
     "Source/Physics/PhysicsSystem.h"
     "Source/Physics/PhysicsComponent.h"
+    "Source/Physics/Quadtree.h"
 
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -102,6 +103,7 @@ set(Source_Files
 
     "Source/Physics/PhysicsSystem.cpp"
     "Source/Physics/PhysicsComponent.cpp"
+    "Source/Physics/Quadtree.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

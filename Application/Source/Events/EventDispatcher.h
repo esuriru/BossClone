@@ -5,8 +5,6 @@
 
 class EventDispatcher
 {
-	template<typename T>
-	using EventHandler = std::function<bool(T&)>;
 public:
 	EventDispatcher(Event& event) : event_(event) {}
 
