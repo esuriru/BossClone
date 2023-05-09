@@ -1,0 +1,63 @@
+[
+  {
+    "name": "GCC 11.2.0 x86_64-w64-mingw32",
+    "compilers": {
+      "C": "C:\\msys64\\mingw64\\bin\\gcc.exe",
+      "CXX": "C:\\msys64\\mingw64\\bin\\g++.exe"
+    }
+  },
+  {
+    "name": "GCC 4.3.2 avr32",
+    "compilers": {
+      "C": "C:\\WinAVR-20100110\\bin\\avr32-gcc.exe",
+      "CXX": "C:\\WinAVR-20100110\\bin\\avr32-g++.exe"
+    }
+  },
+  {
+    "name": "GCC 4.3.3 avr",
+    "compilers": {
+      "C": "C:\\WinAVR-20100110\\bin\\avr-gcc.exe",
+      "CXX": "C:\\WinAVR-20100110\\bin\\avr-g++.exe"
+    }
+  },
+  {
+    "name": "Visual Studio Community 2022 Release - amd64",
+    "visualStudio": "8ffe2360",
+    "visualStudioArchitecture": "x64",
+    "preferredGenerator": {
+      "name": "Visual Studio 17 2022",
+      "platform": "x64",
+      "toolset": "host=x64"
+    }
+  },
+  {
+    "name": "Visual Studio Community 2022 Release - amd64_x86",
+    "visualStudio": "8ffe2360",
+    "visualStudioArchitecture": "x64",
+    "preferredGenerator": {
+      "name": "Visual Studio 17 2022",
+      "platform": "win32",
+      "toolset": "host=x64"
+    }
+  },
+  {
+    "name": "Visual Studio Community 2022 Release - x86",
+    "generator": "Visual Studio 17 2022",
+    "host_architecture": "x86",
+    "target_architecture": "win32",
+    "compilers": {
+        "C" : "D:\\VS2022\\VC\\Tools\\MSVC\\14.31.31103\\bin\\Hostx86\\x86",
+        "CXX" : "D:\\VS2022\\VC\\Tools\\MSVC\\14.31.31103\\bin\\Hostx86\\x86"
+    }
+  },
+  {
+    "name": "Visual Studio Community 2022 Release - x86_amd64",
+    "visualStudio": "8ffe2360",
+    "visualStudioArchitecture": "x86",
+    "preferredGenerator": {
+      "name": "Visual Studio 17 2022",
+      "platform": "x64",
+      "toolset": "host=x86"
+    }
+  }
+]
