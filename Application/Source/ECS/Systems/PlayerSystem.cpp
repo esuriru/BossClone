@@ -37,9 +37,18 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
             if (input->IsKeyDown(Key::J))
             {
-                PhysicsSystem::AddForce(rigidbody,
-                    glm::vec2(physicsSystem->onGroundBitset.test(e) ? -player_controller.HorizontalForce : -player_controller.AirHorizontalForce, 0),
-                    step);
+                // PhysicsSystem::AddForce(rigidbody,
+                //     glm::vec2(physicsSystem->onGroundBitset.test(e) ? -player_controller.HorizontalForce : -player_controller.AirHorizontalForce, 0),
+                //     step);
+                float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
+                    player_controller.AccelerationScalar :
+                        Physics::AirSpeedMultiplier * player_controller.AccelerationScalar;
+                float maxSpeed = physicsSystem->onGroundBitset.test(e) ?
+                    player_controller.MaxHorizontalSpeed : 
+                        Physics::AirSpeedMultiplier * player_controller.MaxHorizontalSpeed;
+                rigidbody.LinearVelocity.x = (1 - accelerationScalar) * rigidbody.LinearVelocity.x
+                    + accelerationScalar * -maxSpeed; 
+
                 if (!runningBitset_.test(e))
                 {
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
@@ -50,9 +59,18 @@ auto PlayerSystem::Update(Timestep ts) -> void
             }
             else if (input->IsKeyDown(Key::L))
             {
-                PhysicsSystem::AddForce(rigidbody,
-                    glm::vec2(physicsSystem->onGroundBitset.test(e) ? player_controller.HorizontalForce : player_controller.AirHorizontalForce, 0),
-                    step);
+                // PhysicsSystem::AddForce(rigidbody,
+                //     glm::vec2(physicsSystem->onGroundBitset.test(e) ? player_controller.HorizontalForce : player_controller.AirHorizontalForce, 0),
+                //     step);
+                float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
+                    player_controller.AccelerationScalar :
+                        Physics::AirSpeedMultiplier * player_controller.AccelerationScalar;
+                float maxSpeed = physicsSystem->onGroundBitset.test(e) ?
+                    player_controller.MaxHorizontalSpeed : 
+                        Physics::AirSpeedMultiplier * player_controller.MaxHorizontalSpeed;
+                rigidbody.LinearVelocity.x = (1 - accelerationScalar) * rigidbody.LinearVelocity.x
+                    + accelerationScalar * maxSpeed; 
+
                 if (!runningBitset_.test(e))
                 {
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
