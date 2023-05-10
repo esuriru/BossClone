@@ -23,9 +23,10 @@ namespace Physics
 
 struct PlayerController2DComponent
 {
-    float HorizontalForce = 80.f;
+    float MaxHorizontalSpeed = 400.f;
+    float AccelerationScalar = 0.05f;    
+
     float JumpForce = 500.f; 
-    float AirHorizontalForce = 8.f;
 };
 
 struct RigidBody2DComponent
