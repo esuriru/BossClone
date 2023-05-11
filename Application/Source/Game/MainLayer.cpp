@@ -70,6 +70,7 @@ MainLayer::MainLayer()
     physicsSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
     physicsSystemSignature.set(coordinator->GetComponentType<RigidBody2DComponent>());
     physicsSystemSignature.set(coordinator->GetComponentType<BoxCollider2DComponent>());
+    physicsSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
     coordinator->SetSystemSignature<PhysicsSystem>(physicsSystemSignature);
 
     Signature activeTilemapSystemSignature;
@@ -215,6 +216,7 @@ MainLayer::MainLayer()
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
     coordinator->AddComponent(playerEntity, inventoryComponent);
+    coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
 }
 
 auto MainLayer::OnAttach() -> void 

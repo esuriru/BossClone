@@ -3,6 +3,8 @@
 
 namespace Utility
 {
+    using Vector2ui = std::pair<size_t, size_t>;
+
     glm::vec4 constexpr Colour32BitConvert(const glm::vec4& colour)
     {
         return glm::vec4(colour.r / 255.f, colour.g / 255.f, colour.b / 255.f, colour.a);

@@ -6,11 +6,36 @@
 TilemapComponent::TilemapComponent(const std::string &map_csv, bool make_tiles_solid)
 {
     ImportTilemapCSV(map_csv, make_tiles_solid);
+
+    HorizontalAreasCount = glm::ceil(
+        static_cast<float>(TilemapData::TILEMAP_MAX_X_LENGTH) *
+            TileSize.x / static_cast<float>(QuadtreeGridAreaWidth));
+
+    VerticalAreasCount = glm::ceil(
+        static_cast<float>(TilemapData::TILEMAP_MAX_Y_LENGTH) *
+            TileSize.y / static_cast<float>(QuadtreeGridAreaHeight));
+
+    // 2D vector resize
+    ObjectsInArea.resize(HorizontalAreasCount);
+    for (int i = 0; i < HorizontalAreasCount; ++i)
+    {
+        ObjectsInArea[i].resize(VerticalAreasCount);
+    }    
+
+
 }
 
 TilemapComponent::TilemapComponent(const std::string &map_csv, const char* tile_type_csv) 
 {
     ImportTilemapCSV(map_csv, std::string(tile_type_csv));
+
+    HorizontalAreasCount = glm::ceil(
+        static_cast<float>(TilemapData::TILEMAP_MAX_X_LENGTH) *
+            TileSize.x / static_cast<float>(QuadtreeGridAreaWidth));
+
+    VerticalAreasCount = glm::ceil(
+        static_cast<float>(TilemapData::TILEMAP_MAX_Y_LENGTH) *
+            TileSize.y / static_cast<float>(QuadtreeGridAreaHeight));
 }
 
 auto TilemapComponent::ImportTilemapCSV(const std::string &map_csv, bool make_tiles_solid) -> void

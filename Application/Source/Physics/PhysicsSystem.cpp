@@ -13,6 +13,8 @@
 #include <glm/common.hpp>
 #include <glm/gtx/norm.hpp>
 
+#include <utility>
+
 #include "Utils/Util.h"
 
 #include <limits>
@@ -21,6 +23,7 @@ static Coordinator* coordinator = Coordinator::Instance();
 
 auto ActiveTilemapSystem::Update(Timestep ts) -> void
 {
+    
 }
 
 auto ActiveTilemapSystem::GetClosestTilemap(const glm::vec2 &position) -> Entity
@@ -442,6 +445,12 @@ auto PhysicsSystem::GetTileIndexYAtWorldPoint(const glm::vec3 &tilemapPosition, 
     return static_cast<size_t>((y - tilemapPosition.y + tileSize.y * 0.5f) / tileSize.y);
 }
 
+auto PhysicsSystem::GetTileIndicesAtWorldPoint(const glm::vec3 &tilemapPosition, const glm::vec2 &tileSize, const glm::vec2& worldPosition) const -> Utility::Vector2ui
+{
+    return std::make_pair(static_cast<size_t>((worldPosition.x - tilemapPosition.x + tileSize.x * 0.5f) / tileSize.x),
+        static_cast<size_t>((worldPosition.y - tilemapPosition.y + tileSize.y * 0.5f) / tileSize.y));
+}
+
 auto PhysicsSystem::GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, size_t index_x, size_t index_y) const -> glm::vec2
 {
     return (glm::vec2(index_x, index_y) * tileSize) + glm::vec2(tilemapWorldPosition);
@@ -450,4 +459,94 @@ auto PhysicsSystem::GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, 
 auto PhysicsSystem::GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, glm::vec2 column_row) const -> glm::vec2
 {
     return (column_row * tileSize) + glm::vec2(tilemapWorldPosition);
+}
+
+auto PhysicsSystem::GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent &tilemap, const glm::vec2 &worldPosition) const -> Tile &
+{
+    return tilemap.MapData[GetTileIndexYAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.y)][GetTileIndexXAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.x)];
+}
+
+auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void
+{
+    glm::vec2 pos_vec2 = glm::vec2(transform.Position);
+    glm::vec2 offsetPosition = pos_vec2 + collider.Offset;
+
+    auto topLeftTile = GetTileIndicesAtWorldPoint(tilemapWorldPosition, nearestTilemap.TileSize, offsetPosition + glm::vec2(-collider.Extents.x, collider.Extents.y)); 
+    auto topRightTile = GetTileIndicesAtWorldPoint(tilemapWorldPosition, nearestTilemap.TileSize, offsetPosition + collider.Extents);
+    auto bottomLeftTile = GetTileIndicesAtWorldPoint(tilemapWorldPosition, nearestTilemap.TileSize, offsetPosition - collider.Extents);
+    auto bottomRightTile = std::make_pair<size_t, size_t>(0, 0);
+
+    topLeftTile.first /= nearestTilemap.QuadtreeGridAreaWidth;
+    topLeftTile.second /= nearestTilemap.QuadtreeGridAreaHeight;
+
+    topRightTile.first /= nearestTilemap.QuadtreeGridAreaWidth;
+    topRightTile.second /= nearestTilemap.QuadtreeGridAreaHeight;
+
+    bottomLeftTile.first /= nearestTilemap.QuadtreeGridAreaWidth;
+    bottomLeftTile.second /= nearestTilemap.QuadtreeGridAreaHeight;
+
+    // NOTE - This is all on the assumption that the entity will never be outside of the tilemap. Hence, there should
+    // NOTE - be preliminary checks of the tilemap.
+
+    // No point calculating it when theres already calculated values.
+    bottomRightTile.first = topRightTile.second;
+    bottomRightTile.second = bottomLeftTile.second;
+
+    std::vector<Utility::Vector2ui> overlappingAreas;
+
+    if (topLeftTile.first == topRightTile.first && topLeftTile.second == bottomLeftTile.second)
+    {
+        overlappingAreas.emplace_back(topLeftTile);
+    }
+    else if (topLeftTile.first == topRightTile.first)
+    {
+        overlappingAreas.emplace_back(topLeftTile);
+        overlappingAreas.emplace_back(bottomLeftTile);
+    }
+    else if (topLeftTile.second == bottomLeftTile.second)
+    {
+        overlappingAreas.emplace_back(topLeftTile);
+        overlappingAreas.emplace_back(topRightTile);
+    }
+    else
+    {
+        overlappingAreas.emplace_back(topLeftTile);
+        overlappingAreas.emplace_back(bottomLeftTile);
+        overlappingAreas.emplace_back(topRightTile);
+        overlappingAreas.emplace_back(bottomRightTile);
+    }
+}
+
+auto PhysicsSystem::AddEntityToArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, Entity e) -> void
+{
+    auto& area = nearestTilemap.ObjectsInArea[areaIndices.first][areaIndices.second];
+
+    auto& quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    quadtree_component.Areas.emplace_back(areaIndices);
+    quadtree_component.EntitiesInAreas.emplace_back(area.size());
+
+    area.emplace_back(e);
+}
+
+auto PhysicsSystem::RemoveObjectFromArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, size_t indexInArea, Entity e) -> void
+{
+    auto& area = nearestTilemap.ObjectsInArea[areaIndices.first][areaIndices.second];
+
+    auto& tempEntity = area.back();
+    std::swap(area.back(), area[indexInArea]);
+
+    auto& tempEntityQuadtreeComponent = coordinator->GetComponent<PhysicsQuadtreeComponent>(tempEntity);
+    auto& tempIDs = tempEntityQuadtreeComponent.EntitiesInAreas;
+    auto& tempAreas = tempEntityQuadtreeComponent.Areas;
+
+    for (size_t i = 0; i < tempAreas.size(); ++i)
+    {
+        if (tempAreas[i] == areaIndices)
+        {
+            tempIDs[i] = indexInArea;
+            break;
+        }
+    }
+
+    area.pop_back();
 }

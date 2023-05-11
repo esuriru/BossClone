@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include "Core/Timestep.h"
+#include "Utils/Util.h"
 
 namespace Physics
 {
@@ -66,3 +67,12 @@ struct BoxCollider2DComponent
         : Offset(offset), Extents(extents) {}
     BoxCollider2DComponent() = default;
 };
+
+struct PhysicsQuadtreeComponent
+{
+    PhysicsQuadtreeComponent() = default;
+
+    std::vector<Utility::Vector2ui> Areas;
+    std::vector<size_t> EntitiesInAreas;
+};
+

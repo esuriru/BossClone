@@ -9,6 +9,7 @@
 #include "Game/Tilemap.h"
 #include <utility>
 #include <bitset>
+#include "Utils/Util.h"
 
 namespace Physics
 {
@@ -26,7 +27,7 @@ public:
     auto Update(Timestep ts) -> void;
     auto GetClosestTilemap(const glm::vec2& position) -> Entity;
     auto GetTilemapCentre(TilemapComponent& tilemap, TransformComponent& transform) const -> glm::vec2;
-    
+
 };
 
 class PhysicsSystem : public System
@@ -66,7 +67,20 @@ private:
 
     auto GetTileIndexXAtWorldPoint(const glm::vec3& tilemapPosition, const glm::vec2& tileSize, const float x) const -> size_t;
     auto GetTileIndexYAtWorldPoint(const glm::vec3& tilemapPosition, const glm::vec2& tileSize, const float y) const -> size_t;
+    
+    auto GetTileIndicesAtWorldPoint(const glm::vec3& tilemapPosition, const glm::vec2& tileSize, const glm::vec2& worldPosition) const -> Utility::Vector2ui;
 
     auto GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, size_t index_x, size_t index_y) const -> glm::vec2;
     auto GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, glm::vec2 column_row) const -> glm::vec2;
+
+    auto GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent& tilemap, const glm::vec2& worldPosition) const -> Tile&;
+
+
+    // Quadtree
+    auto UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void;
+
+    auto AddEntityToArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, Entity e) -> void;
+    auto RemoveObjectFromArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, size_t indexInArea, Entity e) -> void;
+
+    
 };

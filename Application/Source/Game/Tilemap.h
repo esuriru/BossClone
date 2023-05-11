@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <vector>
 
 #include "Core/Core.h"
 #include "Renderer/SubTexture2D.h"
@@ -55,4 +56,13 @@ struct TilemapComponent
 
     // Import tilemap with both map and tile types CSVs 
     auto ImportTilemapCSV(const std::string& map_csv, const std::string& tile_type_csv) -> void;
+
+    // Quadtree 
+    int QuadtreeGridAreaWidth = 16;  
+    int QuadtreeGridAreaHeight = 16;  
+
+    int HorizontalAreasCount = 0;
+    int VerticalAreasCount = 0;
+
+    std::vector<std::vector<std::vector<Entity>>> ObjectsInArea;
 };

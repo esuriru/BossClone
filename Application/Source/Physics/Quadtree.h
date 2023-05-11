@@ -10,7 +10,6 @@ public:
     float gridAreaHeight = 16;
 
 private:
-    std::vector<glm::vec2> areas_;
-    std::vector<Entity> entitiesInAreas_;
+    std::vector<Entity> objectsInArea_; 
         
 };
