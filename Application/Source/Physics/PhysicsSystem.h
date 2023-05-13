@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 
 #include "PhysicsComponent.h"
+#include "Collision2D.h"
 #include "ECS/Component.h"
 #include "Game/Tilemap.h"
 #include <utility>
@@ -27,6 +28,11 @@ public:
     auto Update(Timestep ts) -> void;
     auto GetClosestTilemap(const glm::vec2& position) -> Entity;
     auto GetTilemapCentre(TilemapComponent& tilemap, TransformComponent& transform) const -> glm::vec2;
+    auto CheckCollisions() -> void;
+
+private:
+
+    auto HasCollisionData(const PhysicsQuadtreeComponent& pqc, Entity e) -> bool;
 
 };
 
@@ -43,6 +49,14 @@ public:
     // Bitsets for determining at what state is the entity at. Using bitsets because entities are essentially IDs and it maximizes the memory efficiency.
     std::bitset<MaxEntities> onGroundBitset;
     std::bitset<MaxEntities> onPlatformBitset;
+
+    inline static auto AABBTest(const BoxCollider2DComponent& box1, const glm::vec3& box1pos, const BoxCollider2DComponent& box2, const glm::vec3& box2pos, glm::vec2& outOverlap) -> bool
+    {
+        return AABBTest(box1, glm::vec2(box1pos), box2, glm::vec2(box2pos), outOverlap);
+    }
+
+    static auto AABBTest(const BoxCollider2DComponent& box1, const glm::vec2& box1pos, const BoxCollider2DComponent& box2, const glm::vec2& box2pos, glm::vec2& outOverlap) -> bool;
+
 private:
     Timestep currentTimestep_;
 
@@ -81,6 +95,4 @@ private:
 
     auto AddEntityToArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, Entity e) -> void;
     auto RemoveObjectFromArea(Utility::Vector2ui areaIndices, TilemapComponent& nearestTilemap, size_t indexInArea, Entity e) -> void;
-
-    
 };

@@ -35,6 +35,7 @@ namespace TilemapData
 };
 
 // NOTE - An instance of a TilemapComponent is like a chunk that will be shown to the screen.
+// NOTE - There will probably be multiple lest the game be side-scrolling.
 struct TilemapComponent
 {
     // The map of textures
@@ -58,11 +59,14 @@ struct TilemapComponent
     auto ImportTilemapCSV(const std::string& map_csv, const std::string& tile_type_csv) -> void;
 
     // Quadtree 
-    int QuadtreeGridAreaWidth = 16;  
-    int QuadtreeGridAreaHeight = 16;  
+    int QuadtreeGridAreaWidth = 64;  
+    int QuadtreeGridAreaHeight = 64;  
 
     int HorizontalAreasCount = 0;
     int VerticalAreasCount = 0;
 
     std::vector<std::vector<std::vector<Entity>>> ObjectsInArea;
+
+private:
+    auto InitializeQuadtree() -> void;
 };

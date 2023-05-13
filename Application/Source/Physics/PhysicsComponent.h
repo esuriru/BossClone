@@ -4,6 +4,10 @@
 #include "Core/Timestep.h"
 #include "Utils/Util.h"
 
+#include <vector>
+
+struct Collision2D;
+
 namespace Physics
 {
     enum class ForceMode
@@ -74,5 +78,8 @@ struct PhysicsQuadtreeComponent
 
     std::vector<Utility::Vector2ui> Areas;
     std::vector<size_t> EntitiesInAreas;
+
+    // TODO - Make the list a dictionary instead so it's a hashmap search instead.
+    std::vector<Collision2D> Collisions;
 };
 

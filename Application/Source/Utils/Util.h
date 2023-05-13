@@ -1,5 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <utility>
+#include <algorithm>
+#include <vector>
 
 namespace Utility
 {
@@ -10,8 +13,14 @@ namespace Utility
         return glm::vec4(colour.r / 255.f, colour.g / 255.f, colour.b / 255.f, colour.a);
     }
 
-    template<typename T1, typename T2>
-    bool Contains(T1 container, T2 val)
+    template<typename T, typename A>
+    void RemoveAt(std::vector<T, A>& container, size_t index)
+    {
+        container.erase(container.begin() + index);
+    }
+
+    template<typename C, typename T>
+    bool Contains(C& container, T val)
     {
         return std::find(container.begin(), container.end(), val) != container.end();
     }

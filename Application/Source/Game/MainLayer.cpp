@@ -24,6 +24,7 @@ MainLayer::MainLayer()
     coordinator->Init();
 
     // Register components
+
     coordinator->RegisterComponent<TransformComponent>();
     coordinator->RegisterComponent<SpriteRendererComponent>();
     coordinator->RegisterComponent<TileRendererComponent>();
@@ -37,6 +38,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<WeaponComponent>();
     coordinator->RegisterComponent<OwnedByComponent>();
     coordinator->RegisterComponent<InventoryComponent>();
+    coordinator->RegisterComponent<PhysicsQuadtreeComponent>();
 
     // System registry
 
@@ -217,6 +219,14 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(playerEntity, inventoryComponent);
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
+
+    auto testPhysicsEntity = coordinator->CreateEntity();
+    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0)));
+    coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent()); 
+    coordinator->AddComponent(testPhysicsEntity, BoxCollider2DComponent());
+    coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
+    coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
+
 }
 
 auto MainLayer::OnAttach() -> void 

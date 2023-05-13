@@ -23,7 +23,6 @@ static Coordinator* coordinator = Coordinator::Instance();
 
 auto ActiveTilemapSystem::Update(Timestep ts) -> void
 {
-    
 }
 
 auto ActiveTilemapSystem::GetClosestTilemap(const glm::vec2 &position) -> Entity
@@ -54,6 +53,64 @@ auto ActiveTilemapSystem::GetTilemapCentre(TilemapComponent &tilemap, TransformC
     return (position_vec2 + 0.5f * glm::vec2(TilemapData::TILEMAP_MAX_X_LENGTH * tilemap.TileSize.x, TilemapData::TILEMAP_MAX_Y_LENGTH * tilemap.TileSize.y));
 }
 
+auto ActiveTilemapSystem::CheckCollisions() -> void
+{
+    for (auto& e : entities)
+    {
+        auto& tilemap = coordinator->GetComponent<TilemapComponent>(e);
+
+        for (int y = 0; y < tilemap.VerticalAreasCount; ++y)
+        {
+            for (int x = 0; x < tilemap.HorizontalAreasCount; ++x)
+            {
+                auto& objects = tilemap.ObjectsInArea[x][y];
+                for (int i = 0; i < static_cast<int>(objects.size()) - 1; ++i)
+                {
+                    auto& obj1 = objects[i];
+                    for (int j = i + 1; j < static_cast<int>(objects.size()); ++j)
+                    {
+                        auto& obj2 = objects[j];
+
+                        auto& physics_quadtree_comp1 = coordinator->GetComponent<PhysicsQuadtreeComponent>(obj1);
+                        auto& physics_quadtree_comp2 = coordinator->GetComponent<PhysicsQuadtreeComponent>(obj2);
+
+                        if (HasCollisionData(physics_quadtree_comp1, obj2) || HasCollisionData(physics_quadtree_comp2, obj1)) 
+                            continue;
+
+                        // NOTE - The design of the physics system is such that there will be a need for
+                        // NOTE - each physics object to have both a box collider and a rigidbody.
+                        auto& col1 = coordinator->GetComponent<BoxCollider2DComponent>(obj1);
+                        auto pos1 = glm::vec2(coordinator->GetComponent<TransformComponent>(obj1).Position);
+                        auto& rb1 = coordinator->GetComponent<RigidBody2DComponent>(obj1);
+                        auto& col2 = coordinator->GetComponent<BoxCollider2DComponent>(obj2);
+                        auto pos2 = glm::vec2(coordinator->GetComponent<TransformComponent>(obj2).Position);
+                        auto& rb2 = coordinator->GetComponent<RigidBody2DComponent>(obj1);
+
+                        glm::vec2 overlap;
+
+                        if (PhysicsSystem::AABBTest(col1, pos1, col2, pos2, overlap)) 
+                        {
+                            physics_quadtree_comp1.Collisions.emplace_back(Collision2D(obj2, overlap, rb1.LinearVelocity, rb2.LinearVelocity, pos1, pos2));
+                            physics_quadtree_comp2.Collisions.emplace_back(Collision2D(obj1, overlap, rb2.LinearVelocity, rb1.LinearVelocity, pos2, pos1));
+                            CC_TRACE("Collision detected.");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+auto ActiveTilemapSystem::HasCollisionData(const PhysicsQuadtreeComponent& pqc, Entity e) -> bool
+{
+    for (const auto& c : pqc.Collisions)
+    {
+        if (c.OtherEntity == e)
+            return true;
+    }
+    return false;
+}
+
 auto PhysicsSystem::Update(Timestep ts) -> void
 {
     if (entities.empty()) return;
@@ -76,6 +133,19 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(e);
 
             bool entityOnGround = onGroundBitset.test(e);
+
+            // Broad phase chunking 
+            tilemapEntity = tilemapSystem->GetClosestTilemap(transform.Position);
+            if (tilemapEntity == 0)
+                continue;
+
+            auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
+            glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
+
+            UpdateAreas(nearestTilemap, tilemapPosition, e, transform, box_collider);
+            auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+            physics_quadtree_component.Collisions.clear();
+
             // Add gravity.
             if (!entityOnGround)
             {
@@ -91,14 +161,6 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
 
             // Tilemap collision
-
-            // Broad phase chunking 
-            tilemapEntity = tilemapSystem->GetClosestTilemap(transform.Position);
-            if (tilemapEntity == 0)
-                continue;
-
-            auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
-            glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
 
             bool resolved = false;
             float groundLevel = 0.f;
@@ -171,18 +233,18 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             transform.Position = glm::vec3(proposedPosition, 0);
         }
 
+        tilemapSystem->CheckCollisions();
         accumulator -= step;
     }
 }
 
 auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
-    const glm::vec2 &newPosition,
-    const BoxCollider2DComponent &boxCollider,
-    const TilemapComponent &tilemap,
-    const glm::vec3 &tilemapPosition,
-    float& groundLevel,
-    bool& onPlatform
-) -> bool 
+                                                const glm::vec2 &newPosition,
+                                                const BoxCollider2DComponent &boxCollider,
+                                                const TilemapComponent &tilemap,
+                                                const glm::vec3 &tilemapPosition,
+                                                float &groundLevel,
+                                                bool &onPlatform) -> bool
 {
     glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
     glm::vec2 newCentre = newPosition + boxCollider.Offset;
@@ -466,6 +528,23 @@ auto PhysicsSystem::GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, T
     return tilemap.MapData[GetTileIndexYAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.y)][GetTileIndexXAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.x)];
 }
 
+auto PhysicsSystem::AABBTest(const BoxCollider2DComponent &box1, const glm::vec2& box1pos, const BoxCollider2DComponent &box2, const glm::vec2& box2pos, glm::vec2 &outOverlap) -> bool
+{
+    if (box1.Extents.x == 0.f || box1.Extents.y == 0.f || box2.Extents.x == 0.f || box2.Extents.y == 0.f ||
+        fabs((box1pos.x + box1.Offset.x) - (box2pos.x + box2.Offset.x)) > box1.Extents.x + box2.Extents.x ||
+            fabs((box1pos.y + box1.Offset.y) - (box2pos.y + box2.Offset.y)) > box1.Extents.y + box2.Extents.y)
+                return false;
+
+    outOverlap = glm::vec2(
+        glm::sign((box1pos.x + box1.Offset.x) - (box2pos.x + box2.Offset.x)) * 
+            ((box1.Extents.x + box2.Extents.x)) - fabs((box1pos.x + box1.Offset.x) - (box2pos.x + box2.Offset.x)),
+        glm::sign((box1pos.y + box1.Offset.y) - (box2pos.y + box2.Offset.y)) * 
+            ((box1.Extents.y + box2.Extents.y)) - fabs((box1pos.y + box1.Offset.y) - (box2pos.y + box2.Offset.y))
+    );
+
+    return true;
+}
+
 auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void
 {
     glm::vec2 pos_vec2 = glm::vec2(transform.Position);
@@ -492,28 +571,58 @@ auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec
     bottomRightTile.first = topRightTile.second;
     bottomRightTile.second = bottomLeftTile.second;
 
-    std::vector<Utility::Vector2ui> overlappingAreas;
+    std::array<Utility::Vector2ui, 4> overlappingAreas;
+    size_t count = 0;
 
     if (topLeftTile.first == topRightTile.first && topLeftTile.second == bottomLeftTile.second)
     {
-        overlappingAreas.emplace_back(topLeftTile);
+        overlappingAreas[0] = (topLeftTile);
+        count = 1;
     }
     else if (topLeftTile.first == topRightTile.first)
     {
-        overlappingAreas.emplace_back(topLeftTile);
-        overlappingAreas.emplace_back(bottomLeftTile);
+        overlappingAreas[0] = (topLeftTile);
+        overlappingAreas[1] = (bottomLeftTile);
+        count = 2;
     }
     else if (topLeftTile.second == bottomLeftTile.second)
     {
-        overlappingAreas.emplace_back(topLeftTile);
-        overlappingAreas.emplace_back(topRightTile);
+        overlappingAreas[0] = (topLeftTile);
+        overlappingAreas[1] = (topRightTile);
+        count = 2;
     }
     else
     {
-        overlappingAreas.emplace_back(topLeftTile);
-        overlappingAreas.emplace_back(bottomLeftTile);
-        overlappingAreas.emplace_back(topRightTile);
-        overlappingAreas.emplace_back(bottomRightTile);
+        overlappingAreas[0] = (topLeftTile);
+        overlappingAreas[1] = (bottomLeftTile);
+        overlappingAreas[2] = (topRightTile);
+        overlappingAreas[3] = (bottomRightTile);
+        count = 4;
+    }
+
+    auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    auto& areas = physics_quadtree_component.Areas;
+    auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
+
+    for (int i = 0; i < areas.size(); ++i)
+    {
+        if (!Utility::Contains(overlappingAreas, areas[i]))
+        {
+            RemoveObjectFromArea(areas[i], nearestTilemap, entities_in_areas[i], e);
+
+            Utility::RemoveAt(areas, i);
+            Utility::RemoveAt(entities_in_areas, i);
+            --i;
+        }
+    }
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        auto& area = overlappingAreas[i];
+        if (!Utility::Contains(areas, area))
+        {
+            AddEntityToArea(area, nearestTilemap, e);
+        }
     }
 }
 
