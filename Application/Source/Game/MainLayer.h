@@ -39,6 +39,7 @@ private:
     Ref<TilemapRenderSystem> tilemapRenderSystem_;
     Ref<PhysicsSystem> physicsSystem_;
     Ref<PlayerSystem> playerSystem_;
+    Ref<DamageableSystem> damageableSystem_;
 
     // Animation systems
     Ref<RunningAnimationSystem> runningAnimationSystem_;

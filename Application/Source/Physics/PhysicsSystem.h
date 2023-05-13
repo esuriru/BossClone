@@ -12,6 +12,8 @@
 #include <bitset>
 #include "Utils/Util.h"
 
+#include "Core/Window.h"
+
 namespace Physics
 {
     constexpr float GravityAccelerationScalar = -20.8f;
@@ -30,8 +32,9 @@ public:
     auto GetTilemapCentre(TilemapComponent& tilemap, TransformComponent& transform) const -> glm::vec2;
     auto CheckCollisions() -> void;
 
-private:
+    EventCallback eventCallback;
 
+private:
     auto HasCollisionData(const PhysicsQuadtreeComponent& pqc, Entity e) -> bool;
 
 };

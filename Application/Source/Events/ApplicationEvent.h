@@ -8,6 +8,8 @@
 
 #include "ECS/Component.h"
 
+#include "Physics/Collision2D.h"
+
 class WindowResizeEvent : public Event
 {
 public:
@@ -115,4 +117,37 @@ private:
     bool mouseDown_;
 };
 
+class CollisionEvent : public Event
+{
+public:
+    CollisionEvent(Entity origin, Collision2D& collision) : origin_(origin), collision_(collision) {}
 
+    NR_EVENT_CLASS_TYPE(Collision)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetCollision() -> const Collision2D& { return collision_; }
+    inline auto GetOriginEntity() -> Entity& { return origin_; }
+
+private:
+    Entity origin_;
+    Collision2D& collision_;
+};
+
+class DamageEvent : public Event
+{
+public:
+    DamageEvent(Entity weaponEntity, WeaponComponent& weaponComponent, Entity targetEntity) :
+        weaponEntity_(weaponEntity), weaponComponent_(weaponComponent), targetEntity_(targetEntity) {}
+
+    NR_EVENT_CLASS_TYPE(Damage)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetWeaponEntity() -> Entity { return weaponEntity_; } 
+    inline auto GetTargetEntity() -> Entity { return targetEntity_; } 
+    inline auto GetWeaponComponent() -> WeaponComponent& { return weaponComponent_; }
+
+private:
+    Entity weaponEntity_, targetEntity_;
+    WeaponComponent& weaponComponent_;
+
+};

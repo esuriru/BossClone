@@ -3,10 +3,14 @@
 #include "PhysicsComponent.h"
 #include "ECS/Component.h"
 
+#include "Physics/Collision2D.h"
+
 #include "ECS/Coordinator.h"
 #include "Game/Tilemap.h"
 #include "Core/Core.h"
 #include "Game/Tilemap.h"
+
+#include "Events/ApplicationEvent.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -74,8 +78,9 @@ auto ActiveTilemapSystem::CheckCollisions() -> void
                         auto& physics_quadtree_comp1 = coordinator->GetComponent<PhysicsQuadtreeComponent>(obj1);
                         auto& physics_quadtree_comp2 = coordinator->GetComponent<PhysicsQuadtreeComponent>(obj2);
 
-                        if (HasCollisionData(physics_quadtree_comp1, obj2) || HasCollisionData(physics_quadtree_comp2, obj1)) 
-                            continue;
+
+                        if (HasCollisionData(physics_quadtree_comp1, obj2) || HasCollisionData(physics_quadtree_comp2, obj1) ||
+                            !physics_quadtree_comp1.Active || !physics_quadtree_comp2.Active) continue;
 
                         // NOTE - The design of the physics system is such that there will be a need for
                         // NOTE - each physics object to have both a box collider and a rigidbody.
@@ -84,15 +89,18 @@ auto ActiveTilemapSystem::CheckCollisions() -> void
                         auto& rb1 = coordinator->GetComponent<RigidBody2DComponent>(obj1);
                         auto& col2 = coordinator->GetComponent<BoxCollider2DComponent>(obj2);
                         auto pos2 = glm::vec2(coordinator->GetComponent<TransformComponent>(obj2).Position);
-                        auto& rb2 = coordinator->GetComponent<RigidBody2DComponent>(obj1);
+                        auto& rb2 = coordinator->GetComponent<RigidBody2DComponent>(obj2);
 
                         glm::vec2 overlap;
 
                         if (PhysicsSystem::AABBTest(col1, pos1, col2, pos2, overlap)) 
                         {
-                            physics_quadtree_comp1.Collisions.emplace_back(Collision2D(obj2, overlap, rb1.LinearVelocity, rb2.LinearVelocity, pos1, pos2));
+                            Collision2D obj1_collision = Collision2D(obj2, overlap, rb1.LinearVelocity, rb2.LinearVelocity, pos1, pos2);
+                            physics_quadtree_comp1.Collisions.emplace_back(obj1_collision);
                             physics_quadtree_comp2.Collisions.emplace_back(Collision2D(obj1, overlap, rb2.LinearVelocity, rb1.LinearVelocity, pos2, pos1));
-                            CC_TRACE("Collision detected.");
+
+                            CollisionEvent event(obj1, obj1_collision);
+                            eventCallback(event);
                         }
                     }
                 }
@@ -115,8 +123,8 @@ auto PhysicsSystem::Update(Timestep ts) -> void
 {
     if (entities.empty()) return;
 
-    constexpr int8_t velocityIterations = 6;
-    constexpr int8_t positionIterations = 2;
+    // constexpr int8_t velocityIterations = 6;
+    // constexpr int8_t positionIterations = 2;
 
     constexpr float step = 1 / 50.f;
     static float accumulator = 0.f;
@@ -145,6 +153,9 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             UpdateAreas(nearestTilemap, tilemapPosition, e, transform, box_collider);
             auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
             physics_quadtree_component.Collisions.clear();
+
+            if (rigidbody.BodyType == Physics::RigidBodyType::Static)
+                continue;
 
             // Add gravity.
             if (!entityOnGround)

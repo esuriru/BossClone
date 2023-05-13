@@ -22,4 +22,14 @@ public:
 
 private:
     auto OnWeaponUseEvent(WeaponUseEvent& e) -> bool;
+    auto OnCollisionEvent(CollisionEvent& e) -> bool;
+};
+
+class DamageableSystem : public System
+{
+public:
+    auto OnEvent(Event& e) -> void;
+
+private:
+    auto OnDamageEvent(DamageEvent& e) -> bool;
 };

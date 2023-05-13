@@ -76,6 +76,8 @@ struct PhysicsQuadtreeComponent
 {
     PhysicsQuadtreeComponent() = default;
 
+    bool Active = true;
+
     std::vector<Utility::Vector2ui> Areas;
     std::vector<size_t> EntitiesInAreas;
 

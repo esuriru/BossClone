@@ -124,6 +124,14 @@ struct WeaponComponent
 {
     float Damage = 0.f;
     WeaponBehaviour Behaviour;  
+
+    // For collision
+    glm::vec2 OldExtents{};
+    glm::vec2 NewExtents{};
+    glm::vec2 HandOffset{};
+
+    bool Active = false;
+    bool HiddenOnActive = true;
 };
 
 struct OwnedByComponent
@@ -132,4 +140,17 @@ struct OwnedByComponent
     OwnedByComponent(Entity owner) : Owner(owner) {}
 
     Entity Owner;
+};
+
+struct HealthComponent
+{
+    HealthComponent() = default;
+    HealthComponent(float max, bool reset = true)
+        : MaxHealth(max)
+    {
+        Health = MaxHealth;
+    }
+
+    float Health = 0.f;
+    float MaxHealth = 100.f;
 };

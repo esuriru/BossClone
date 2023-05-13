@@ -1,3 +1,5 @@
+#pragma once 
+
 #include "ECS/Entity.h"
 #include <glm/glm.hpp>
 

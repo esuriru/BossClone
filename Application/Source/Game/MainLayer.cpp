@@ -18,10 +18,11 @@ MainLayer::MainLayer()
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
 
-    // Register components
     static Coordinator* coordinator = Coordinator::Instance();
 
     coordinator->Init();
+
+    // TODO - Consider using pragma region.
 
     // Register components
 
@@ -39,6 +40,8 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<OwnedByComponent>();
     coordinator->RegisterComponent<InventoryComponent>();
     coordinator->RegisterComponent<PhysicsQuadtreeComponent>();
+    coordinator->RegisterComponent<HealthComponent>();
+
 
     // System registry
 
@@ -50,13 +53,15 @@ MainLayer::MainLayer()
     physicsSystem_->tilemapSystem = coordinator->RegisterSystem<ActiveTilemapSystem>();
     playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
     playerSystem_->physicsSystem = physicsSystem_;
-    playerSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
+    playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     runningAnimationSystem_ = coordinator->RegisterSystem<RunningAnimationSystem>();
     swingingAnimationSystem_ = coordinator->RegisterSystem<SwingingAnimationSystem>();
 
     weaponSystem_ = coordinator->RegisterSystem<WeaponSystem>();
     weaponSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
+
+    damageableSystem_ = coordinator->RegisterSystem<DamageableSystem>();
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -100,6 +105,10 @@ MainLayer::MainLayer()
     weaponSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
     weaponSystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
     coordinator->SetSystemSignature<WeaponSystem>(weaponSystemSignature);
+
+    Signature damageableSystemSignature;
+    damageableSystemSignature.set(coordinator->GetComponentType<HealthComponent>());
+    coordinator->SetSystemSignature<DamageableSystem>(damageableSystemSignature);
 
     // TODO - Fix tilemap bleeding
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
@@ -211,21 +220,39 @@ MainLayer::MainLayer()
 
     WeaponComponent meleeWeaponComponent;
     meleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+    meleeWeaponComponent.HandOffset = { 15, -2 };
+    meleeWeaponComponent.Damage = 5.0f;
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
     coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
 
     inventoryComponent.Items.emplace_back(meleeWeaponEntity);
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
+    coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0), glm::vec3(0), glm::vec3(4, 8, 1)));
+    coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
+    RigidBody2DComponent meleeWeaponRigidbody;
+    meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
+
+    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponRigidbody); 
+
+    auto meleeBoxCollider = BoxCollider2DComponent();
+    meleeBoxCollider.Extents = glm::vec2(2, 4);
+    coordinator->AddComponent(meleeWeaponEntity, meleeBoxCollider); 
+    coordinator->AddComponent(meleeWeaponEntity, PhysicsQuadtreeComponent()); 
+
     coordinator->AddComponent(playerEntity, inventoryComponent);
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
 
     auto testPhysicsEntity = coordinator->CreateEntity();
-    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0)));
+    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0), glm::vec3(0), glm::vec3(12, 12, 1)));
     coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent()); 
-    coordinator->AddComponent(testPhysicsEntity, BoxCollider2DComponent());
+
+    auto testPhysicsEntityCollider = BoxCollider2DComponent();
+    testPhysicsEntityCollider.Extents = glm::vec2(6, 6);
+    coordinator->AddComponent(testPhysicsEntity, testPhysicsEntityCollider); 
     coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(testPhysicsEntity, HealthComponent(100));
 
 }
 
@@ -242,9 +269,9 @@ auto MainLayer::OnDetach() -> void
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
     cameraController_.OnUpdate(ts);
+    weaponSystem_->Update(ts);
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
-    weaponSystem_->Update(ts);
 
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
@@ -268,6 +295,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 
     // All the render stuff should be after.
     cameraController_.OnEvent(e);
+    damageableSystem_->OnEvent(e);
     runningAnimationSystem_->OnEvent(e);    
     swingingAnimationSystem_->OnEvent(e);
 }
