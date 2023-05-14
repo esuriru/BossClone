@@ -15,6 +15,10 @@
 
 static Coordinator* coordinator = Coordinator::Instance();
 
+PlayerSystem::PlayerSystem()
+{
+}
+
 auto PlayerSystem::Update(Timestep ts) -> void
 {
     if (entities.empty()) return;

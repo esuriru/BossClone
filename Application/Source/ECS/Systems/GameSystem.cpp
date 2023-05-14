@@ -23,9 +23,19 @@ auto WeaponSystem::Update(Timestep ts) -> void
             auto& transform = coordinator->GetComponent<TransformComponent>(e);
             auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
             auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
+            auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
 
             // For detecting collision.
             transform.Position = owner_centre + glm::vec3(weapon.HandOffset, 0);
+
+            // if (physics_quadtree.Active)
+            // {
+            //     CC_TRACE("Physics quad tree active for weapon.");
+            // }
+            // else
+            //     CC_TRACE("Physics quad tree not active for weapon.");
+            // if (weapon.CurrentCooldownFrames > 0)
+            //     --weapon.CurrentCooldownFrames;
         }
     } 
 }
@@ -124,6 +134,17 @@ auto WeaponSystem::OnCollisionEvent(CollisionEvent &e) -> bool
     return true;
 }
 
+auto DamageableSystem::Update(Timestep ts) -> void
+{
+    for (auto& e : entities)
+    {
+        auto& health = coordinator->GetComponent<HealthComponent>(e);
+
+        if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
+            coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+    }
+}
+
 auto DamageableSystem::OnEvent(Event &e) -> void
 {
     EventDispatcher dispatcher(e);
@@ -138,7 +159,58 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
 
     auto& health = coordinator->GetComponent<HealthComponent>(target);
     health.Health -= e.GetWeaponComponent().Damage;
+
+    // Apply an i-frame to the enemy.
+    health.CurrentCooldownFrames += health.CooldownFramesOnHit;
+    coordinator->GetComponent<PhysicsQuadtreeComponent>(target).Active = false;
+
     CC_TRACE("New health: ", health.Health);
 
+    return true;
+}
+
+auto WeaponAffectedByAnimationSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<ItemAffectByAnimationEvent>(CC_BIND_EVENT_FUNC(WeaponAffectedByAnimationSystem::OnItemAffectByAnimationEvent));
+}
+
+auto WeaponAffectedByAnimationSystem::OnItemAffectByAnimationEvent(ItemAffectByAnimationEvent &e) -> bool
+{
+    if (entities.find(e.GetItemEntity()) == entities.end())
+        return false;
+            
+    auto& waba = coordinator->GetComponent<WeaponAffectedByAnimationComponent>(e.GetItemEntity()); 
+
+    waba.AnimationBehaviour(e.GetItemEntity(), e.GetAnimationSpriteChangeEvent(),
+        coordinator->GetComponent<PlayerController2DComponent>(e.GetAnimationSpriteChangeEvent().
+            GetEntityAffected()).ActiveMeleeWeaponIndices);
+
+    return true;
+}
+
+
+auto PlayerAffectedByAnimationSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<AnimationSpriteChangeEvent>(CC_BIND_EVENT_FUNC(PlayerAffectedByAnimationSystem::OnAnimationSpriteChangeEvent));
+}
+
+auto PlayerAffectedByAnimationSystem::OnAnimationSpriteChangeEvent(AnimationSpriteChangeEvent &e) -> bool 
+{
+    // NOTE - Realistically, if there is only one player, this is pointless, however, this is just in case.
+    if (entities.find(e.GetEntityAffected()) == entities.end())
+        return false;
+
+    auto& animation_effect = coordinator->GetComponent<AffectedByAnimationComponent>(e.GetEntityAffected());
+    if (!(animation_effect.TargetAnimationTypes & e.GetAnimationType()))
+        return false;
+
+    auto& inventory = coordinator->GetComponent<InventoryComponent>(e.GetEntityAffected());
+
+    // Create an event with what the player has in his hand.
+    auto event = ItemAffectByAnimationEvent(inventory.CurrentlyHolding, e);
+    eventCallback(event);
+    
     return true;
 }

@@ -10,6 +10,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
 
+class AnimationSpriteChangeEvent;
 class WeaponUseEvent;
 
 // NOTE - Components are mainly for storing data. All the logic processes will be done in Systems.
@@ -74,7 +75,7 @@ struct TileRendererComponent
 
 struct Animation
 {
-    enum AnimationType
+    enum AnimationType : uint16_t
     {
         None = 0,
         Running,
@@ -132,6 +133,7 @@ struct WeaponComponent
 
     bool Active = false;
     bool HiddenOnActive = true;
+
 };
 
 struct OwnedByComponent
@@ -153,4 +155,23 @@ struct HealthComponent
 
     float Health = 0.f;
     float MaxHealth = 100.f;
+
+    uint32_t CurrentCooldownFrames = 0;
+    uint32_t CooldownFramesOnHit = 240;
 };
+
+struct AffectedByAnimationComponent
+{
+    AffectedByAnimationComponent() = default;
+    AffectedByAnimationComponent(uint16_t types) : TargetAnimationTypes(types) {}
+
+    uint16_t TargetAnimationTypes; 
+};
+
+struct WeaponAffectedByAnimationComponent
+{
+    using WeaponAnimationBehaviour = void(*)(Entity, AnimationSpriteChangeEvent&, const std::set<size_t>&);
+
+    WeaponAnimationBehaviour AnimationBehaviour;
+};
+

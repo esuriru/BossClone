@@ -28,8 +28,32 @@ private:
 class DamageableSystem : public System
 {
 public:
+    auto Update(Timestep ts) -> void;
     auto OnEvent(Event& e) -> void;
 
 private:
     auto OnDamageEvent(DamageEvent& e) -> bool;
 };
+
+class WeaponAffectedByAnimationSystem : public System
+{
+public:
+    auto OnEvent(Event& e) -> void;
+
+    EventCallback eventCallback;
+private:
+    auto OnItemAffectByAnimationEvent(ItemAffectByAnimationEvent& e) -> bool;
+
+};
+
+class PlayerAffectedByAnimationSystem : public System
+{
+public:
+    auto OnEvent(Event& e) -> void;
+
+    EventCallback eventCallback;
+private:
+    auto OnAnimationSpriteChangeEvent(AnimationSpriteChangeEvent& e) -> bool;
+};
+
+

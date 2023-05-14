@@ -5,6 +5,7 @@
 #include "Utils/Util.h"
 
 #include <vector>
+#include <set>
 
 struct Collision2D;
 
@@ -32,6 +33,9 @@ struct PlayerController2DComponent
     float AccelerationScalar = 0.05f;    
 
     float JumpForce = 500.f; 
+
+    std::set<size_t> ActiveMeleeWeaponIndices;
+
 };
 
 struct RigidBody2DComponent

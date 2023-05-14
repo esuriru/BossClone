@@ -34,16 +34,23 @@ private:
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> playerSpritesheet_;
     
-    // Systems
+    // Render Systems 
     Ref<SpriteRenderSystem> spriteRenderSystem_;
     Ref<TilemapRenderSystem> tilemapRenderSystem_;
-    Ref<PhysicsSystem> physicsSystem_;
-    Ref<PlayerSystem> playerSystem_;
-    Ref<DamageableSystem> damageableSystem_;
 
     // Animation systems
     Ref<RunningAnimationSystem> runningAnimationSystem_;
     Ref<SwingingAnimationSystem> swingingAnimationSystem_;
+
+    // Physics System
+    Ref<PhysicsSystem> physicsSystem_;
+
+    // Game Logic systems
+    Ref<PlayerSystem> playerSystem_;
+    Ref<DamageableSystem> damageableSystem_;
+    Ref<PlayerAffectedByAnimationSystem> playerAffectedByAnimationSystem_;
+    Ref<WeaponAffectedByAnimationSystem> weaponAffectedByAnimationSystem_;
+
 
     Ref<WeaponSystem> weaponSystem_;
 

@@ -98,6 +98,24 @@ private:
     Entity entityAffected_;
 };
 
+class AnimationSpriteChangeEvent : public Event
+{
+public:
+    AnimationSpriteChangeEvent(Animation::AnimationType type, Entity entity, size_t index)
+        : animationType_(type), entityAffected_(entity), spriteIndex_(index) {}
+
+	NR_EVENT_CLASS_TYPE(AnimationSpriteChange)
+	NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetSpriteIndex() -> size_t const { return spriteIndex_; }
+    inline auto GetEntityAffected() -> Entity const { return entityAffected_; }
+    inline auto GetAnimationType() -> Animation::AnimationType const { return animationType_; }
+private:
+    Animation::AnimationType animationType_;
+    Entity entityAffected_;
+    size_t spriteIndex_;
+};
+
 class WeaponUseEvent : public Event
 {
 public:
@@ -149,5 +167,24 @@ public:
 private:
     Entity weaponEntity_, targetEntity_;
     WeaponComponent& weaponComponent_;
+
+};
+
+// NOTE - This event is for affecting items (mainly what the character is holding)
+// NOTE - Mainly for setting the collider of the melee weapon active during correct timings.
+class ItemAffectByAnimationEvent : public Event
+{
+public:
+    ItemAffectByAnimationEvent(Entity itemEntity, AnimationSpriteChangeEvent& ascEvent)
+        : itemEntity_(itemEntity), animationSpriteChangeEvent(ascEvent) {}
+
+    inline auto GetItemEntity() -> Entity { return itemEntity_; } 
+    inline auto GetAnimationSpriteChangeEvent() -> AnimationSpriteChangeEvent& { return animationSpriteChangeEvent; }
+
+    NR_EVENT_CLASS_TYPE(ItemAffectByAnimation)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+private:
+    Entity itemEntity_;
+    AnimationSpriteChangeEvent& animationSpriteChangeEvent;
 
 };

@@ -41,7 +41,8 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<InventoryComponent>();
     coordinator->RegisterComponent<PhysicsQuadtreeComponent>();
     coordinator->RegisterComponent<HealthComponent>();
-
+    coordinator->RegisterComponent<AffectedByAnimationComponent>();
+    coordinator->RegisterComponent<WeaponAffectedByAnimationComponent>();
 
     // System registry
 
@@ -53,7 +54,6 @@ MainLayer::MainLayer()
     physicsSystem_->tilemapSystem = coordinator->RegisterSystem<ActiveTilemapSystem>();
     playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
     playerSystem_->physicsSystem = physicsSystem_;
-    playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     runningAnimationSystem_ = coordinator->RegisterSystem<RunningAnimationSystem>();
     swingingAnimationSystem_ = coordinator->RegisterSystem<SwingingAnimationSystem>();
@@ -62,6 +62,17 @@ MainLayer::MainLayer()
     weaponSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     damageableSystem_ = coordinator->RegisterSystem<DamageableSystem>();
+
+    playerAffectedByAnimationSystem_ = coordinator->RegisterSystem<PlayerAffectedByAnimationSystem>();
+    weaponAffectedByAnimationSystem_ = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
+
+    // Set event callbacks for most of the systems.
+    playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback =
+        runningAnimationSystem_->eventCallback = weaponSystem_->eventCallback =
+            swingingAnimationSystem_->eventCallback = 
+                weaponAffectedByAnimationSystem_->eventCallback =
+                    playerAffectedByAnimationSystem_->eventCallback =
+                        CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -108,7 +119,20 @@ MainLayer::MainLayer()
 
     Signature damageableSystemSignature;
     damageableSystemSignature.set(coordinator->GetComponentType<HealthComponent>());
+    damageableSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
     coordinator->SetSystemSignature<DamageableSystem>(damageableSystemSignature);
+
+    Signature weaponAffectedByAnimationSystemSignature;
+    weaponAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
+    weaponAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<WeaponAffectedByAnimationComponent>());
+    weaponAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
+    coordinator->SetSystemSignature<WeaponAffectedByAnimationSystem>(weaponAffectedByAnimationSystemSignature);
+
+    Signature playerAffectedByAnimationSystemSignature;
+    playerAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
+    playerAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<AffectedByAnimationComponent>());
+    playerAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<InventoryComponent>());
+    coordinator->SetSystemSignature<PlayerAffectedByAnimationSystem>(playerAffectedByAnimationSystemSignature);
 
     // TODO - Fix tilemap bleeding
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
@@ -172,7 +196,12 @@ MainLayer::MainLayer()
     swingingAnimationSystem_->SetOriginalTexture(playerSpriteRendererComponent.Texture, playerEntity);
 
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
-    coordinator->AddComponent(playerEntity, PlayerController2DComponent());
+
+    auto playerControllerComponent = PlayerController2DComponent();
+    playerControllerComponent.ActiveMeleeWeaponIndices = { 5 };
+    coordinator->AddComponent(playerEntity, playerControllerComponent);
+
+    coordinator->AddComponent(playerEntity, AffectedByAnimationComponent(Animation::AnimationType::Swinging));
 
     // Running animation
     RunningAnimationComponent runningAnimationComponent;
@@ -225,6 +254,19 @@ MainLayer::MainLayer()
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
     coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
 
+    WeaponAffectedByAnimationComponent meleeWeaponAffectedByAnimationComponent;
+
+    // When the index is part of the weapons 'active index', enable the collider for melee weapons.
+    meleeWeaponAffectedByAnimationComponent.AnimationBehaviour =
+        [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
+            const std::set<size_t>& activeIndices)
+        {
+            bool indexIsActive = activeIndices.find(ascEvent.GetSpriteIndex()) != activeIndices.end();
+            coordinator->GetComponent<PhysicsQuadtreeComponent>(weaponEntity).Active = indexIsActive;
+        };
+
+    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponAffectedByAnimationComponent);
+
     inventoryComponent.Items.emplace_back(meleeWeaponEntity);
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
@@ -270,6 +312,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 {
     cameraController_.OnUpdate(ts);
     weaponSystem_->Update(ts);
+    damageableSystem_->Update(ts);
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
 
@@ -296,6 +339,12 @@ auto MainLayer::OnEvent(Event &e) -> void
     // All the render stuff should be after.
     cameraController_.OnEvent(e);
     damageableSystem_->OnEvent(e);
+
+    // Run the animations
     runningAnimationSystem_->OnEvent(e);    
     swingingAnimationSystem_->OnEvent(e);
+
+    // Animation sprite change events are now called, now setup callbacks
+    playerAffectedByAnimationSystem_->OnEvent(e);
+    weaponAffectedByAnimationSystem_->OnEvent(e);
 }

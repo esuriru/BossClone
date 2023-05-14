@@ -11,6 +11,8 @@
 #include "Events/ApplicationEvent.h"
 #include "Renderer/SubTexture2D.h"
 
+#include "Core/Window.h"
+
 class SpriteRenderSystem : public System
 {
 public:
@@ -54,13 +56,14 @@ template<typename T>
 class AnimationSystem : public System
 {
 public:
+    EventCallback eventCallback;
+
     inline auto Update(Timestep ts) -> void
     {
         static Coordinator* coordinator = Coordinator::Instance(); 
         for (auto& e : entities)
         {
             auto& animationComponent = coordinator->GetComponent<T>(e);
-            // CC_TRACE(GetDebugName<T>(), " : ", animationComponent.Enabled);
             if (!animationComponent.Enabled)
             {
                 return;
@@ -74,6 +77,7 @@ public:
                 return;
             }
 
+            // TODO - Maybe not keep updating the texture every frame.
             spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
 
             if (++frameCounters_[e] >= animation.FramesBetweenTransition)
@@ -87,6 +91,10 @@ public:
                 {
                     ++spriteIterators_[e];
                 }
+                AnimationSpriteChangeEvent event(GetEnumValue<T>(), e, spriteIterators_[e]);
+                eventCallback(event);
+                // spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
+
                 frameCounters_[e] -= animation.FramesBetweenTransition;
             }
         }
@@ -145,19 +153,5 @@ private:
 using RunningAnimationSystem = AnimationSystem<RunningAnimationComponent>;
 using SwingingAnimationSystem = AnimationSystem<SwingingAnimationComponent>;
 
-// class RunningAnimationSystem : public System
-// {
-// public:
-//     auto Update(Timestep ts) -> void;
-//     auto OnEvent(Event& e) -> void;
-
-// private:
-//     auto OnAnimationEvent(AnimationEvent& e) -> bool;
-
-//     std::array<size_t, MaxEntities> spriteIterators_{};
-//     std::array<size_t, MaxEntities> frameCounters_{};
-//     std::array<Ref<SubTexture2D>, MaxEntities> originalTextures_{};
-
-// };
 
 

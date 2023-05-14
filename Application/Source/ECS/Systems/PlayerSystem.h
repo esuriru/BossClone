@@ -12,10 +12,13 @@
 class PlayerSystem : public System 
 {
 public:
+    PlayerSystem();
+
     auto Update(Timestep ts) -> void;
 
     Ref<PhysicsSystem> physicsSystem;
     EventCallback eventCallback;
+
 private:
     // TODO - Probably make this a bool also, waste of memory.
     std::bitset<MaxEntities> runningBitset_;
