@@ -119,8 +119,8 @@ private:
 class WeaponUseEvent : public Event
 {
 public:
-    WeaponUseEvent(Entity owner, Entity item, bool mouseDown)
-       : owner_(owner), weapon_(item), mouseDown_(mouseDown){}
+    WeaponUseEvent(Entity owner, Entity item, bool mouseDown, bool facingRight)
+       : owner_(owner), weapon_(item), mouseDown_(mouseDown), facingRight_(facingRight){}
 
     NR_EVENT_CLASS_TYPE(WeaponUse)
     NR_EVENT_CLASS_CATEGORY(EventCategoryApplication | EventCategoryInput)
@@ -128,11 +128,13 @@ public:
     inline auto GetOwner() -> Entity const { return owner_; }
     inline auto GetWeapon() -> Entity const { return weapon_; }
     inline auto IsMouseDown() -> bool const { return mouseDown_; }
+    inline auto IsFacingRight() -> bool const { return facingRight_; }
 
 private:
     Entity owner_;
     Entity weapon_;
     bool mouseDown_;
+    bool facingRight_;
 };
 
 class CollisionEvent : public Event
