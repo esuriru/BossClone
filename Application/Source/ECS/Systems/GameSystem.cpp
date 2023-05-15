@@ -27,15 +27,6 @@ auto WeaponSystem::Update(Timestep ts) -> void
 
             // For detecting collision.
             transform.Position = owner_centre + glm::vec3(weapon.HandOffset, 0);
-
-            // if (physics_quadtree.Active)
-            // {
-            //     CC_TRACE("Physics quad tree active for weapon.");
-            // }
-            // else
-            //     CC_TRACE("Physics quad tree not active for weapon.");
-            // if (weapon.CurrentCooldownFrames > 0)
-            //     --weapon.CurrentCooldownFrames;
         }
     } 
 }
@@ -140,6 +131,7 @@ auto DamageableSystem::Update(Timestep ts) -> void
     {
         auto& health = coordinator->GetComponent<HealthComponent>(e);
 
+        // NOTE - Decrement in if statement
         if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
             coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
     }

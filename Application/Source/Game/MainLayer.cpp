@@ -164,9 +164,7 @@ MainLayer::MainLayer()
     tilemapComponent.SubTextureMap[11] = platformEnd;
 
     coordinator->AddComponent(tilemapEntity, TransformComponent {
-        // glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, TilemapData::TILEMAP_MAX_Y_LENGTH * -0.5f * tilemapComponent.TileSize.y, 0),
         glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, -70, 0),
-
     });
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
@@ -182,8 +180,6 @@ MainLayer::MainLayer()
     rigidbody.SetMass(3.f);
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
-        // glm::vec2(0, -3.f),
-        // glm::vec2(13.f, 13.f)
         glm::vec2(0, 0),
         glm::vec2(8.5f, 16.f)
     ));
@@ -191,7 +187,8 @@ MainLayer::MainLayer()
     constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);
 
     auto playerSpriteRendererComponent = SpriteRendererComponent();
-    playerSpriteRendererComponent.Texture = (SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0, 8), playerTextureSize));
+    playerSpriteRendererComponent.Texture =
+        (SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0, 8), playerTextureSize));
     runningAnimationSystem_->SetOriginalTexture(playerSpriteRendererComponent.Texture, playerEntity);
     swingingAnimationSystem_->SetOriginalTexture(playerSpriteRendererComponent.Texture, playerEntity);
 
@@ -207,10 +204,11 @@ MainLayer::MainLayer()
     RunningAnimationComponent runningAnimationComponent;
 
     auto& runningAnimation = runningAnimationComponent.Animation;
-    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 6), playerTextureSize));
-    runningAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 6), playerTextureSize));
+    for (int i = 0; i < 4; ++i)
+    {
+        runningAnimation.SpriteTextures.emplace_back(
+            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 6), playerTextureSize));
+    }
 
     for (size_t i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
     {
@@ -225,14 +223,11 @@ MainLayer::MainLayer()
     SwingingAnimationComponent swingingAnimationComponent;
     auto& swingingAnimation = swingingAnimationComponent.Animation;
 
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(0 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(1 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(2 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(3 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(4 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(5 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(6 , 0), playerTextureSize));
-    swingingAnimation.SpriteTextures.emplace_back(SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(7 , 0), playerTextureSize));
+    for (int i = 0; i < 8; ++i)
+    {
+        swingingAnimation.SpriteTextures.emplace_back(
+            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 0), playerTextureSize));
+    }
 
     for (size_t i = 0; i < swingingAnimation.SpriteTextures.size(); ++i)
     {
@@ -270,7 +265,8 @@ MainLayer::MainLayer()
     inventoryComponent.Items.emplace_back(meleeWeaponEntity);
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
-    coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0), glm::vec3(0), glm::vec3(4, 8, 1)));
+    coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
+        glm::vec3(0), glm::vec3(4, 8, 1)));
     coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
     RigidBody2DComponent meleeWeaponRigidbody;
     meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
@@ -286,7 +282,8 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
 
     auto testPhysicsEntity = coordinator->CreateEntity();
-    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0), glm::vec3(0), glm::vec3(12, 12, 1)));
+    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0),
+       glm::vec3(0), glm::vec3(12, 12, 1)));
     coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent()); 
 
     auto testPhysicsEntityCollider = BoxCollider2DComponent();
