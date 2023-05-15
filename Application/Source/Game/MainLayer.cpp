@@ -244,7 +244,7 @@ MainLayer::MainLayer()
 
     WeaponComponent meleeWeaponComponent;
     meleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
-    meleeWeaponComponent.HandOffset = { 15, -2 };
+    meleeWeaponComponent.HandOffset = { 11, -2 };
     meleeWeaponComponent.Damage = 5.0f;
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
     coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
@@ -266,7 +266,7 @@ MainLayer::MainLayer()
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
     coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
-        glm::vec3(0), glm::vec3(4, 8, 1)));
+        glm::vec3(0), glm::vec3(6, 12, 1)));
     coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
     RigidBody2DComponent meleeWeaponRigidbody;
     meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
@@ -274,7 +274,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponRigidbody); 
 
     auto meleeBoxCollider = BoxCollider2DComponent();
-    meleeBoxCollider.Extents = glm::vec2(2, 4);
+    meleeBoxCollider.Extents = glm::vec2(3, 6);
     coordinator->AddComponent(meleeWeaponEntity, meleeBoxCollider); 
     coordinator->AddComponent(meleeWeaponEntity, PhysicsQuadtreeComponent()); 
 

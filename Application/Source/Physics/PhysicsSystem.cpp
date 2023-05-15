@@ -652,7 +652,7 @@ auto PhysicsSystem::RemoveObjectFromArea(Utility::Vector2ui areaIndices, Tilemap
 {
     auto& area = nearestTilemap.ObjectsInArea[areaIndices.first][areaIndices.second];
 
-    auto& tempEntity = area.back();
+    auto tempEntity = area.back();
     std::swap(area.back(), area[indexInArea]);
 
     auto& tempEntityQuadtreeComponent = coordinator->GetComponent<PhysicsQuadtreeComponent>(tempEntity);

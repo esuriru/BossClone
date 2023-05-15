@@ -25,8 +25,11 @@ auto WeaponSystem::Update(Timestep ts) -> void
             auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
             auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
 
+            bool ownerIsFacingRight = coordinator->GetComponent<PlayerController2DComponent>(owned_by.Owner).IsFacingRight;
+
             // For detecting collision.
-            transform.Position = owner_centre + glm::vec3(weapon.HandOffset, 0);
+            transform.Position = owner_centre +
+                glm::vec3((-1.f + 2.f * static_cast<float>(ownerIsFacingRight)) * weapon.HandOffset.x, weapon.HandOffset.y, 0.f);
         }
     } 
 }
@@ -50,21 +53,10 @@ auto WeaponSystem::MeleeBehaviour(Entity e, WeaponUseEvent& event) -> void
     // Change the collider
     auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
     auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
-    physics_quadtree.Active = weapon.Active = event.IsMouseDown();
+    weapon.Active = event.IsMouseDown();
+    if (!weapon.Active)
+        physics_quadtree.Active = false;
 
-    // if (event.IsMouseDown())
-    // {
-    //     // auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(e);
-    //     // auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
-
-    //     // rigidbody.BodyType = Physics::RigidBodyType::Static;
-    //     physics_quadtree.Active = weapon.Active = true;
-    // }
-    // else
-    // {
-    //     // While the person is not swinging, we don't want the weapon to detect it being hit.
-    //     physics_quadtree.Active = weapon.Active = false;
-    // }
 }
 
 auto WeaponSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool 

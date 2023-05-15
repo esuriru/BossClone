@@ -35,7 +35,7 @@ struct PlayerController2DComponent
     float JumpForce = 500.f; 
 
     std::set<size_t> ActiveMeleeWeaponIndices;
-
+    bool IsFacingRight = true;
 };
 
 struct RigidBody2DComponent

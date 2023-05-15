@@ -60,6 +60,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     runningBitset_.set(e, true);
                 }
                 transform.Scale.x = -fabs(transform.Scale.x);
+                player_controller.IsFacingRight = false;
             }
             else if (input->IsKeyDown(Key::L))
             {
@@ -82,6 +83,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     runningBitset_.set(e, true);
                 }
                 transform.Scale.x = fabs(transform.Scale.x);
+                player_controller.IsFacingRight = true;
             }
             else
             {
@@ -112,7 +114,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
             {
                 if (!mouseDown_)
                 {
-                    WeaponUseEvent event(e, inventory.CurrentlyHolding, true); 
+                    WeaponUseEvent event(e, inventory.CurrentlyHolding, true, player_controller.IsFacingRight); 
                     eventCallback(event);
                     mouseDown_ = true;
                 }
@@ -122,7 +124,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 if (mouseDown_)
                 {
                     mouseDown_ = false;
-                    WeaponUseEvent event(e, inventory.CurrentlyHolding, false); 
+                    WeaponUseEvent event(e, inventory.CurrentlyHolding, false, player_controller.IsFacingRight); 
                     eventCallback(event);
                 }
             }
