@@ -10,6 +10,8 @@
 #include "Utils/Input.h"
 #include "Utils/Util.h"
 
+#include "imgui.h"
+
 MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)

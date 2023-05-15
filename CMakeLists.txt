@@ -93,3 +93,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(Application)
 add_subdirectory(Common)
 
+# Imgui
+add_subdirectory(vendor/imgui)
+

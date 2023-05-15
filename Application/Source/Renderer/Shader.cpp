@@ -267,7 +267,7 @@ std::pair<bool, GLint> Shader::TryGetLocation(const std::string& name)
 		if (location == -1)
 		{
 #ifndef MUTE_SHADER
-			std::cout << "Uniform location not found with name '" << name << "'\n";
+			CC_ERROR("Uniform location not found with name '", name, "'");
 #endif
 			return { false, 0 };
 		}

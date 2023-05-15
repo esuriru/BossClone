@@ -56,7 +56,6 @@ auto WeaponSystem::MeleeBehaviour(Entity e, WeaponUseEvent& event) -> void
     weapon.Active = event.IsMouseDown();
     if (!weapon.Active)
         physics_quadtree.Active = false;
-
 }
 
 auto WeaponSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool 

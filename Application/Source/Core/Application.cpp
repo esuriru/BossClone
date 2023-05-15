@@ -16,6 +16,8 @@
 #include "Events/EventDispatcher.h"
 #include "Scene/Scene.h"
 
+#include "ImGui/ImGuiLayer.h"
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -149,13 +151,11 @@ auto Application::OnKeyRelease(KeyReleasedEvent& e) -> bool
 auto Application::PushLayer(Layer* layer) -> void
 {
 	layerStack_.PushLayer(layer);
-    layer->OnAttach();
 }
 
 auto Application::PushOverlay(Layer* overlay) -> void
 {
 	layerStack_.PushOverlay(overlay);
-    overlay->OnAttach();
 }
 
 Application::Application()
@@ -178,6 +178,7 @@ Application::Application()
     Renderer2D::Init();
 
     PushLayer(new MainLayer());
+    PushOverlay(new ImGuiLayer());
 
 	running_ = true;
 }

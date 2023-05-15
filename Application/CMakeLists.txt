@@ -60,6 +60,7 @@ set(Header_Files
     "Source/Physics/Quadtree.h"
     "Source/Physics/Collision2D.h"
 
+    "Source/ImGui/ImGuiLayer.h"
 
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -106,18 +107,30 @@ set(Source_Files
     "Source/Physics/PhysicsSystem.cpp"
     "Source/Physics/PhysicsComponent.cpp"
     "Source/Physics/Quadtree.cpp"
+
+    "Source/ImGui/ImGuiLayer.cpp"
 )
+
 source_group("Source Files" FILES ${Source_Files})
+
+# set (IMGUI_OPENGL_FILES 
+#     "../vendor/imgui/imgui/examples/imgui_impl_opengl3.h"
+#     "../vendor/imgui/imgui/examples/imgui_impl_opengl3.cpp"
+#     "../vendor/imgui/imgui/examples/imgui_impl_opengl3_loader.h"
+# )
 
 set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
+    ${IMGUI_SOURCES}
+    # ${IMGUI_OPENGL_FILES}
 )
 
 ################################################################################
 # Target
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
+target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
 
 use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE Application)
@@ -154,6 +167,7 @@ elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
         "${CMAKE_SOURCE_DIR}/vendor/stb_image;"
         "${CMAKE_SOURCE_DIR}/vendor/assimp/include;"
         "${CMAKE_SOURCE_DIR}/vendor/glfw/include;"
+        "${CMAKE_SOURCE_DIR}/vendor/imgui/imgui;"
         "${CMAKE_SOURCE_DIR}/Common/Source"
     )
 endif()
@@ -262,14 +276,16 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
         "glfw3;"
         "opengl32;"
         "winmm;"
-        "Common"
+        "Common;"
     )
 endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES}")
 
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     target_link_directories(${PROJECT_NAME} PRIVATE
         "${CMAKE_SOURCE_DIR}/vendor/assimp/lib;"
+        # "${CMAKE_SOURCE_DIR}/vendor/imgui;"
         "${CMAKE_SOURCE_DIR}/vendor/glfw/lib-vc2019;"
         "${CMAKE_SOURCE_DIR}/$<CONFIG>"
     )
@@ -305,9 +321,10 @@ add_custom_command(
 
 set (SHADER_SOURCE "${CMAKE_CURRENT_LIST_DIR}/Shader")
 set (SHADER_DEST "${output_dir}/Shader")
+# execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST})
 add_custom_command(
     TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST} 
     DEPENDS ${SHADER_DEST}
-    COMMENT "symbolic link assets folder from ${SHADER_SOURCE} => ${SHADER_DEST}"
+    COMMENT "symbolic link shader folder from ${SHADER_SOURCE} => ${SHADER_DEST}"
 )
