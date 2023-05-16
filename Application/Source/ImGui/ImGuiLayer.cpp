@@ -5,6 +5,7 @@
 #include "Core/KeyCodes.h"
 
 #include "Core/Application.h"
+#include "Events/EventDispatcher.h"
 
 ImGuiLayer::ImGuiLayer()
     : Layer("ImGuiLayer")
@@ -33,6 +34,8 @@ auto ImGuiLayer::OnAttach() -> void
     ImGui::StyleColorsDark();
 
     auto& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
     io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
 
@@ -77,6 +80,20 @@ auto ImGuiLayer::OnDetach() -> void
 
 auto ImGuiLayer::OnEvent(Event &e) -> void 
 {
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<MouseButtonPressedEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnMouseButtonPressedEvent));
+    dispatcher.Dispatch<MouseButtonReleasedEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnMouseButtonReleased));
+    dispatcher.Dispatch<MouseMovedEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnMouseMovedEvent));
+    dispatcher.Dispatch<MouseScrolledEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnMouseScrolledEvent));
+    dispatcher.Dispatch<KeyPressedEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnKeyPressedEvent));
+    dispatcher.Dispatch<KeyReleasedEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnKeyReleasedEvent));
+    dispatcher.Dispatch<WindowResizeEvent>(CC_BIND_EVENT_FUNC(ImGuiLayer::OnWindowResizeEvent));
+    // if (blockEvents_)
+    // {
+    //     auto& io = ImGui::GetIO();
+    //     e.Handled = e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+    //     e.Handled = e.IsInCategory(EventCategoryMouse) & io.WantCaptureKeyboard;
+    // }
 }
 
 auto ImGuiLayer::Begin() -> void
@@ -116,4 +133,79 @@ auto ImGuiLayer::SetDarkTheme() -> void
 auto ImGuiLayer::GetActiveWidgetID() const -> uint32_t
 {
     return 0;
+}
+
+auto ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    io.MouseDown[e.GetMouseButton()] = true;
+
+    return false;
+}
+
+auto ImGuiLayer::OnMouseButtonReleased(MouseButtonReleasedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    io.MouseDown[e.GetMouseButton()] = false;
+
+    return false;
+}
+
+auto ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    auto coords = e.GetCoords();
+    io.MousePos = ImVec2(coords.x, coords.y);
+
+    return false;
+}
+
+auto ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    auto offset = e.GetOffset();
+    io.MouseWheelH += offset.x;
+    io.MouseWheel += offset.y;
+
+    return false;
+}
+
+auto ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    io.KeysDown[e.GetKeyCode()] = true;
+
+    io.KeyCtrl = io.KeysDown[Key::LeftControl] || io.KeysDown[Key::RightControl];
+    io.KeyAlt = io.KeysDown[Key::LeftAlt] || io.KeysDown[Key::RightAlt];
+    io.KeyShift = io.KeysDown[Key::LeftShift] || io.KeysDown[Key::RightShift];
+    io.KeySuper = io.KeysDown[Key::LeftSuper] || io.KeysDown[Key::RightSuper];
+
+    return false;
+}
+
+auto ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    io.KeysDown[e.GetKeyCode()] = false;
+
+    return false;
+}
+
+auto ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    int keycode = static_cast<unsigned int>(e.GetKeyCode());
+    if (keycode > 0 && keycode < 0x10000)
+        io.AddInputCharacter(static_cast<unsigned short>(keycode));
+
+    return false;
+}
+
+auto ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent &e) -> bool
+{
+    auto& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
+    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+
+    return false;
 }

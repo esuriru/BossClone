@@ -160,6 +160,14 @@ void Window::Init(const WindowProps& props)
 		MouseMovedEvent event({ static_cast<float>(x_pos), static_cast<float>(y_pos) });
 		data.EventCallback(event);
 	});
+
+    glfwSetCharCallback(window_, [](GLFWwindow* window, unsigned int character)
+    {
+		WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+		KeyTypedEvent event(character);
+		data.EventCallback(event);
+    });
 #pragma endregion GLFW_CALLBACKS
 }
 

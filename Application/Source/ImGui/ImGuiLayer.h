@@ -1,6 +1,9 @@
 #pragma once
 #include "Core/Layer.h"
 #include "Events/Event.h"
+#include "Events/MouseEvent.h"
+#include "Events/KeyEvent.h"
+#include "Events/ApplicationEvent.h"
 
 
 class ImGuiLayer : public Layer
@@ -24,5 +27,16 @@ public:
     auto GetActiveWidgetID() const -> uint32_t;
 
 private:
+    auto OnMouseButtonPressedEvent(MouseButtonPressedEvent& e) -> bool;
+    auto OnMouseButtonReleased(MouseButtonReleasedEvent& e) -> bool;
+    auto OnMouseMovedEvent(MouseMovedEvent& e) -> bool;
+    auto OnMouseScrolledEvent(MouseScrolledEvent& e) -> bool;
+
+    auto OnKeyPressedEvent(KeyPressedEvent& e) -> bool;
+    auto OnKeyReleasedEvent(KeyReleasedEvent& e) -> bool;
+    auto OnKeyTypedEvent(KeyTypedEvent& e) -> bool;
+
+    auto OnWindowResizeEvent(WindowResizeEvent& e) -> bool;
+
     bool blockEvents_ = true;
 };
