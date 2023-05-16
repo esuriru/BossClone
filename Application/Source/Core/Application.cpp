@@ -57,6 +57,11 @@ auto Application::PerformRunCycle() -> void
 
 		for (const auto& layer : layerStack_)
 			layer->OnUpdate(deltaTime);
+
+        imGuiLayer_->Begin();
+        for (const auto& layer : layerStack_)
+            layer->OnImGuiRender();
+        imGuiLayer_->End(); 
 	}
 
 	input->PostUpdateKeys();
@@ -178,7 +183,9 @@ Application::Application()
     Renderer2D::Init();
 
     PushLayer(new MainLayer());
-    PushOverlay(new ImGuiLayer());
+
+    imGuiLayer_ = new ImGuiLayer();
+    PushOverlay(imGuiLayer_);
 
 	running_ = true;
 }

@@ -8,7 +8,7 @@
 #include "Events/ApplicationEvent.h"
 
 #include "Renderer/Texture.h"
-
+#include "Renderer/SubTexture2D.h"
 
 class ImGuiLayer : public Layer
 {
@@ -43,8 +43,6 @@ private:
     auto OnWindowResizeEvent(WindowResizeEvent& e) -> bool;
 
     bool blockEvents_ = true;
-
-    Ref<Texture2D> testTexture_;
 
     
 };

@@ -23,12 +23,16 @@ public:
 
     auto OnUpdate(Timestep ts) -> void override;
     auto OnEvent(Event& e) -> void override;
+    auto OnImGuiRender() -> void override;
 
 private:
     OrthographicCameraController cameraController_;
 
     Ref<Texture2D> nareLogoTexture_;
     Ref<Scene> activeScene_;
+
+    Ref<Texture2D> itemSpritesheet_;
+    Ref<SubTexture2D> swordSprite_;
 
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;

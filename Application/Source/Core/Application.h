@@ -14,6 +14,8 @@
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
 
+#include "ImGui/ImGuiLayer.h"
+
 #include "Utils/Singleton.h"
 #include "Renderer/OrthographicCamera.h"
 
@@ -90,6 +92,7 @@ private:
 	
 	std::shared_ptr<Window> window_;
 
+    ImGuiLayer* imGuiLayer_;
 };
 
 #endif

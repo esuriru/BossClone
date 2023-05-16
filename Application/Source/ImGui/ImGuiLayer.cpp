@@ -10,29 +10,26 @@
 ImGuiLayer::ImGuiLayer()
     : Layer("ImGuiLayer")
 {
-    testTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png", false);
+}
+
+auto ImGuiLayer::Begin() -> void
+{
+    ImGuiIO& io = ImGui::GetIO();
+    Application* app = Application::Instance();
+    io.DisplaySize = ImVec2(static_cast<float>(app->GetWindow().GetWidth()), static_cast<float>(app->GetWindow().GetHeight()));
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+}
+
+auto ImGuiLayer::End() -> void
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 auto ImGuiLayer::OnUpdate(Timestep ts) -> void 
 {
-
-    ImGuiIO& io = ImGui::GetIO();
-    Application* app = Application::Instance();
-    io.DisplaySize = ImVec2(app->GetWindow().GetWidth(), app->GetWindow().GetHeight());
-    io.DeltaTime = ts;
-
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui::NewFrame();
-
-    static bool show = true;
-    ImGui::Text("Test");
-
-    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(testTexture_->GetRendererID())),
-        ImVec2(static_cast<float>(testTexture_->GetWidth()), static_cast<float>(testTexture_->GetHeight())));
-    testTexture_->Bind();
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 auto ImGuiLayer::OnAttach() -> void
@@ -103,13 +100,6 @@ auto ImGuiLayer::OnEvent(Event &e) -> void
     // }
 }
 
-auto ImGuiLayer::Begin() -> void
-{
-}
-
-auto ImGuiLayer::End() -> void
-{
-}
 
 auto ImGuiLayer::SetDarkTheme() -> void
 {
@@ -211,7 +201,7 @@ auto ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent &e) -> bool
 auto ImGuiLayer::OnWindowResizeEvent(WindowResizeEvent &e) -> bool
 {
     auto& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2(e.GetWidth(), e.GetHeight());
+    io.DisplaySize = ImVec2(static_cast<float>(e.GetWidth()), static_cast<float>(e.GetHeight()));
     io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 
     return false;

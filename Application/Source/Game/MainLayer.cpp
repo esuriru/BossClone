@@ -10,12 +10,18 @@
 #include "Utils/Input.h"
 #include "Utils/Util.h"
 
+#include <examples/imgui_impl_opengl3.h>
+
 #include "imgui.h"
 
 MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
+    itemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/BG7Icons.png", false);
+
+    swordSprite_ = SubTexture2D::CreateFromCoords(itemSpritesheet_, glm::vec2(0, 5), glm::vec2(32, 32));
+
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
@@ -347,4 +353,44 @@ auto MainLayer::OnEvent(Event &e) -> void
     // Animation sprite change events are now called, now setup callbacks
     playerAffectedByAnimationSystem_->OnEvent(e);
     weaponAffectedByAnimationSystem_->OnEvent(e);
+}
+
+auto MainLayer::OnImGuiRender() -> void 
+{
+    static bool show = true;
+
+    auto& style = ImGui::GetStyle();
+    style.WindowBorderSize = 0.0f;
+
+    constexpr float item_size_multiplier = 1.5f;
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    // ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar );
+    ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_NoMove*/ |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoSavedSettings);
+
+    // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
+    // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+    //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
+    if (ImGui::BeginTable("inventory", 5, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+        ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
+    {
+        ImGui::TableNextRow();
+        for (int i = 0; i < 5; ++i)
+        {
+            ImGui::TableSetColumnIndex(i);
+            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(swordSprite_->GetTexture()->GetRendererID())),
+                ImVec2(item_size_multiplier * static_cast<float>(swordSprite_->GetWidth()),
+                    item_size_multiplier * static_cast<float>(swordSprite_->GetHeight())),
+                ImVec2(swordSprite_->GetTexCoordsArray()[0].x, swordSprite_->GetTexCoordsArray()[0].y),
+                ImVec2(swordSprite_->GetTexCoordsArray()[2].x, swordSprite_->GetTexCoordsArray()[2].y)
+            );
+        }
+        ImGui::EndTable();
+    }
+
+    ImGui::End();
+    
 }
