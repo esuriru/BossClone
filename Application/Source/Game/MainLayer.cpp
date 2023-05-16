@@ -137,6 +137,7 @@ MainLayer::MainLayer()
     coordinator->SetSystemSignature<PlayerAffectedByAnimationSystem>(playerAffectedByAnimationSystemSignature);
 
     // TODO - Fix tilemap bleeding
+    // TODO - Fix animation update
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
     auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
     auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);

@@ -38,6 +38,7 @@ namespace TilemapData
 // NOTE - There will probably be multiple lest the game be side-scrolling.
 struct TilemapComponent
 {
+    // NOTE - The first element is left out purposely.
     // The map of textures
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> SubTextureMap {};
 

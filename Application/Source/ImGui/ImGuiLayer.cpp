@@ -10,6 +10,7 @@
 ImGuiLayer::ImGuiLayer()
     : Layer("ImGuiLayer")
 {
+    testTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png", false);
 }
 
 auto ImGuiLayer::OnUpdate(Timestep ts) -> void 
@@ -18,12 +19,18 @@ auto ImGuiLayer::OnUpdate(Timestep ts) -> void
     ImGuiIO& io = ImGui::GetIO();
     Application* app = Application::Instance();
     io.DisplaySize = ImVec2(app->GetWindow().GetWidth(), app->GetWindow().GetHeight());
+    io.DeltaTime = ts;
 
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
 
     static bool show = true;
-    ImGui::ShowDemoWindow(&show);
+    ImGui::Text("Test");
+
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(testTexture_->GetRendererID())),
+        ImVec2(static_cast<float>(testTexture_->GetWidth()), static_cast<float>(testTexture_->GetHeight())));
+    testTexture_->Bind();
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

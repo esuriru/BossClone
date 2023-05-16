@@ -28,7 +28,7 @@ public:
 class Texture2D : public Texture
 {
 public:
-    Texture2D(const std::string& path);
+    Texture2D(const std::string& path, bool flip = true);
     Texture2D(uint32_t width, uint32_t height);
     ~Texture2D();
 
@@ -50,6 +50,11 @@ public:
     {
         // NOTE - for debugging only?
         return rendererID_ == dynamic_cast<const Texture2D&>(other).rendererID_;
+    }
+
+    inline auto GetRendererID() const -> uint32_t
+    {
+        return rendererID_;
     }
 
 private:

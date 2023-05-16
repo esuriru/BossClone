@@ -1,9 +1,13 @@
 #pragma once
+#include "Core/Core.h"
+
 #include "Core/Layer.h"
 #include "Events/Event.h"
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
 #include "Events/ApplicationEvent.h"
+
+#include "Renderer/Texture.h"
 
 
 class ImGuiLayer : public Layer
@@ -39,4 +43,8 @@ private:
     auto OnWindowResizeEvent(WindowResizeEvent& e) -> bool;
 
     bool blockEvents_ = true;
+
+    Ref<Texture2D> testTexture_;
+
+    
 };

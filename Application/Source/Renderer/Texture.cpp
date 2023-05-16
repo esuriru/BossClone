@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-Texture2D::Texture2D(const std::string &path)
+Texture2D::Texture2D(const std::string &path, bool flip)
     : rendererID_(0)
     , path_(path)
     , width_(0)
@@ -15,7 +15,7 @@ Texture2D::Texture2D(const std::string &path)
     int width, height, channels;
 
     // Flip the image
-    stbi_set_flip_vertically_on_load(1);
+    stbi_set_flip_vertically_on_load(flip);
     const auto& data = stbi_load(path.data(), &width, &height, &channels, 0);
     // TODO: Might not want to make it fatal
     CC_ASSERT(data, "Failed to load image!");
