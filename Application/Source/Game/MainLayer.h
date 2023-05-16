@@ -33,6 +33,7 @@ private:
 
     Ref<Texture2D> itemSpritesheet_;
     Ref<SubTexture2D> swordSprite_;
+    Ref<SubTexture2D> emptyItemSprite_;
 
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;

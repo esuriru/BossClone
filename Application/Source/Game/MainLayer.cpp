@@ -21,6 +21,7 @@ MainLayer::MainLayer()
     itemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/BG7Icons.png", false);
 
     swordSprite_ = SubTexture2D::CreateFromCoords(itemSpritesheet_, glm::vec2(0, 5), glm::vec2(32, 32));
+    emptyItemSprite_ = SubTexture2D::CreateFromCoords(itemSpritesheet_, glm::vec2(10, 1), glm::vec2(32, 32));
 
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
@@ -204,7 +205,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
 
     auto playerControllerComponent = PlayerController2DComponent();
-    playerControllerComponent.ActiveMeleeWeaponIndices = { 5 };
+    playerControllerComponent.ActiveMeleeWeaponIndices = { 4, 5, 6 };
     coordinator->AddComponent(playerEntity, playerControllerComponent);
 
     coordinator->AddComponent(playerEntity, AffectedByAnimationComponent(Animation::AnimationType::Swinging));
@@ -253,7 +254,7 @@ MainLayer::MainLayer()
 
     WeaponComponent meleeWeaponComponent;
     meleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
-    meleeWeaponComponent.HandOffset = { 11, -2 };
+    meleeWeaponComponent.HandOffset = { 12, -2 };
     meleeWeaponComponent.Damage = 5.0f;
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
     coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
@@ -275,7 +276,7 @@ MainLayer::MainLayer()
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
     coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
-        glm::vec3(0), glm::vec3(6, 12, 1)));
+        glm::vec3(0), glm::vec3(8, 18, 1)));
     coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
     RigidBody2DComponent meleeWeaponRigidbody;
     meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
@@ -283,7 +284,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponRigidbody); 
 
     auto meleeBoxCollider = BoxCollider2DComponent();
-    meleeBoxCollider.Extents = glm::vec2(3, 6);
+    meleeBoxCollider.Extents = glm::vec2(4, 9);
     coordinator->AddComponent(meleeWeaponEntity, meleeBoxCollider); 
     coordinator->AddComponent(meleeWeaponEntity, PhysicsQuadtreeComponent()); 
 
@@ -374,20 +375,21 @@ auto MainLayer::OnImGuiRender() -> void
     // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
     // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
     //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    if (ImGui::BeginTable("inventory", 5, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+    if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
         ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
     {
         ImGui::TableNextRow();
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 6; ++i)
         {
             ImGui::TableSetColumnIndex(i);
-            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(swordSprite_->GetTexture()->GetRendererID())),
-                ImVec2(item_size_multiplier * static_cast<float>(swordSprite_->GetWidth()),
-                    item_size_multiplier * static_cast<float>(swordSprite_->GetHeight())),
-                ImVec2(swordSprite_->GetTexCoordsArray()[0].x, swordSprite_->GetTexCoordsArray()[0].y),
-                ImVec2(swordSprite_->GetTexCoordsArray()[2].x, swordSprite_->GetTexCoordsArray()[2].y)
+            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(emptyItemSprite_->GetTexture()->GetRendererID())),
+                ImVec2(item_size_multiplier * static_cast<float>(emptyItemSprite_->GetWidth()),
+                    item_size_multiplier * static_cast<float>(emptyItemSprite_->GetHeight())),
+                ImVec2(emptyItemSprite_->GetTexCoordsArray()[0].x, emptyItemSprite_->GetTexCoordsArray()[0].y),
+                ImVec2(emptyItemSprite_->GetTexCoordsArray()[2].x, emptyItemSprite_->GetTexCoordsArray()[2].y)
             );
         }
+
         ImGui::EndTable();
     }
 
