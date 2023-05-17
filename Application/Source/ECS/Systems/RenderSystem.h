@@ -60,44 +60,62 @@ public:
 
     inline auto Update(Timestep ts) -> void
     {
-        static Coordinator* coordinator = Coordinator::Instance(); 
-        for (auto& e : entities)
+        constexpr float step = 1 / 50.f;
+        constexpr float clamp = 1/ 30.f;
+        static float accumulator = 0.f;
+
+        accumulator += glm::min(static_cast<float>(ts), clamp);
+        
+        CC_TRACE("Accumulator:", accumulator);
+
+        int repeats = 0;
+        while (accumulator >= step) 
         {
-            auto& animationComponent = coordinator->GetComponent<T>(e);
-            if (!animationComponent.Enabled)
+            static Coordinator* coordinator = Coordinator::Instance(); 
+            for (auto& e : entities)
             {
-                return;
-            }
-
-            auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(e);
-
-            auto& animation = animationComponent.Animation;
-            if (animation.AnimationIndices.empty())
-            {
-                return;
-            }
-
-            // TODO - Maybe not keep updating the texture every frame.
-            spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
-
-            if (++frameCounters_[e] >= animation.FramesBetweenTransition)
-            {
-                // If the sprite shown is already the last sprite, go back to the first loop.
-                if (animation.AnimationIndices.size() - 1 == spriteIterators_[e])
+                auto& animationComponent = coordinator->GetComponent<T>(e);
+                if (!animationComponent.Enabled)
                 {
-                    spriteIterators_[e] = 0;    
+                    continue;
                 }
-                else
-                {
-                    ++spriteIterators_[e];
-                }
-                AnimationSpriteChangeEvent event(GetEnumValue<T>(), e, spriteIterators_[e]);
-                eventCallback(event);
-                // spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
 
-                frameCounters_[e] -= animation.FramesBetweenTransition;
+                auto& spriteRenderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+
+                auto& animation = animationComponent.Animation;
+                if (animation.AnimationIndices.empty())
+                {
+                    continue;
+                }
+
+                // TODO - Maybe not keep updating the texture every frame.
+                spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
+                // CC_TRACE("Sprite iterator for ", GetDebugName<T>(), " : ", spriteIterators_[e]);
+
+                if (++frameCounters_[e] >= animation.FramesBetweenTransition)
+                {
+                    // If the sprite shown is already the last sprite, go back to the first loop.
+                    if (animation.AnimationIndices.size() - 1 == spriteIterators_[e])
+                    {
+                        spriteIterators_[e] = 0;    
+                    }
+                    else
+                    {
+                        ++spriteIterators_[e];
+                    }
+                    AnimationSpriteChangeEvent event(GetEnumValue<T>(), e, spriteIterators_[e]);
+                    eventCallback(event);
+                    // spriteRenderer.Texture = animation.SpriteTextures[animation.AnimationIndices[spriteIterators_[e]]];
+
+                    frameCounters_[e] -= animation.FramesBetweenTransition;
+                }
             }
+            accumulator -= step;
+            repeats++;
         }
+
+        if (repeats > 1)
+            CC_TRACE("While loop repeated ", repeats, " times");
 
     } 
     inline auto OnEvent(Event& e) -> void
@@ -140,6 +158,8 @@ private:
             // Cache the texture so we can restore it back when the animation is cancelled/stopped.
             if (!originalTextures_[entity])
                 originalTextures_[entity] = spriteRenderer.Texture;
+
+            spriteRenderer.Texture = animation.Animation.SpriteTextures[0];
         }
 
         return true;

@@ -118,13 +118,23 @@ auto WeaponSystem::OnCollisionEvent(CollisionEvent &e) -> bool
 
 auto DamageableSystem::Update(Timestep ts) -> void
 {
-    for (auto& e : entities)
-    {
-        auto& health = coordinator->GetComponent<HealthComponent>(e);
+    constexpr float step = 1 / 50.f;
+    static float accumulator = 0.f;
 
-        // NOTE - Decrement in if statement
-        if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
-            coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+    accumulator += glm::min(static_cast<float>(ts), 0.25f);
+
+    while (accumulator >= step)
+    {
+        for (auto& e : entities)
+        {
+            auto& health = coordinator->GetComponent<HealthComponent>(e);
+
+            // NOTE - Decrement in if statement
+            if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
+                coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+
+        }
+        accumulator -= step;
     }
 }
 
@@ -145,7 +155,9 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
 
     // Apply an i-frame to the enemy.
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
-    coordinator->GetComponent<PhysicsQuadtreeComponent>(target).Active = false;
+    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+    // CC_ASSERT(!physics_quadtree.Active, "Break");
+    physics_quadtree.Active = false;
 
     CC_TRACE("New health: ", health.Health);
 

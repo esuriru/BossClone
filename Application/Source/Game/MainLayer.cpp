@@ -205,7 +205,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, playerSpriteRendererComponent);
 
     auto playerControllerComponent = PlayerController2DComponent();
-    playerControllerComponent.ActiveMeleeWeaponIndices = { 4, 5, 6 };
+    playerControllerComponent.ActiveMeleeWeaponIndices = { 3, 4 };
     coordinator->AddComponent(playerEntity, playerControllerComponent);
 
     coordinator->AddComponent(playerEntity, AffectedByAnimationComponent(Animation::AnimationType::Swinging));
@@ -225,7 +225,7 @@ MainLayer::MainLayer()
         runningAnimation.AnimationIndices.emplace_back(i);
     }
 
-    runningAnimation.FramesBetweenTransition = 240;
+    runningAnimation.FramesBetweenTransition = 8;
 
     coordinator->AddComponent(playerEntity, runningAnimationComponent);
 
@@ -244,7 +244,7 @@ MainLayer::MainLayer()
         swingingAnimation.AnimationIndices.emplace_back(i);
     }
 
-    swingingAnimation.FramesBetweenTransition = 240;
+    swingingAnimation.FramesBetweenTransition = 8;
 
     coordinator->AddComponent(playerEntity, swingingAnimationComponent);
 
@@ -317,6 +317,7 @@ auto MainLayer::OnDetach() -> void
 
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
+    this->ts = ts.GetSeconds();
     cameraController_.OnUpdate(ts);
     weaponSystem_->Update(ts);
     damageableSystem_->Update(ts);
@@ -342,18 +343,31 @@ auto MainLayer::OnEvent(Event &e) -> void
 {
     // Process all the logic stuff first before rendering.
     weaponSystem_->OnEvent(e);
-
+    if (e.Handled)
+        return;
     // All the render stuff should be after.
     cameraController_.OnEvent(e);
+    if (e.Handled)
+        return;
     damageableSystem_->OnEvent(e);
+    if (e.Handled)
+        return;
 
     // Run the animations
     runningAnimationSystem_->OnEvent(e);    
+    if (e.Handled)
+        return;
     swingingAnimationSystem_->OnEvent(e);
+    if (e.Handled)
+        return;
 
     // Animation sprite change events are now called, now setup callbacks
     playerAffectedByAnimationSystem_->OnEvent(e);
+    if (e.Handled)
+        return;
     weaponAffectedByAnimationSystem_->OnEvent(e);
+    if (e.Handled)
+        return;
 }
 
 auto MainLayer::OnImGuiRender() -> void 
@@ -375,6 +389,8 @@ auto MainLayer::OnImGuiRender() -> void
     // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
     // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
     //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
+    ImGui::Text(std::to_string(1 / ts).data());
+
     if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
         ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
     {

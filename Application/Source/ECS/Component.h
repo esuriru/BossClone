@@ -157,7 +157,7 @@ struct HealthComponent
     float MaxHealth = 100.f;
 
     uint32_t CurrentCooldownFrames = 0;
-    uint32_t CooldownFramesOnHit = 240;
+    uint32_t CooldownFramesOnHit = 300;
 };
 
 struct AffectedByAnimationComponent
