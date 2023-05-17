@@ -18,10 +18,6 @@ MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
-    itemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/BG7Icons.png", false);
-
-    swordSprite_ = SubTexture2D::CreateFromCoords(itemSpritesheet_, glm::vec2(0, 5), glm::vec2(32, 32));
-    emptyItemSprite_ = SubTexture2D::CreateFromCoords(itemSpritesheet_, glm::vec2(10, 1), glm::vec2(32, 32));
 
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
@@ -258,7 +254,9 @@ MainLayer::MainLayer()
     meleeWeaponComponent.HandOffset = { 12, -2 };
     meleeWeaponComponent.Damage = 5.0f;
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
-    coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity));
+    coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity, 
+        SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {0, 5}, {32, 32})
+    ));
 
     WeaponAffectedByAnimationComponent meleeWeaponAffectedByAnimationComponent;
 
@@ -278,7 +276,7 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
         glm::vec3(0), glm::vec3(8, 18, 1)));
-    coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
+    // coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
     RigidBody2DComponent meleeWeaponRigidbody;
     meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
 

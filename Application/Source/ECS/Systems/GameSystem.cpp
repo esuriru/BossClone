@@ -131,7 +131,10 @@ auto DamageableSystem::Update(Timestep ts) -> void
 
             // NOTE - Decrement in if statement
             if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
+            {
                 coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+                coordinator->GetComponent<SpriteRendererComponent>(e).Colour = { 1.0f, 1.f, 1.f , 1.0f };
+            }
 
         }
         accumulator -= step;
@@ -156,6 +159,7 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
     // Apply an i-frame to the enemy.
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
     auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+    coordinator->GetComponent<SpriteRendererComponent>(target).Colour = { 1.0f, 0.f, 0.f , 1.0f };
     // CC_ASSERT(!physics_quadtree.Active, "Break");
     physics_quadtree.Active = false;
 

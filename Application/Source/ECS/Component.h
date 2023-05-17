@@ -142,9 +142,9 @@ struct OwnedByComponent
 {
     OwnedByComponent() = default;
     OwnedByComponent(Entity owner) : Owner(owner) {}
+    OwnedByComponent(Entity owner, const Ref<SubTexture2D>& icon) : Owner(owner), Icon(icon) {}
 
     Entity Owner;
-
     Ref<SubTexture2D> Icon;
 };
 

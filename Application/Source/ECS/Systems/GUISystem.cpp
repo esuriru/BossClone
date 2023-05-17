@@ -19,7 +19,6 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     auto& style = ImGui::GetStyle();
     style.WindowBorderSize = 0.0f;
 
-
     constexpr float item_size_multiplier = 1.5f;
 
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
@@ -49,23 +48,26 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     // }
 
     // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
-    if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+    if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
         ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
     {
         ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
+        size_t i = 0;
         for (auto& e : entities)
         {
+            ImGui::TableSetColumnIndex(i);
             auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
             ImGuiImage(owned_by.Icon ? owned_by.Icon : emptySpriteTexture_);
-            ImGui::TableNextColumn();
+            ++i;
         }
 
-        for (int i = 0; i < InventorySize - static_cast<int>(entities.size()); ++i)
+        for (; i < InventorySize; ++i)
         {
+            ImGui::TableSetColumnIndex(i);
             ImGuiImage(emptySpriteTexture_);
-            ImGui::TableNextColumn();
         }
+
+        ImGui::EndTable();
     }
 
 
