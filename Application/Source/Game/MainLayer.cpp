@@ -64,16 +64,13 @@ MainLayer::MainLayer()
     playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
     playerSystem_->physicsSystem = physicsSystem_;
 
-    runningAnimationSystem_ = coordinator->RegisterSystem<RunningAnimationSystem>();
-    swingingAnimationSystem_ = coordinator->RegisterSystem<SwingingAnimationSystem>();
-
-    weaponSystem_ = coordinator->RegisterSystem<WeaponSystem>();
-    weaponSystem_->eventCallback = CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
-
-    damageableSystem_ = coordinator->RegisterSystem<DamageableSystem>();
-
+    runningAnimationSystem_          = coordinator->RegisterSystem<RunningAnimationSystem>();
+    swingingAnimationSystem_         = coordinator->RegisterSystem<SwingingAnimationSystem>();
+    weaponSystem_                    = coordinator->RegisterSystem<WeaponSystem>();
+    damageableSystem_                = coordinator->RegisterSystem<DamageableSystem>();
     playerAffectedByAnimationSystem_ = coordinator->RegisterSystem<PlayerAffectedByAnimationSystem>();
     weaponAffectedByAnimationSystem_ = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
+    inventoryGUISystem_              = coordinator->RegisterSystem<InventoryGUISystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback =
@@ -142,6 +139,10 @@ MainLayer::MainLayer()
     playerAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<AffectedByAnimationComponent>());
     playerAffectedByAnimationSystemSignature.set(coordinator->GetComponentType<InventoryComponent>());
     coordinator->SetSystemSignature<PlayerAffectedByAnimationSystem>(playerAffectedByAnimationSystemSignature);
+
+    Signature inventoryGUISystemSignature;
+    inventoryGUISystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
+    coordinator->SetSystemSignature<InventoryGUISystem>(inventoryGUISystemSignature);
 
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
@@ -363,5 +364,5 @@ auto MainLayer::OnEvent(Event &e) -> void
 
 auto MainLayer::OnImGuiRender() -> void 
 {
-
+    inventoryGUISystem_->OnImGuiRender();
 }

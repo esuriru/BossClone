@@ -5,11 +5,20 @@
 
 #include <examples/imgui_impl_opengl3.h>
 
+Ref<Texture2D> InventoryGUISystem::ItemSpritesheet;
 static Coordinator* coordinator = Coordinator::Instance();
+
+InventoryGUISystem::InventoryGUISystem()
+{
+    ItemSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/BG7Icons.png", false);
+    emptySpriteTexture_ = SubTexture2D::CreateFromCoords(ItemSpritesheet, glm::vec2(10, 1), glm::vec2(32, 32));
+}
+
 auto InventoryGUISystem::OnImGuiRender() -> void
 {
     auto& style = ImGui::GetStyle();
     style.WindowBorderSize = 0.0f;
+
 
     constexpr float item_size_multiplier = 1.5f;
 
@@ -23,8 +32,6 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
 
     // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-    //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    // if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
     //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
     // {
     //     ImGui::TableNextRow();
@@ -40,11 +47,45 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     //     }
     //     ImGui::EndTable();
     // }
-    ImGui::End();
-    for (auto& e : entities)
+
+    // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
+    if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+        ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
     {
-        auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        for (auto& e : entities)
+        {
+            auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
+            ImGuiImage(owned_by.Icon ? owned_by.Icon : emptySpriteTexture_);
+            ImGui::TableNextColumn();
+        }
 
-
+        for (int i = 0; i < InventorySize - static_cast<int>(entities.size()); ++i)
+        {
+            ImGuiImage(emptySpriteTexture_);
+            ImGui::TableNextColumn();
+        }
     }
+
+
+    ImGui::End();
+}
+
+auto InventoryGUISystem::ImGuiImage(const Ref<Texture2D>& icon, float itemSizeMultiplier) -> void
+{
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
+        ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
+            itemSizeMultiplier * static_cast<float>(icon->GetHeight()))
+    );
+}
+
+auto InventoryGUISystem::ImGuiImage(const Ref<SubTexture2D> &icon, float itemSizeMultiplier) -> void
+{
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
+        ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
+            itemSizeMultiplier * static_cast<float>(icon->GetHeight())),
+        ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
+        ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
+    );
 }

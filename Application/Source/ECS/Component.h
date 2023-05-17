@@ -103,9 +103,10 @@ struct SwingingAnimationComponent
 };
 
 // NOTE - For this game there are only 6 slots.
+constexpr size_t InventorySize = 6;
 struct InventoryComponent
 {
-    std::array<Entity, 6> Items;
+    std::array<Entity, InventorySize> Items;
     Entity CurrentlyHolding;
 };
 

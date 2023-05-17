@@ -5,6 +5,7 @@
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Systems/PlayerSystem.h"
 #include "ECS/Systems/GameSystem.h"
+#include "ECS/Systems/GUISystem.h"
 
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
@@ -55,9 +56,10 @@ private:
     Ref<DamageableSystem> damageableSystem_;
     Ref<PlayerAffectedByAnimationSystem> playerAffectedByAnimationSystem_;
     Ref<WeaponAffectedByAnimationSystem> weaponAffectedByAnimationSystem_;
-
-
     Ref<WeaponSystem> weaponSystem_;
+
+    // GUI Systems
+    Ref<InventoryGUISystem> inventoryGUISystem_;
 
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;
