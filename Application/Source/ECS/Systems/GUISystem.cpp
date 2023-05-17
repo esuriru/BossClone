@@ -56,8 +56,8 @@ auto InventoryGUISystem::OnImGuiRender() -> void
         for (auto& e : entities)
         {
             ImGui::TableSetColumnIndex(i);
-            auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
-            ImGuiImage(owned_by.Icon ? owned_by.Icon : emptySpriteTexture_);
+            auto& item = coordinator->GetComponent<ItemComponent>(e);
+            ImGuiImage(item.Icon ? item.Icon : emptySpriteTexture_);
             ++i;
         }
 

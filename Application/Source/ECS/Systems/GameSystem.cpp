@@ -135,7 +135,6 @@ auto DamageableSystem::Update(Timestep ts) -> void
                 coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
                 coordinator->GetComponent<SpriteRendererComponent>(e).Colour = { 1.0f, 1.f, 1.f , 1.0f };
             }
-
         }
         accumulator -= step;
     }
@@ -160,7 +159,6 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
     auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
     coordinator->GetComponent<SpriteRendererComponent>(target).Colour = { 1.0f, 0.f, 0.f , 1.0f };
-    // CC_ASSERT(!physics_quadtree.Active, "Break");
     physics_quadtree.Active = false;
 
     CC_TRACE("New health: ", health.Health);
@@ -211,5 +209,32 @@ auto PlayerAffectedByAnimationSystem::OnAnimationSpriteChangeEvent(AnimationSpri
     auto event = ItemAffectByAnimationEvent(inventory.CurrentlyHolding, e);
     eventCallback(event);
     
+    return true;
+}
+
+auto PickupItemSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<PickupEvent>(CC_BIND_EVENT_FUNC(PickupItemSystem::OnPickupEvent));
+}
+
+auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
+{
+    if (entities.find(e.GetTargetEntity()) == entities.end())
+        return false;
+
+    auto& inventory = coordinator->GetComponent<InventoryComponent>(e.GetPlayerEntity());
+    if (inventory.Items.size() < InventorySize)
+        inventory.Items.emplace_back(e.GetTargetEntity());
+    
+    // TODO - Could have some issues where the player can hit things he owns.
+    coordinator->AddComponent(e.GetTargetEntity(), OwnedByComponent(e.GetPlayerEntity()));
+
+    // Remove the item from being able to be picked up.
+    coordinator->RemoveComponent<PickupComponent>(e.GetTargetEntity());
+    coordinator->RemoveComponent<SpriteRendererComponent>(e.GetTargetEntity());
+    auto& physics_obj = coordinator->GetComponent<PhysicsQuadtreeComponent>(e.GetTargetEntity());
+    physics_obj.Active = false;
+
     return true;
 }

@@ -22,6 +22,7 @@ MainLayer::MainLayer()
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
+    transparentItemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/TIcons.png");
 
     static Coordinator* coordinator = Coordinator::Instance();
 
@@ -48,6 +49,8 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<HealthComponent>();
     coordinator->RegisterComponent<AffectedByAnimationComponent>();
     coordinator->RegisterComponent<WeaponAffectedByAnimationComponent>();
+    coordinator->RegisterComponent<ItemComponent>();
+    coordinator->RegisterComponent<PickupComponent>();
 
     // System registry
 
@@ -67,6 +70,7 @@ MainLayer::MainLayer()
     playerAffectedByAnimationSystem_ = coordinator->RegisterSystem<PlayerAffectedByAnimationSystem>();
     weaponAffectedByAnimationSystem_ = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
     inventoryGUISystem_              = coordinator->RegisterSystem<InventoryGUISystem>();
+    pickupSystem_                    = coordinator->RegisterSystem<PickupItemSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback =
@@ -138,7 +142,13 @@ MainLayer::MainLayer()
 
     Signature inventoryGUISystemSignature;
     inventoryGUISystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
+    inventoryGUISystemSignature.set(coordinator->GetComponentType<ItemComponent>());
     coordinator->SetSystemSignature<InventoryGUISystem>(inventoryGUISystemSignature);
+
+    Signature pickupSystemSignature;
+    pickupSystemSignature.set(coordinator->GetComponentType<ItemComponent>());
+    pickupSystemSignature.set(coordinator->GetComponentType<PickupComponent>());
+    coordinator->SetSystemSignature<PickupItemSystem>(pickupSystemSignature);
 
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
@@ -243,25 +253,7 @@ MainLayer::MainLayer()
 
     swingingAnimation.FramesBetweenTransition = 4;
 
-    coordinator->AddComponent(playerEntity, swingingAnimationComponent);
-
-    auto inventoryComponent = InventoryComponent();
-
-    auto meleeWeaponEntity = coordinator->CreateEntity();
-
-    WeaponComponent meleeWeaponComponent;
-    meleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
-    meleeWeaponComponent.HandOffset = { 12, -2 };
-    meleeWeaponComponent.Damage = 5.0f;
-    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponComponent);
-    coordinator->AddComponent(meleeWeaponEntity, OwnedByComponent(playerEntity, 
-        SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {0, 5}, {32, 32})
-    ));
-
-    WeaponAffectedByAnimationComponent meleeWeaponAffectedByAnimationComponent;
-
-    // When the index is part of the weapons 'active index', enable the collider for melee weapons.
-    meleeWeaponAffectedByAnimationComponent.AnimationBehaviour =
+    auto meleeAnimationBehaviour = 
         [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
             const std::set<size_t>& activeIndices)
         {
@@ -269,23 +261,86 @@ MainLayer::MainLayer()
             coordinator->GetComponent<PhysicsQuadtreeComponent>(weaponEntity).Active = indexIsActive;
         };
 
-    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponAffectedByAnimationComponent);
+    coordinator->AddComponent(playerEntity, swingingAnimationComponent);
 
-    inventoryComponent.Items[0] = meleeWeaponEntity;
-    inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
+    auto inventoryComponent = InventoryComponent();
 
-    coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
+    auto woodenSwordWeaponEntity = coordinator->CreateEntity();
+
+    WeaponComponent woodenSwordMeleeWeaponComponent;
+    woodenSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+    woodenSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
+    woodenSwordMeleeWeaponComponent.Damage = 5.0f;
+    coordinator->AddComponent(woodenSwordWeaponEntity, woodenSwordMeleeWeaponComponent);
+    coordinator->AddComponent(woodenSwordWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
         glm::vec3(0), glm::vec3(8, 18, 1)));
-    // coordinator->AddComponent(meleeWeaponEntity, SpriteRendererComponent(glm::vec4(1.0f, 0, 0, 1.0f)));
+    coordinator->AddComponent(woodenSwordWeaponEntity, OwnedByComponent(playerEntity));
+    coordinator->AddComponent(woodenSwordWeaponEntity, ItemComponent(
+        SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {0, 5}, {32, 32})
+    ));
+
+    WeaponAffectedByAnimationComponent meleeWeaponAffectedByAnimationComponent;
+
+    // When the index is part of the weapons 'active index', enable the collider for melee weapons.
+    meleeWeaponAffectedByAnimationComponent.AnimationBehaviour = meleeAnimationBehaviour;
+
+    coordinator->AddComponent(woodenSwordWeaponEntity, meleeWeaponAffectedByAnimationComponent);
+
     RigidBody2DComponent meleeWeaponRigidbody;
     meleeWeaponRigidbody.BodyType = Physics::RigidBodyType::Static;
 
-    coordinator->AddComponent(meleeWeaponEntity, meleeWeaponRigidbody); 
+    coordinator->AddComponent(woodenSwordWeaponEntity, meleeWeaponRigidbody); 
 
     auto meleeBoxCollider = BoxCollider2DComponent();
     meleeBoxCollider.Extents = glm::vec2(4, 9);
-    coordinator->AddComponent(meleeWeaponEntity, meleeBoxCollider); 
-    coordinator->AddComponent(meleeWeaponEntity, PhysicsQuadtreeComponent()); 
+    coordinator->AddComponent(woodenSwordWeaponEntity, meleeBoxCollider); 
+    coordinator->AddComponent(woodenSwordWeaponEntity, PhysicsQuadtreeComponent()); 
+
+    auto ironSwordWeaponEntity = coordinator->CreateEntity();
+
+    WeaponComponent ironSwordMeleeWeaponComponent;
+    ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+    ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
+    ironSwordMeleeWeaponComponent.Damage = 5.0f;
+    coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
+    coordinator->AddComponent(ironSwordWeaponEntity, OwnedByComponent(playerEntity));
+    coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
+        SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})
+    ));
+
+    coordinator->AddComponent(ironSwordWeaponEntity, meleeWeaponRigidbody); 
+
+    coordinator->AddComponent(ironSwordWeaponEntity, meleeBoxCollider); 
+    coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
+
+    coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
+
+    {
+        auto ironSwordWeaponEntity = coordinator->CreateEntity();
+
+        WeaponComponent ironSwordMeleeWeaponComponent;
+        ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+        ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
+        ironSwordMeleeWeaponComponent.Damage = 5.0f;
+        coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40, 20, -0.5f), glm::vec3(0), glm::vec3(32, 32, 1)));
+
+        auto texture = 
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32});
+        coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(texture));
+        coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
+            SubTexture2D::CreateFromCoords(transparentItemSpritesheet_, {1, 21}, {32, 32})));
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
+        coordinator->AddComponent(ironSwordWeaponEntity, RigidBody2DComponent()); 
+        coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {16, 16})); 
+        coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
+        coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
+    }
+
+    inventoryComponent.Items[0] = woodenSwordWeaponEntity;
+    inventoryComponent.Items[1] = ironSwordWeaponEntity;
+    inventoryComponent.CurrentlyHolding = woodenSwordWeaponEntity;
+
 
     coordinator->AddComponent(playerEntity, inventoryComponent);
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
@@ -341,10 +396,16 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 7> on_events {
+    static const std::array<std::function<void(Event&)>, 9> on_events {
         OEB(WeaponSystem, weaponSystem_),
+
         OEB(OrthographicCameraController, &cameraController_),
+
         OEB(DamageableSystem, damageableSystem_),
+
+        OEB(PlayerSystem, playerSystem_),
+        OEB(PickupItemSystem, pickupSystem_),
+
         OEB(RunningAnimationSystem, runningAnimationSystem_),
         OEB(SwingingAnimationSystem, swingingAnimationSystem_),
         OEB(PlayerAffectedByAnimationSystem, playerAffectedByAnimationSystem_),

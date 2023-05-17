@@ -190,3 +190,20 @@ private:
     AnimationSpriteChangeEvent& animationSpriteChangeEvent;
 
 };
+
+class PickupEvent : public Event
+{
+public:
+    PickupEvent(Entity playerEntity, Entity targetEntity, const Collision2D& collision)
+        : playerEntity_(playerEntity), targetEntity_(targetEntity), collision_(collision) {}
+
+    inline auto GetPlayerEntity() -> Entity { return playerEntity_; } 
+    inline auto GetTargetEntity() -> Entity { return targetEntity_; } 
+    inline auto GetCollision() -> const Collision2D& { return collision_; }
+
+    NR_EVENT_CLASS_TYPE(Pickup)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+private:
+    Entity playerEntity_, targetEntity_;
+    const Collision2D& collision_;
+};

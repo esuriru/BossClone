@@ -9,6 +9,7 @@
 #include "Utils/Input.h"
 
 #include "Events/ApplicationEvent.h"
+#include "Events/EventDispatcher.h"
 
 #include <glm/glm.hpp>
 #include <glm/common.hpp>
@@ -131,4 +132,53 @@ auto PlayerSystem::Update(Timestep ts) -> void
         }
         accumulator -= step;
     }
+}
+
+auto PlayerSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<CollisionEvent>(CC_BIND_EVENT_FUNC(PlayerSystem::OnCollisionEvent));
+}
+
+auto PlayerSystem::OnCollisionEvent(CollisionEvent &e) -> bool
+{
+    const auto& collision = e.GetCollision();
+
+    bool originPlayer = false;
+    Entity playerEntity;
+
+    auto otherEntityQuery = entities.find(collision.OtherEntity);
+    auto originEntityQuery = entities.find(e.GetOriginEntity());
+    if (otherEntityQuery == entities.end())
+    {
+        if (originEntityQuery == entities.end())
+            return false; 
+        else
+            originPlayer = true;
+    }
+    else
+    {
+        if (originEntityQuery == entities.end())
+            originPlayer = false;
+        else 
+            return false;
+    }
+
+    Entity targetEntity;
+    if (originPlayer)
+    {
+        playerEntity = e.GetOriginEntity();
+        targetEntity = collision.OtherEntity;
+    }
+    else
+    {
+        playerEntity = collision.OtherEntity;
+        targetEntity = e.GetOriginEntity();
+    }
+
+    // Send a pickup event.
+    PickupEvent pickup(playerEntity, targetEntity, e.GetCollision());
+    eventCallback(pickup);
+
+    return false;
 }

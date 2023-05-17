@@ -106,7 +106,12 @@ struct SwingingAnimationComponent
 constexpr size_t InventorySize = 6;
 struct InventoryComponent
 {
-    std::array<Entity, InventorySize> Items;
+    InventoryComponent()
+    {
+        Items.resize(InventorySize);
+    }
+
+    std::vector<Entity> Items;
     Entity CurrentlyHolding;
 };
 
@@ -142,10 +147,8 @@ struct OwnedByComponent
 {
     OwnedByComponent() = default;
     OwnedByComponent(Entity owner) : Owner(owner) {}
-    OwnedByComponent(Entity owner, const Ref<SubTexture2D>& icon) : Owner(owner), Icon(icon) {}
 
     Entity Owner;
-    Ref<SubTexture2D> Icon;
 };
 
 struct HealthComponent
@@ -175,8 +178,21 @@ struct AffectedByAnimationComponent
 struct WeaponAffectedByAnimationComponent
 {
     using WeaponAnimationBehaviour = void(*)(Entity, AnimationSpriteChangeEvent&, const std::set<size_t>&);
+    WeaponAffectedByAnimationComponent() = default;
+    WeaponAffectedByAnimationComponent(WeaponAnimationBehaviour wab) : AnimationBehaviour(wab) {}
 
     WeaponAnimationBehaviour AnimationBehaviour;
 };
+
+struct ItemComponent 
+{
+    ItemComponent() = default;
+    ItemComponent(const Ref<SubTexture2D>& icon) : Icon(icon) {}
+
+    Ref<SubTexture2D> Icon;
+};
+
+struct PickupComponent {};
+
 
 

@@ -39,6 +39,7 @@ private:
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> playerSpritesheet_;
+    Ref<Texture2D> transparentItemSpritesheet_;
     
     // Render Systems 
     Ref<SpriteRenderSystem> spriteRenderSystem_;
@@ -57,6 +58,7 @@ private:
     Ref<PlayerAffectedByAnimationSystem> playerAffectedByAnimationSystem_;
     Ref<WeaponAffectedByAnimationSystem> weaponAffectedByAnimationSystem_;
     Ref<WeaponSystem> weaponSystem_;
+    Ref<PickupItemSystem> pickupSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

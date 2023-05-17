@@ -56,4 +56,14 @@ private:
     auto OnAnimationSpriteChangeEvent(AnimationSpriteChangeEvent& e) -> bool;
 };
 
+class PickupItemSystem : public System
+{
+public:
+    auto OnEvent(Event& e) -> void;
+
+private:
+    auto OnPickupEvent(PickupEvent& e) -> bool;
+
+};
+
 
