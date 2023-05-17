@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.embeddedhtml": "html",
         "*.fragmentshader": "glsl",
         "*.vertexshader": "glsl",
         "xstring": "cpp",
@@ -79,6 +80,7 @@
         "codecvt": "cpp",
         "cwctype": "cpp",
         "numbers": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "mutex": "cpp"
     }
 }

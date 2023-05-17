@@ -65,10 +65,7 @@ public:
         static float accumulator = 0.f;
 
         accumulator += glm::min(static_cast<float>(ts), clamp);
-        
-        CC_TRACE("Accumulator:", accumulator);
 
-        int repeats = 0;
         while (accumulator >= step) 
         {
             static Coordinator* coordinator = Coordinator::Instance(); 
@@ -111,12 +108,7 @@ public:
                 }
             }
             accumulator -= step;
-            repeats++;
         }
-
-        if (repeats > 1)
-            CC_TRACE("While loop repeated ", repeats, " times");
-
     } 
     inline auto OnEvent(Event& e) -> void
     {

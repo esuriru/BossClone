@@ -244,7 +244,7 @@ MainLayer::MainLayer()
         swingingAnimation.AnimationIndices.emplace_back(i);
     }
 
-    swingingAnimation.FramesBetweenTransition = 8;
+    swingingAnimation.FramesBetweenTransition = 4;
 
     coordinator->AddComponent(playerEntity, swingingAnimationComponent);
 
@@ -272,7 +272,7 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(meleeWeaponEntity, meleeWeaponAffectedByAnimationComponent);
 
-    inventoryComponent.Items.emplace_back(meleeWeaponEntity);
+    inventoryComponent.Items[0] = meleeWeaponEntity;
     inventoryComponent.CurrentlyHolding = meleeWeaponEntity;
 
     coordinator->AddComponent(meleeWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
@@ -317,7 +317,6 @@ auto MainLayer::OnDetach() -> void
 
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
-    this->ts = ts.GetSeconds();
     cameraController_.OnUpdate(ts);
     weaponSystem_->Update(ts);
     damageableSystem_->Update(ts);
@@ -339,76 +338,30 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     Renderer2D::EndScene();
 }
 
+
 auto MainLayer::OnEvent(Event &e) -> void 
 {
-    // Process all the logic stuff first before rendering.
-    weaponSystem_->OnEvent(e);
-    if (e.Handled)
-        return;
-    // All the render stuff should be after.
-    cameraController_.OnEvent(e);
-    if (e.Handled)
-        return;
-    damageableSystem_->OnEvent(e);
-    if (e.Handled)
-        return;
+#define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
+    static const std::array<std::function<void(Event&)>, 7> on_events {
+        OEB(WeaponSystem, weaponSystem_),
+        OEB(OrthographicCameraController, &cameraController_),
+        OEB(DamageableSystem, damageableSystem_),
+        OEB(RunningAnimationSystem, runningAnimationSystem_),
+        OEB(SwingingAnimationSystem, swingingAnimationSystem_),
+        OEB(PlayerAffectedByAnimationSystem, playerAffectedByAnimationSystem_),
+        OEB(WeaponAffectedByAnimationSystem, weaponAffectedByAnimationSystem_)
+    };
+#undef OEB 
 
-    // Run the animations
-    runningAnimationSystem_->OnEvent(e);    
-    if (e.Handled)
-        return;
-    swingingAnimationSystem_->OnEvent(e);
-    if (e.Handled)
-        return;
-
-    // Animation sprite change events are now called, now setup callbacks
-    playerAffectedByAnimationSystem_->OnEvent(e);
-    if (e.Handled)
-        return;
-    weaponAffectedByAnimationSystem_->OnEvent(e);
-    if (e.Handled)
-        return;
+    for (auto& func : on_events)
+    {
+        if (e.Handled)
+            return;
+        func(e);
+    }
 }
 
 auto MainLayer::OnImGuiRender() -> void 
 {
-    static bool show = true;
 
-    auto& style = ImGui::GetStyle();
-    style.WindowBorderSize = 0.0f;
-
-    constexpr float item_size_multiplier = 1.5f;
-
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
-    ImGui::SetNextWindowBgAlpha(0.0f);
-    // ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar );
-    ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_NoMove*/ |
-        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
-        ImGuiWindowFlags_NoSavedSettings);
-
-    // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
-    // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-    //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    ImGui::Text(std::to_string(1 / ts).data());
-
-    if (ImGui::BeginTable("inventory", 6, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-        ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    {
-        ImGui::TableNextRow();
-        for (int i = 0; i < 6; ++i)
-        {
-            ImGui::TableSetColumnIndex(i);
-            ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(emptyItemSprite_->GetTexture()->GetRendererID())),
-                ImVec2(item_size_multiplier * static_cast<float>(emptyItemSprite_->GetWidth()),
-                    item_size_multiplier * static_cast<float>(emptyItemSprite_->GetHeight())),
-                ImVec2(emptyItemSprite_->GetTexCoordsArray()[0].x, emptyItemSprite_->GetTexCoordsArray()[0].y),
-                ImVec2(emptyItemSprite_->GetTexCoordsArray()[2].x, emptyItemSprite_->GetTexCoordsArray()[2].y)
-            );
-        }
-
-        ImGui::EndTable();
-    }
-
-    ImGui::End();
-    
 }

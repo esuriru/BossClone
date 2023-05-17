@@ -102,9 +102,10 @@ struct SwingingAnimationComponent
     bool Enabled = false;
 };
 
+// NOTE - For this game there are only 6 slots.
 struct InventoryComponent
 {
-    vector<Entity> Items;
+    std::array<Entity, 6> Items;
     Entity CurrentlyHolding;
 };
 
@@ -142,6 +143,8 @@ struct OwnedByComponent
     OwnedByComponent(Entity owner) : Owner(owner) {}
 
     Entity Owner;
+
+    Ref<SubTexture2D> Icon;
 };
 
 struct HealthComponent
@@ -157,7 +160,7 @@ struct HealthComponent
     float MaxHealth = 100.f;
 
     uint32_t CurrentCooldownFrames = 0;
-    uint32_t CooldownFramesOnHit = 300;
+    uint32_t CooldownFramesOnHit = 60;
 };
 
 struct AffectedByAnimationComponent
@@ -174,4 +177,5 @@ struct WeaponAffectedByAnimationComponent
 
     WeaponAnimationBehaviour AnimationBehaviour;
 };
+
 

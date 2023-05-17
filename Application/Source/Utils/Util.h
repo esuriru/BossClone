@@ -63,4 +63,5 @@ namespace Utility
             ? sqrtNewtonRaphson(x, x, 0)
             : std::numeric_limits<double>::quiet_NaN();
 	}
+
 }
