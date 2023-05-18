@@ -18,11 +18,12 @@ MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
-
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
     transparentItemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/TIcons.png");
+    blueBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Blue.png");
+    greenBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
 
     static Coordinator* coordinator = Coordinator::Instance();
 
@@ -315,6 +316,7 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
 
+    for (int i = 0; i < 5; ++i)
     {
         auto ironSwordWeaponEntity = coordinator->CreateEntity();
 
@@ -323,7 +325,7 @@ MainLayer::MainLayer()
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
         ironSwordMeleeWeaponComponent.Damage = 5.0f;
         coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40, 20, -0.5f), glm::vec3(0), glm::vec3(32, 32, 1)));
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 20, 20, -0.5f), glm::vec3(0), glm::vec3(32, 32, 1)));
 
         auto texture = 
             SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32});
@@ -337,8 +339,8 @@ MainLayer::MainLayer()
         coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
     }
 
-    inventoryComponent.Items[0] = woodenSwordWeaponEntity;
-    inventoryComponent.Items[1] = ironSwordWeaponEntity;
+    inventoryComponent.Items.emplace_back(woodenSwordWeaponEntity);
+    inventoryComponent.Items.emplace_back(ironSwordWeaponEntity);
     inventoryComponent.CurrentlyHolding = woodenSwordWeaponEntity;
 
 
@@ -382,6 +384,9 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
+
+    constexpr float tiling_factor = 64.0f;
+    Renderer2D::DrawQuad(glm::vec3(), glm::vec2(1280, 1280), greenBackground_, tiling_factor);
 
     runningAnimationSystem_->Update(ts);
     swingingAnimationSystem_->Update(ts);

@@ -36,6 +36,10 @@ private:
     Ref<SubTexture2D> swordSprite_;
     Ref<SubTexture2D> emptyItemSprite_;
 
+    // Background
+    Ref<Texture2D> blueBackground_;
+    Ref<Texture2D> greenBackground_;
+
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> playerSpritesheet_;

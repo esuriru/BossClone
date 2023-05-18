@@ -19,34 +19,13 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     auto& style = ImGui::GetStyle();
     style.WindowBorderSize = 0.0f;
 
-    constexpr float item_size_multiplier = 1.5f;
-
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowBgAlpha(0.0f);
-    // ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar );
     ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_NoMove*/ |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
 
     // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
-
-    // if (ImGui::BeginTable("inventory", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-    //     ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    // {
-    //     ImGui::TableNextRow();
-    //     for (int i = 0; i < 6; ++i)
-    //     {
-    //         ImGui::TableSetColumnIndex(i);
-    //         ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(emptyItemSprite_->GetTexture()->GetRendererID())),
-    //             ImVec2(item_size_multiplier * static_cast<float>(emptyItemSprite_->GetWidth()),
-    //                 item_size_multiplier * static_cast<float>(emptyItemSprite_->GetHeight())),
-    //             ImVec2(emptyItemSprite_->GetTexCoordsArray()[0].x, emptyItemSprite_->GetTexCoordsArray()[0].y),
-    //             ImVec2(emptyItemSprite_->GetTexCoordsArray()[2].x, emptyItemSprite_->GetTexCoordsArray()[2].y)
-    //         );
-    //     }
-    //     ImGui::EndTable();
-    // }
-
     // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
     if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
         ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))

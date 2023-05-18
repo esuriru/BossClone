@@ -108,7 +108,7 @@ struct InventoryComponent
 {
     InventoryComponent()
     {
-        Items.resize(InventorySize);
+        Items.reserve(InventorySize);
     }
 
     std::vector<Entity> Items;

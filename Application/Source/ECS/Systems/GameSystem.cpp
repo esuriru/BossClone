@@ -226,7 +226,9 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     auto& inventory = coordinator->GetComponent<InventoryComponent>(e.GetPlayerEntity());
     if (inventory.Items.size() < InventorySize)
         inventory.Items.emplace_back(e.GetTargetEntity());
-    
+    else
+        return true;
+
     // TODO - Could have some issues where the player can hit things he owns.
     coordinator->AddComponent(e.GetTargetEntity(), OwnedByComponent(e.GetPlayerEntity()));
 
