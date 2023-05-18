@@ -2,9 +2,11 @@
 
 #include "ECS/System.h"
 #include "Core/Timestep.h"
+#include "Core/Core.h"
 
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
+#include "Events/EventDispatcher.h"
 
 #include "Core/Window.h"
 
@@ -60,6 +62,20 @@ class PickupItemSystem : public System
 {
 public:
     auto OnEvent(Event& e) -> void;
+
+private:
+    auto OnPickupEvent(PickupEvent& e) -> bool;
+
+};
+
+class WeaponAffectedByPickupSystem : public System
+{
+public:
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<PickupEvent>(CC_BIND_EVENT_FUNC(WeaponAffectedByPickupSystem::OnPickupEvent));
+    }
 
 private:
     auto OnPickupEvent(PickupEvent& e) -> bool;

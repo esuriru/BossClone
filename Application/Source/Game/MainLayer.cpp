@@ -26,13 +26,11 @@ MainLayer::MainLayer()
     greenBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
 
     static Coordinator* coordinator = Coordinator::Instance();
-
     coordinator->Init();
 
     // TODO - Consider using pragma region.
 
-    // Register components
-
+#pragma region COMPONENT_REGISTRY
     coordinator->RegisterComponent<TransformComponent>();
     coordinator->RegisterComponent<SpriteRendererComponent>();
     coordinator->RegisterComponent<TileRendererComponent>();
@@ -52,9 +50,10 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<WeaponAffectedByAnimationComponent>();
     coordinator->RegisterComponent<ItemComponent>();
     coordinator->RegisterComponent<PickupComponent>();
+    coordinator->RegisterComponent<WeaponAffectedByPickupComponent>();
 
-    // System registry
-
+#pragma endregion
+#pragma region SYSTEM_REGISTRY
     spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
     physicsSystem_ = coordinator->RegisterSystem<PhysicsSystem>();
@@ -72,6 +71,7 @@ MainLayer::MainLayer()
     weaponAffectedByAnimationSystem_ = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
     inventoryGUISystem_              = coordinator->RegisterSystem<InventoryGUISystem>();
     pickupSystem_                    = coordinator->RegisterSystem<PickupItemSystem>();
+    weaponAffectedByPickupSystem_    = coordinator->RegisterSystem<WeaponAffectedByPickupSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -83,6 +83,8 @@ MainLayer::MainLayer()
     playerAffectedByAnimationSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
+#pragma endregion
+#pragma region SYSTEM_SIGNATURES
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
     spriteRenderSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
@@ -153,6 +155,12 @@ MainLayer::MainLayer()
     pickupSystemSignature.set(coordinator->GetComponentType<PickupComponent>());
     coordinator->SetSystemSignature<PickupItemSystem>(pickupSystemSignature);
 
+    Signature weaponAffectedByPickupSystemSignature;
+    weaponAffectedByPickupSystemSignature.set(coordinator->GetComponentType<WeaponAffectedByPickupComponent>());
+    weaponAffectedByPickupSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
+    coordinator->SetSystemSignature<WeaponAffectedByPickupSystem>(weaponAffectedByPickupSystemSignature);
+#pragma endregion
+#pragma region TILEMAP_SETUP
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
@@ -189,6 +197,8 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
 
+#pragma endregion
+#pragma region PLAYER_SETUP
     auto playerEntity = coordinator->CreateEntity();
 
     coordinator->AddComponent(playerEntity, TransformComponent{
@@ -220,6 +230,8 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(playerEntity, AffectedByAnimationComponent(Animation::AnimationType::Swinging));
 
+#pragma region RUNNING_ANIMATION_SETUP
+
     // Running animation
     RunningAnimationComponent runningAnimationComponent;
 
@@ -239,6 +251,10 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(playerEntity, runningAnimationComponent);
 
+#pragma endregion
+
+#pragma region SWINGING_ANIMATION_SETUP
+
     // Swinging animation
     SwingingAnimationComponent swingingAnimationComponent;
     auto& swingingAnimation = swingingAnimationComponent.Animation;
@@ -255,7 +271,10 @@ MainLayer::MainLayer()
     }
 
     swingingAnimation.FramesBetweenTransition = 4;
+    coordinator->AddComponent(playerEntity, swingingAnimationComponent);
+#pragma endregion
 
+#pragma region MELEE_WEAPON_SETUP
     auto meleeAnimationBehaviour = 
         [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
             const std::set<size_t>& activeIndices)
@@ -264,9 +283,15 @@ MainLayer::MainLayer()
             coordinator->GetComponent<PhysicsQuadtreeComponent>(weaponEntity).Active = indexIsActive;
         };
 
-    coordinator->AddComponent(playerEntity, swingingAnimationComponent);
+    auto meleePickupBehaviour = [](Entity weaponEntity, PickupEvent& e)
+    {
+        auto& weapon_component = coordinator->GetComponent<WeaponComponent>(weaponEntity);
+        // NOTE - Every weapon should have a box collider, if it does not, how would it have been picked up anyway?
+        auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(weaponEntity);
 
-    auto inventoryComponent = InventoryComponent();
+        // Set the new extents to those of the correct use case when being held by the player.
+        box_collider.Extents = weapon_component.EquippedExtents;
+    };
 
     auto woodenSwordWeaponEntity = coordinator->CreateEntity();
 
@@ -274,7 +299,10 @@ MainLayer::MainLayer()
     woodenSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
     woodenSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
     woodenSwordMeleeWeaponComponent.Damage = 5.0f;
+    woodenSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
+    woodenSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
     coordinator->AddComponent(woodenSwordWeaponEntity, woodenSwordMeleeWeaponComponent);
+    coordinator->AddComponent(woodenSwordWeaponEntity, WeaponAffectedByPickupComponent(meleePickupBehaviour));
     coordinator->AddComponent(woodenSwordWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
         glm::vec3(0), glm::vec3(8, 18, 1)));
     coordinator->AddComponent(woodenSwordWeaponEntity, OwnedByComponent(playerEntity));
@@ -299,39 +327,22 @@ MainLayer::MainLayer()
     coordinator->AddComponent(woodenSwordWeaponEntity, meleeBoxCollider); 
     coordinator->AddComponent(woodenSwordWeaponEntity, PhysicsQuadtreeComponent()); 
 
-    auto ironSwordWeaponEntity = coordinator->CreateEntity();
-
-    WeaponComponent ironSwordMeleeWeaponComponent;
-    ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
-    ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
-    ironSwordMeleeWeaponComponent.Damage = 5.0f;
-    coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-    coordinator->AddComponent(ironSwordWeaponEntity, OwnedByComponent(playerEntity));
-    coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
-        SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})
-    ));
-
-    coordinator->AddComponent(ironSwordWeaponEntity, meleeWeaponRigidbody); 
-
-    coordinator->AddComponent(ironSwordWeaponEntity, meleeBoxCollider); 
-    coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
-
-    coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
-
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 6; ++i)
     {
         auto ironSwordWeaponEntity = coordinator->CreateEntity();
 
         WeaponComponent ironSwordMeleeWeaponComponent;
         ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
-        ironSwordMeleeWeaponComponent.Damage = 5.0f;
+        ironSwordMeleeWeaponComponent.Damage = 12.0f;
+        ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
+        ironSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
+
         coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 20, 20, -0.5f),
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 35, 20, -0.5f),
             glm::vec3(0), glm::vec3(32, 32, 1)));
-        auto texture = 
-            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32});
-        coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(texture));
+        coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
             SubTexture2D::CreateFromCoords(transparentItemSpritesheet_, {1, 21}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
@@ -339,16 +350,21 @@ MainLayer::MainLayer()
         coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
         coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(meleePickupBehaviour));
     }
+#pragma endregion
 
+#pragma region INVENTORY_INIT
+    auto inventoryComponent = InventoryComponent();
     inventoryComponent.Items.emplace_back(woodenSwordWeaponEntity);
-    inventoryComponent.Items.emplace_back(ironSwordWeaponEntity);
     inventoryComponent.CurrentlyHolding = woodenSwordWeaponEntity;
 
-
     coordinator->AddComponent(playerEntity, inventoryComponent);
-    coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
+#pragma endregion
 
+    coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
+#pragma endregion
+#pragma region MISC_ENTITIES
     auto testPhysicsEntity = coordinator->CreateEntity();
     coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0),
        glm::vec3(0), glm::vec3(12, 12, 1)));
@@ -360,7 +376,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
     coordinator->AddComponent(testPhysicsEntity, HealthComponent(100));
-
+#pragma endregion
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -403,7 +419,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 9> on_events {
+    static const std::array<std::function<void(Event&)>, 10> on_events {
         OEB(WeaponSystem, weaponSystem_),
 
         OEB(OrthographicCameraController, &cameraController_),
@@ -412,6 +428,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 
         OEB(PlayerSystem, playerSystem_),
         OEB(PickupItemSystem, pickupSystem_),
+        OEB(WeaponAffectedByPickupSystem, weaponAffectedByPickupSystem_),
 
         OEB(RunningAnimationSystem, runningAnimationSystem_),
         OEB(SwingingAnimationSystem, swingingAnimationSystem_),

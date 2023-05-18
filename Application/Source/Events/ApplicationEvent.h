@@ -200,10 +200,12 @@ public:
     inline auto GetPlayerEntity() -> Entity { return playerEntity_; } 
     inline auto GetTargetEntity() -> Entity { return targetEntity_; } 
     inline auto GetCollision() -> const Collision2D& { return collision_; }
+    inline auto IsPickedUp() -> bool& { return pickedUp_; };
 
     NR_EVENT_CLASS_TYPE(Pickup)
     NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
 private:
     Entity playerEntity_, targetEntity_;
     const Collision2D& collision_;
+    bool pickedUp_ = false; 
 };

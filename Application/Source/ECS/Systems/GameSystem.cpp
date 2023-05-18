@@ -229,6 +229,7 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     else
         return true;
 
+    e.IsPickedUp() = true;
     // TODO - Could have some issues where the player can hit things he owns.
     coordinator->AddComponent(e.GetTargetEntity(), OwnedByComponent(e.GetPlayerEntity()));
 
@@ -238,5 +239,16 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     auto& physics_obj = coordinator->GetComponent<PhysicsQuadtreeComponent>(e.GetTargetEntity());
     physics_obj.Active = false;
 
+    return false;
+}
+
+auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
+{
+    Entity weaponEntity = e.GetTargetEntity();
+    if (e.IsPickedUp()) 
+    {
+        auto& weaponAffectedByPickupComponent = coordinator->GetComponent<WeaponAffectedByPickupComponent>(weaponEntity);
+        weaponAffectedByPickupComponent.PickupBehaviour(weaponEntity, e);
+    }
     return true;
 }

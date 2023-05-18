@@ -138,6 +138,7 @@ auto PlayerSystem::OnEvent(Event &e) -> void
 {
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<CollisionEvent>(CC_BIND_EVENT_FUNC(PlayerSystem::OnCollisionEvent));
+    dispatcher.Dispatch<KeyPressedEvent>(CC_BIND_EVENT_FUNC(PlayerSystem::OnKeyPressedEvent));
 }
 
 auto PlayerSystem::OnCollisionEvent(CollisionEvent &e) -> bool
@@ -180,5 +181,21 @@ auto PlayerSystem::OnCollisionEvent(CollisionEvent &e) -> bool
     PickupEvent pickup(playerEntity, targetEntity, e.GetCollision());
     eventCallback(pickup);
 
+    return false;
+}
+
+constexpr auto KeyToInventorySlot(int key) -> size_t
+{
+    return (key - 49);
+}
+
+auto PlayerSystem::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
+{
+    // NOTE - There should be only one player, or this will not work.
+    auto& inventory = coordinator->GetComponent<InventoryComponent>(*(entities.begin()));
+    size_t slot = KeyToInventorySlot(e.GetKeyCode());
+    constexpr uint32_t max_slot = InventorySize - 1;
+    if (slot > max_slot || slot > inventory.Items.size()) return false;
+    inventory.CurrentlyHolding = inventory.Items.at(slot);
     return false;
 }

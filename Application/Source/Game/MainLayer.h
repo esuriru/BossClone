@@ -63,6 +63,7 @@ private:
     Ref<WeaponAffectedByAnimationSystem> weaponAffectedByAnimationSystem_;
     Ref<WeaponSystem> weaponSystem_;
     Ref<PickupItemSystem> pickupSystem_;
+    Ref<WeaponAffectedByPickupSystem> weaponAffectedByPickupSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

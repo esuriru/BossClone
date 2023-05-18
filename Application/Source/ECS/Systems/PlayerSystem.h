@@ -27,6 +27,7 @@ private:
     std::bitset<MaxEntities> runningBitset_;
 
     auto OnCollisionEvent(CollisionEvent& e) -> bool;
+    auto OnKeyPressedEvent(KeyPressedEvent& e) -> bool;
 
     bool mouseDown_ = false;
 };

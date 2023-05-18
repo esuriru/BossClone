@@ -12,6 +12,7 @@
 
 class AnimationSpriteChangeEvent;
 class WeaponUseEvent;
+class PickupEvent;
 
 // NOTE - Components are mainly for storing data. All the logic processes will be done in Systems.
 
@@ -134,8 +135,8 @@ struct WeaponComponent
     WeaponBehaviour Behaviour;  
 
     // For collision
-    glm::vec2 OldExtents{};
-    glm::vec2 NewExtents{};
+    glm::vec2 GroundExtents{};
+    glm::vec2 EquippedExtents{};
     glm::vec2 HandOffset{};
 
     bool Active = false;
@@ -182,6 +183,16 @@ struct WeaponAffectedByAnimationComponent
     WeaponAffectedByAnimationComponent(WeaponAnimationBehaviour wab) : AnimationBehaviour(wab) {}
 
     WeaponAnimationBehaviour AnimationBehaviour;
+};
+
+struct WeaponAffectedByPickupComponent
+{
+    using WeaponPickupBehaviour = void(*)(Entity, PickupEvent&);
+    WeaponAffectedByPickupComponent() = default;
+    WeaponAffectedByPickupComponent(WeaponPickupBehaviour wpb)
+        : PickupBehaviour(wpb) {}
+
+    WeaponPickupBehaviour PickupBehaviour;    
 };
 
 struct ItemComponent 
