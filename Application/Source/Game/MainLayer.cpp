@@ -74,12 +74,14 @@ MainLayer::MainLayer()
     pickupSystem_                    = coordinator->RegisterSystem<PickupItemSystem>();
 
     // Set event callbacks for most of the systems.
-    playerSystem_->eventCallback = physicsSystem_->tilemapSystem->eventCallback =
-        runningAnimationSystem_->eventCallback = weaponSystem_->eventCallback =
-            swingingAnimationSystem_->eventCallback = 
-                weaponAffectedByAnimationSystem_->eventCallback =
-                    playerAffectedByAnimationSystem_->eventCallback =
-                        CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
+    playerSystem_->eventCallback = 
+    physicsSystem_->tilemapSystem->eventCallback =
+    runningAnimationSystem_->eventCallback = 
+    weaponSystem_->eventCallback =
+    swingingAnimationSystem_->eventCallback = 
+    weaponAffectedByAnimationSystem_->eventCallback =
+    playerAffectedByAnimationSystem_->eventCallback =
+        CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     Signature spriteRenderSystemSignature;
     spriteRenderSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
@@ -325,8 +327,8 @@ MainLayer::MainLayer()
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
         ironSwordMeleeWeaponComponent.Damage = 5.0f;
         coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 20, 20, -0.5f), glm::vec3(0), glm::vec3(32, 32, 1)));
-
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 20, 20, -0.5f),
+            glm::vec3(0), glm::vec3(32, 32, 1)));
         auto texture = 
             SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32});
         coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(texture));
@@ -334,7 +336,7 @@ MainLayer::MainLayer()
             SubTexture2D::CreateFromCoords(transparentItemSpritesheet_, {1, 21}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
         coordinator->AddComponent(ironSwordWeaponEntity, RigidBody2DComponent()); 
-        coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {16, 16})); 
+        coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
         coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
     }
