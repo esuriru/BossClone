@@ -3,7 +3,7 @@
 #include "ECS/System.h"
 #include "Core/Core.h"
 #include "Renderer/SubTexture2D.h"
-
+#include "Renderer/Texture.h"
 
 class InventoryGUISystem : public System
 {
@@ -15,9 +15,13 @@ public:
     static Ref<Texture2D> ItemSpritesheet;
 
 private:
-    // TODO - Add custom UV coordinates
-    auto ImGuiImage(const Ref<Texture2D>& icon, float itemSizeMultiplier = 1.5f) -> void;
-    auto ImGuiImage(const Ref<SubTexture2D>& icon, float itemSizeMultiplier = 1.5f) -> void;
 
     Ref<SubTexture2D> emptySpriteTexture_;
+};
+
+class PlayerHealthGUISystem : public System
+{
+public:
+    auto OnImGuiRender() -> void;
+
 };

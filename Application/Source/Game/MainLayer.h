@@ -67,6 +67,7 @@ private:
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;
+    Ref<PlayerHealthGUISystem> playerHealthGUISystem_;
 
     // Tilemaps
     Ref<TilemapComponent> testTilemap_;

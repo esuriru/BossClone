@@ -72,6 +72,7 @@ MainLayer::MainLayer()
     inventoryGUISystem_              = coordinator->RegisterSystem<InventoryGUISystem>();
     pickupSystem_                    = coordinator->RegisterSystem<PickupItemSystem>();
     weaponAffectedByPickupSystem_    = coordinator->RegisterSystem<WeaponAffectedByPickupSystem>();
+    playerHealthGUISystem_           = coordinator->RegisterSystem<PlayerHealthGUISystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -159,6 +160,11 @@ MainLayer::MainLayer()
     weaponAffectedByPickupSystemSignature.set(coordinator->GetComponentType<WeaponAffectedByPickupComponent>());
     weaponAffectedByPickupSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
     coordinator->SetSystemSignature<WeaponAffectedByPickupSystem>(weaponAffectedByPickupSystemSignature);
+
+    Signature playerHealthGUISystemSignature;
+    playerHealthGUISystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
+    playerHealthGUISystemSignature.set(coordinator->GetComponentType<HealthComponent>());
+    coordinator->SetSystemSignature<PlayerHealthGUISystem>(playerHealthGUISystemSignature);
 #pragma endregion
 #pragma region TILEMAP_SETUP
     // TODO - Fix tilemap bleeding
@@ -363,6 +369,7 @@ MainLayer::MainLayer()
 #pragma endregion
 
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(playerEntity, HealthComponent());
 #pragma endregion
 #pragma region MISC_ENTITIES
     auto testPhysicsEntity = coordinator->CreateEntity();
@@ -448,4 +455,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 auto MainLayer::OnImGuiRender() -> void 
 {
     inventoryGUISystem_->OnImGuiRender();
+
+    // TODO - Remove collision from weapons on player health comp..
+    playerHealthGUISystem_->OnImGuiRender();
 }

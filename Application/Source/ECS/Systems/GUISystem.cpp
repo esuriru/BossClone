@@ -2,11 +2,36 @@
 
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
+#include "Utils/Util.h"
+
+#include "Core/Application.h"
 
 #include <examples/imgui_impl_opengl3.h>
 
 Ref<Texture2D> InventoryGUISystem::ItemSpritesheet;
 static Coordinator* coordinator = Coordinator::Instance();
+
+namespace Utility
+{
+    auto ImGuiImage(const Ref<Texture2D>& icon, float itemSizeMultiplier = 1.5f) -> void
+    {
+        ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
+            ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
+                itemSizeMultiplier * static_cast<float>(icon->GetHeight()))
+        );
+    }
+
+    auto ImGuiImage(const Ref<SubTexture2D> &icon, float itemSizeMultiplier = 1.5f) -> void
+    {
+        ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
+            ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
+                itemSizeMultiplier * static_cast<float>(icon->GetHeight())),
+            ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
+            ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
+        );
+    }
+}
+
 
 InventoryGUISystem::InventoryGUISystem()
 {
@@ -25,48 +50,39 @@ auto InventoryGUISystem::OnImGuiRender() -> void
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
 
-    // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
-    // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
-    if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-        ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
-    {
-        ImGui::TableNextRow();
-        size_t i = 0;
-        for (auto& e : entities)
+        // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
+        // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
+        if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
+            ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
         {
-            ImGui::TableSetColumnIndex(i);
-            auto& item = coordinator->GetComponent<ItemComponent>(e);
-            ImGuiImage(item.Icon ? item.Icon : emptySpriteTexture_);
-            ++i;
-        }
+            ImGui::TableNextRow();
+            size_t i = 0;
+            for (auto& e : entities)
+            {
+                ImGui::TableSetColumnIndex(i);
+                auto& item = coordinator->GetComponent<ItemComponent>(e);
+                Utility::ImGuiImage(item.Icon ? item.Icon : emptySpriteTexture_);
+                ++i;
+            }
 
-        for (; i < InventorySize; ++i)
-        {
-            ImGui::TableSetColumnIndex(i);
-            ImGuiImage(emptySpriteTexture_);
-        }
+            for (; i < InventorySize; ++i)
+            {
+                ImGui::TableSetColumnIndex(i);
+                Utility::ImGuiImage(emptySpriteTexture_);
+            }
 
-        ImGui::EndTable();
-    }
+            ImGui::EndTable();
+        }
 
 
     ImGui::End();
 }
 
-auto InventoryGUISystem::ImGuiImage(const Ref<Texture2D>& icon, float itemSizeMultiplier) -> void
+auto PlayerHealthGUISystem::OnImGuiRender() -> void
 {
-    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
-        ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
-            itemSizeMultiplier * static_cast<float>(icon->GetHeight()))
-    );
-}
+    static auto* app = Application::Instance(); 
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(app->GetWindowWidth()), 0), ImGuiCond_Once);
+    ImGui::Begin("Health Bar");
 
-auto InventoryGUISystem::ImGuiImage(const Ref<SubTexture2D> &icon, float itemSizeMultiplier) -> void
-{
-    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
-        ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
-            itemSizeMultiplier * static_cast<float>(icon->GetHeight())),
-        ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
-        ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
-    );
+    ImGui::End();
 }
