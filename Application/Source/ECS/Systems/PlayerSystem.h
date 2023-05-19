@@ -29,5 +29,8 @@ private:
     auto OnCollisionEvent(CollisionEvent& e) -> bool;
     auto OnKeyPressedEvent(KeyPressedEvent& e) -> bool;
 
+    // TODO - Make this modular
     bool mouseDown_ = false;
+    uint32_t dashCooldownFrames_ = 50;
+    uint32_t currentDashCooldown_ = 0;
 };

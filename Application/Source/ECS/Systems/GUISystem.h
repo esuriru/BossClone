@@ -22,6 +22,12 @@ private:
 class PlayerHealthGUISystem : public System
 {
 public:
+    PlayerHealthGUISystem();
     auto OnImGuiRender() -> void;
+
+private:
+    Ref<Texture2D> baseHealthBar_;
+    Ref<Texture2D> emptyHealthBar_;
+    Ref<Texture2D> fullHealthBar_;
 
 };

@@ -133,7 +133,9 @@ auto DamageableSystem::Update(Timestep ts) -> void
             if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
             {
                 coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+#if _DEBUG
                 coordinator->GetComponent<SpriteRendererComponent>(e).Colour = { 1.0f, 1.f, 1.f , 1.0f };
+#endif
             }
         }
         accumulator -= step;
@@ -149,8 +151,8 @@ auto DamageableSystem::OnEvent(Event &e) -> void
 auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
 {
     Entity target = e.GetTargetEntity();
-    if (entities.find(target) == entities.end())
-        return false;
+    if (entities.find(target) == entities.end() || !e.GetWeaponComponent().Active ||
+        coordinator->GetComponent<OwnedByComponent>(e.GetWeaponEntity()).Owner == target) return false;
 
     auto& health = coordinator->GetComponent<HealthComponent>(target);
     health.Health -= e.GetWeaponComponent().Damage;
@@ -158,7 +160,9 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
     // Apply an i-frame to the enemy.
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
     auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+#if _DEBUG
     coordinator->GetComponent<SpriteRendererComponent>(target).Colour = { 1.0f, 0.f, 0.f , 1.0f };
+#endif
     physics_quadtree.Active = false;
 
     CC_TRACE("New health: ", health.Health);
@@ -252,3 +256,4 @@ auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
     }
     return true;
 }
+

@@ -216,8 +216,8 @@ MainLayer::MainLayer()
     rigidbody.SetMass(3.f);
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
-        glm::vec2(0, 0),
-        glm::vec2(8.5f, 16.f)
+        glm::vec2(0, -2),
+        glm::vec2(8.5f, 14.f)
     ));
 
     constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);
@@ -369,7 +369,7 @@ MainLayer::MainLayer()
 #pragma endregion
 
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
-    coordinator->AddComponent(playerEntity, HealthComponent());
+    coordinator->AddComponent(playerEntity, HealthComponent(100));
 #pragma endregion
 #pragma region MISC_ENTITIES
     auto testPhysicsEntity = coordinator->CreateEntity();
@@ -455,7 +455,5 @@ auto MainLayer::OnEvent(Event &e) -> void
 auto MainLayer::OnImGuiRender() -> void 
 {
     inventoryGUISystem_->OnImGuiRender();
-
-    // TODO - Remove collision from weapons on player health comp..
     playerHealthGUISystem_->OnImGuiRender();
 }

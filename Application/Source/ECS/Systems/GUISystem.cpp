@@ -3,6 +3,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 #include "Utils/Util.h"
+#include "Utils/Input.h"
+#include "Core/KeyCodes.h"
 
 #include "Core/Application.h"
 
@@ -13,19 +15,25 @@ static Coordinator* coordinator = Coordinator::Instance();
 
 namespace Utility
 {
-    auto ImGuiImage(const Ref<Texture2D>& icon, float itemSizeMultiplier = 1.5f) -> void
+    auto ImGuiImage(const Ref<Texture2D>& icon, float imageSizeMultiplier = 1.5f) -> void
     {
         ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
-            ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
-                itemSizeMultiplier * static_cast<float>(icon->GetHeight()))
+            ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
+                imageSizeMultiplier * static_cast<float>(icon->GetHeight()))
         );
     }
 
-    auto ImGuiImage(const Ref<SubTexture2D> &icon, float itemSizeMultiplier = 1.5f) -> void
+    auto ImGuiImage(const Ref<Texture2D>& icon, float width, float height) -> void
+    {
+        ImGui::Image(reinterpret_cast<ImTextureID>(
+            static_cast<intptr_t>(icon->GetRendererID())), ImVec2(width, height));
+    }
+
+    auto ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier = 1.5f) -> void
     {
         ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
-            ImVec2(itemSizeMultiplier * static_cast<float>(icon->GetWidth()),
-                itemSizeMultiplier * static_cast<float>(icon->GetHeight())),
+            ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
+                imageSizeMultiplier * static_cast<float>(icon->GetHeight())),
             ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
             ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
         );
@@ -46,7 +54,7 @@ auto InventoryGUISystem::OnImGuiRender() -> void
 
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowBgAlpha(0.0f);
-    ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize /*| ImGuiWindowFlags_NoMove*/ |
+    ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
 
@@ -78,11 +86,42 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     ImGui::End();
 }
 
+PlayerHealthGUISystem::PlayerHealthGUISystem()
+{
+    baseHealthBar_ = CreateRef<Texture2D>("Assets/Images/PixQuestGUI/GUI Assets/Status Bar Horizontal (Round)/Base.png");
+    emptyHealthBar_ = CreateRef<Texture2D>("Assets/Images/PixQuestGUI/GUI Assets/Status Bar Horizontal (Round)/Empty.png");
+    fullHealthBar_ = CreateRef<Texture2D>("Assets/Images/PixQuestGUI/GUI Assets/Status Bar Horizontal (Round)/FullRed.png");
+}
+
 auto PlayerHealthGUISystem::OnImGuiRender() -> void
 {
-    static auto* app = Application::Instance(); 
-    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(app->GetWindowWidth()), 0), ImGuiCond_Once);
-    ImGui::Begin("Health Bar");
+    CC_ASSERT(entities.size() <= 1, "There should be no more than one player.");
+    Entity player = *entities.begin();
+    static Application* app = Application::Instance();
+
+    auto& health_comp = coordinator->GetComponent<HealthComponent>(player);
+
+    // TODO - Make this change ONLY on damage events.
+    float percentage = glm::clamp(health_comp.Health / health_comp.MaxHealth, 0.f, 1.f);
+
+    static Input* input = Input::Instance();
+
+    constexpr float HealthBarRightOffset = 220.f;
+    constexpr float HealthBarSizeMultiplier = 4.f;
+
+    ImGui::SetNextWindowPos(ImVec2(app->GetWindowWidth() - HealthBarRightOffset, 0), ImGuiCond_Always);
+    ImGui::SetNextWindowBgAlpha(0.0f);
+    ImGui::Begin("Health Bar", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoSavedSettings);
+
+        Utility::ImGuiImage(baseHealthBar_, HealthBarSizeMultiplier);
+        ImGui::SameLine();
+        ImGui::SetCursorPosX(  
+            percentage * (baseHealthBar_->GetWidth() * HealthBarSizeMultiplier)
+            - (baseHealthBar_->GetWidth() * HealthBarSizeMultiplier * 0.5f)
+        );
+        Utility::ImGuiImage(percentage < 0.5f ? emptyHealthBar_ : fullHealthBar_, HealthBarSizeMultiplier);
 
     ImGui::End();
 }

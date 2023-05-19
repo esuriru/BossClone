@@ -32,7 +32,8 @@ struct PlayerController2DComponent
     float MaxHorizontalSpeed = 400.f;
     float AccelerationScalar = 0.05f;    
 
-    float JumpForce = 500.f; 
+    float JumpForce = 700.f; 
+    float DashForce = 700.f; 
 
     std::set<size_t> ActiveMeleeWeaponIndices;
     bool IsFacingRight = true;

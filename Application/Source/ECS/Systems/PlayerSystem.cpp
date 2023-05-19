@@ -31,6 +31,10 @@ auto PlayerSystem::Update(Timestep ts) -> void
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
+        
+    static bool wantsToDash = false;
+    if (input->IsKeyPressed(Key::F) && currentDashCooldown_ == 0)
+        wantsToDash = true;
 
     while (accumulator >= step) 
     {
@@ -109,6 +113,18 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 }
             }
 
+            if (currentDashCooldown_ > 0)
+                --currentDashCooldown_;
+            if (wantsToDash)
+            {
+                wantsToDash = false;
+                currentDashCooldown_ += dashCooldownFrames_; 
+                PhysicsSystem::AddForce(rigidbody, glm::vec2(physicsSystem->onGroundBitset.test(e) ?
+                    player_controller.DashForce * (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) :
+                    player_controller.DashForce * (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * Physics::AirSpeedMultiplier
+                    , 0), step, Physics::ForceMode::Impulse);
+            }
+
             // Using the item that the player currently holds.
             auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    
             if (input->GetMouseButtonDown(0))
@@ -129,6 +145,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     eventCallback(event);
                 }
             }
+
         }
         accumulator -= step;
     }
@@ -195,7 +212,7 @@ auto PlayerSystem::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
     auto& inventory = coordinator->GetComponent<InventoryComponent>(*(entities.begin()));
     size_t slot = KeyToInventorySlot(e.GetKeyCode());
     constexpr uint32_t max_slot = InventorySize - 1;
-    if (slot > max_slot || slot > inventory.Items.size()) return false;
+    if (inventory.Items.empty() || slot > max_slot || slot > (inventory.Items.size() - 1)) return false;
     inventory.CurrentlyHolding = inventory.Items.at(slot);
     return false;
 }
