@@ -5,17 +5,20 @@
 #include "Renderer/SubTexture2D.h"
 #include "Renderer/Texture.h"
 
+// NOTE - This system is literally just to get the player entity for the inventory GUI to get the inventory component
+class InventoryGUIHelperSystem : public System {};
+
 class InventoryGUISystem : public System
 {
 public:
     InventoryGUISystem();
     auto OnImGuiRender() -> void;
 
+    Ref<InventoryGUIHelperSystem> helperSystem;
+
     // TODO - Should this be left as static?
     static Ref<Texture2D> ItemSpritesheet;
-
 private:
-
     Ref<SubTexture2D> emptySpriteTexture_;
 };
 

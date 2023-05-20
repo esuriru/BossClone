@@ -63,16 +63,17 @@ MainLayer::MainLayer()
     playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
     playerSystem_->physicsSystem = physicsSystem_;
 
-    runningAnimationSystem_          = coordinator->RegisterSystem<RunningAnimationSystem>();
-    swingingAnimationSystem_         = coordinator->RegisterSystem<SwingingAnimationSystem>();
-    weaponSystem_                    = coordinator->RegisterSystem<WeaponSystem>();
-    damageableSystem_                = coordinator->RegisterSystem<DamageableSystem>();
-    playerAffectedByAnimationSystem_ = coordinator->RegisterSystem<PlayerAffectedByAnimationSystem>();
-    weaponAffectedByAnimationSystem_ = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
-    inventoryGUISystem_              = coordinator->RegisterSystem<InventoryGUISystem>();
-    pickupSystem_                    = coordinator->RegisterSystem<PickupItemSystem>();
-    weaponAffectedByPickupSystem_    = coordinator->RegisterSystem<WeaponAffectedByPickupSystem>();
-    playerHealthGUISystem_           = coordinator->RegisterSystem<PlayerHealthGUISystem>();
+    runningAnimationSystem_           = coordinator->RegisterSystem<RunningAnimationSystem>();
+    swingingAnimationSystem_          = coordinator->RegisterSystem<SwingingAnimationSystem>();
+    weaponSystem_                     = coordinator->RegisterSystem<WeaponSystem>();
+    damageableSystem_                 = coordinator->RegisterSystem<DamageableSystem>();
+    playerAffectedByAnimationSystem_  = coordinator->RegisterSystem<PlayerAffectedByAnimationSystem>();
+    weaponAffectedByAnimationSystem_  = coordinator->RegisterSystem<WeaponAffectedByAnimationSystem>();
+    inventoryGUISystem_               = coordinator->RegisterSystem<InventoryGUISystem>();
+    inventoryGUISystem_->helperSystem = coordinator->RegisterSystem<InventoryGUIHelperSystem>();
+    pickupSystem_                     = coordinator->RegisterSystem<PickupItemSystem>();
+    weaponAffectedByPickupSystem_     = coordinator->RegisterSystem<WeaponAffectedByPickupSystem>();
+    playerHealthGUISystem_            = coordinator->RegisterSystem<PlayerHealthGUISystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -151,6 +152,11 @@ MainLayer::MainLayer()
     inventoryGUISystemSignature.set(coordinator->GetComponentType<ItemComponent>());
     coordinator->SetSystemSignature<InventoryGUISystem>(inventoryGUISystemSignature);
 
+    Signature inventoryGUIHelperSystemSignature;
+    inventoryGUIHelperSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
+    inventoryGUIHelperSystemSignature.set(coordinator->GetComponentType<InventoryComponent>());
+    coordinator->SetSystemSignature<InventoryGUIHelperSystem>(inventoryGUIHelperSystemSignature);
+
     Signature pickupSystemSignature;
     pickupSystemSignature.set(coordinator->GetComponentType<ItemComponent>());
     pickupSystemSignature.set(coordinator->GetComponentType<PickupComponent>());
@@ -217,7 +223,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, rigidbody);
     coordinator->AddComponent(playerEntity, BoxCollider2DComponent(
         glm::vec2(0, -2),
-        glm::vec2(8.5f, 14.f)
+        glm::vec2(7.0f, 14.f)
     ));
 
     constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);

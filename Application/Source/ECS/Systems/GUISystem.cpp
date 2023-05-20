@@ -52,30 +52,44 @@ auto InventoryGUISystem::OnImGuiRender() -> void
     auto& style = ImGui::GetStyle();
     style.WindowBorderSize = 0.0f;
 
+    constexpr float DefaultCellLength = 1.75f * 32.f;
+
     ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     ImGui::SetNextWindowBgAlpha(0.0f);
     ImGui::Begin("Inventory", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
+    
+        ImGui::SetWindowSize(ImVec2(DefaultCellLength * 7, DefaultCellLength + 20.f));
 
         // NOTE - Convert RendererID to something ImGUI can interpret (image needs to be NOT FLIPPED)
         // NOTE - There should only probably be 6 entities with OwnedBy component, because the inventory is only 6 slots.
-        if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_NoPadInnerX | ImGuiTableFlags_NoPadOuterX |
-            ImGuiTableFlags_NoHostExtendX | ImGuiTableFlags_PreciseWidths))
+        if (ImGui::BeginTable("inventory", InventorySize, ImGuiTableFlags_SizingFixedFit))
         {
+            ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, DefaultCellLength);
             ImGui::TableNextRow();
             size_t i = 0;
+
+            // float tableWidth = ImGui::GetContentRegionAvail().x; 
+            // float cellPaddingX = (tableWidth - DefaultCellLength * 6) * 0.5f;
+            float cellPaddingX = (1.75f * 32) - (1.5f * 32);
             for (auto& e : entities)
             {
-                ImGui::TableSetColumnIndex(i);
+                auto& inventory = coordinator->GetComponent<InventoryComponent>(*helperSystem->entities.begin());
                 auto& item = coordinator->GetComponent<ItemComponent>(e);
-                Utility::ImGuiImage(item.Icon ? item.Icon : emptySpriteTexture_);
+
+                ImGui::TableSetColumnIndex(i);
+                if (e != inventory.CurrentlyHolding)
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cellPaddingX);
+                Utility::ImGuiImage(item.Icon ? item.Icon : emptySpriteTexture_,
+                    (e == inventory.CurrentlyHolding) ? 1.75f : 1.5f);
                 ++i;
             }
 
             for (; i < InventorySize; ++i)
             {
                 ImGui::TableSetColumnIndex(i);
+                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cellPaddingX);
                 Utility::ImGuiImage(emptySpriteTexture_);
             }
 
@@ -103,8 +117,6 @@ auto PlayerHealthGUISystem::OnImGuiRender() -> void
 
     // TODO - Make this change ONLY on damage events.
     float percentage = glm::clamp(health_comp.Health / health_comp.MaxHealth, 0.f, 1.f);
-
-    static Input* input = Input::Instance();
 
     constexpr float HealthBarRightOffset = 220.f;
     constexpr float HealthBarSizeMultiplier = 4.f;
