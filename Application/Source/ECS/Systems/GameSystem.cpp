@@ -176,6 +176,12 @@ auto WeaponAffectedByAnimationSystem::OnEvent(Event &e) -> void
     dispatcher.Dispatch<ItemAffectByAnimationEvent>(CC_BIND_EVENT_FUNC(WeaponAffectedByAnimationSystem::OnItemAffectByAnimationEvent));
 }
 
+auto WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour(Entity e, AnimationSpriteChangeEvent &ascEvent, const std::set<size_t> &activeIndices) -> void
+{
+    bool indexIsActive = activeIndices.find(ascEvent.GetSpriteIndex()) != activeIndices.end();
+    coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = indexIsActive;
+}
+
 auto WeaponAffectedByAnimationSystem::OnItemAffectByAnimationEvent(ItemAffectByAnimationEvent &e) -> bool
 {
     if (entities.find(e.GetItemEntity()) == entities.end())
@@ -216,6 +222,11 @@ auto PlayerAffectedByAnimationSystem::OnAnimationSpriteChangeEvent(AnimationSpri
     return true;
 }
 
+auto PickupItemSystem::Update(Timestep ts) -> void
+{
+    // CC_TRACE(entities.size());
+}
+
 auto PickupItemSystem::OnEvent(Event &e) -> void
 {
     EventDispatcher dispatcher(e);
@@ -244,6 +255,16 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     physics_obj.Active = false;
 
     return false;
+}
+
+auto WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour(Entity e, PickupEvent &event) -> void
+{
+    auto& weapon_component = coordinator->GetComponent<WeaponComponent>(e);
+    // NOTE - Every weapon should have a box collider, if it does not, how would it have been picked up anyway?
+    auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(e);
+
+    // Set the new extents to those of the correct use case when being held by the player.
+    box_collider.Extents = weapon_component.EquippedExtents;
 }
 
 auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
@@ -277,17 +298,15 @@ auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
     auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
 #if _DEBUG
     auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(target);
+    physics_quadtree.Active = false;
     sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f , 1.0f };
 
     if (health.Health <= 0)
     {
-        // sprite_renderer.Texture = nullptr;
         breakable.OnBreakBehaviour(target);
     }
 #endif
-    physics_quadtree.Active = false;
-
-    CC_TRACE("New health: ", health.Health);
+    // NOTE - DO NOT HAVE ANYTHING AFTER THIS CAUSE THERE IS A POSSIBILITY THAT THIS ENTITY IS DESTROYED.
 
     return true;
 }

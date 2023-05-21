@@ -81,7 +81,11 @@ auto ActiveTilemapSystem::CheckCollisions() -> void
 
 
                         if (HasCollisionData(physics_quadtree_comp1, obj2) || HasCollisionData(physics_quadtree_comp2, obj1) ||
-                            !physics_quadtree_comp1.Active || !physics_quadtree_comp2.Active) continue;
+                            !physics_quadtree_comp1.Active || !physics_quadtree_comp2.Active)
+                        {
+                            continue;
+                        } 
+
 
                         // NOTE - The design of the physics system is such that there will be a need for
                         // NOTE - each physics object to have both a box collider and a rigidbody.
@@ -123,6 +127,7 @@ auto ActiveTilemapSystem::HasCollisionData(const PhysicsQuadtreeComponent& pqc, 
 auto PhysicsSystem::Update(Timestep ts) -> void
 {
     if (entities.empty()) return;
+    // CC_TRACE("Physics system entities size: ", entities.size());
 
     // constexpr int8_t velocityIterations = 6;
     // constexpr int8_t positionIterations = 2;
@@ -146,7 +151,9 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             // Broad phase chunking 
             tilemapEntity = tilemapSystem->GetClosestTilemap(transform.Position);
             if (tilemapEntity == 0)
+            {
                 continue;
+            }
 
             auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
             glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
@@ -586,14 +593,30 @@ auto PhysicsSystem::RemoveEntityFromQuadtree(Entity e) -> void
     auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
     auto& areas = physics_quadtree_component.Areas;
     auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
+    auto& tilemap = coordinator->GetComponent<TilemapComponent>(nearestTilemap);
 
     for (size_t i = 0; i < areas.size(); ++i)
     {
-        RemoveObjectFromArea(areas[i], coordinator->GetComponent<TilemapComponent>(nearestTilemap), entities_in_areas[i], e);
+        RemoveObjectFromArea(areas[i], tilemap, entities_in_areas[i], e);
+
+        for (auto& ent : entities_in_areas)
+        {
+            auto& pqc = coordinator->GetComponent<PhysicsQuadtreeComponent>(ent);
+            for (size_t j = 0; j < pqc.Collisions.size(); ++j)
+            {
+                if (pqc.Collisions[j].OtherEntity == e)
+                {
+                    Utility::RemoveAt(pqc.Collisions, j);
+                    break;
+                }
+            }
+        }
 
         Utility::RemoveAt(areas, i);
         Utility::RemoveAt(entities_in_areas, i);
     }
+
+    physics_quadtree_component.Collisions.clear();
 }
 
 auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void

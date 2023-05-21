@@ -14,6 +14,7 @@
 
 #include "imgui.h"
 
+Ref<Texture2D> MainLayer::TransparentItemSpritesheet;
 MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
@@ -21,7 +22,7 @@ MainLayer::MainLayer()
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
-    transparentItemSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/TIcons.png");
+    TransparentItemSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/TIcons.png");
     blueBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Blue.png");
     greenBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
 
@@ -304,23 +305,23 @@ MainLayer::MainLayer()
 #pragma endregion
 
 #pragma region MELEE_WEAPON_SETUP
-    auto meleeAnimationBehaviour = 
-        [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
-            const std::set<size_t>& activeIndices)
-        {
-            bool indexIsActive = activeIndices.find(ascEvent.GetSpriteIndex()) != activeIndices.end();
-            coordinator->GetComponent<PhysicsQuadtreeComponent>(weaponEntity).Active = indexIsActive;
-        };
+    // auto WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour = 
+    //     [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
+    //         const std::set<size_t>& activeIndices)
+    //     {
+    //         bool indexIsActive = activeIndices.find(ascEvent.GetSpriteIndex()) != activeIndices.end();
+    //         coordinator->GetComponent<PhysicsQuadtreeComponent>(weaponEntity).Active = indexIsActive;
+    //     };
 
-    auto meleePickupBehaviour = [](Entity weaponEntity, PickupEvent& e)
-    {
-        auto& weapon_component = coordinator->GetComponent<WeaponComponent>(weaponEntity);
-        // NOTE - Every weapon should have a box collider, if it does not, how would it have been picked up anyway?
-        auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(weaponEntity);
+    // auto WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour = [](Entity weaponEntity, PickupEvent& e)
+    // {
+    //     auto& weapon_component = coordinator->GetComponent<WeaponComponent>(weaponEntity);
+    //     // NOTE - Every weapon should have a box collider, if it does not, how would it have been picked up anyway?
+    //     auto& box_collider = coordinator->GetComponent<BoxCollider2DComponent>(weaponEntity);
 
-        // Set the new extents to those of the correct use case when being held by the player.
-        box_collider.Extents = weapon_component.EquippedExtents;
-    };
+    //     // Set the new extents to those of the correct use case when being held by the player.
+    //     box_collider.Extents = weapon_component.EquippedExtents;
+    // };
 
     auto woodenSwordWeaponEntity = coordinator->CreateEntity();
 
@@ -331,7 +332,7 @@ MainLayer::MainLayer()
     woodenSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
     woodenSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
     coordinator->AddComponent(woodenSwordWeaponEntity, woodenSwordMeleeWeaponComponent);
-    coordinator->AddComponent(woodenSwordWeaponEntity, WeaponAffectedByPickupComponent(meleePickupBehaviour));
+    coordinator->AddComponent(woodenSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
     coordinator->AddComponent(woodenSwordWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
         glm::vec3(0), glm::vec3(8, 18, 1)));
     coordinator->AddComponent(woodenSwordWeaponEntity, OwnedByComponent(playerEntity));
@@ -342,7 +343,7 @@ MainLayer::MainLayer()
     WeaponAffectedByAnimationComponent meleeWeaponAffectedByAnimationComponent;
 
     // When the index is part of the weapons 'active index', enable the collider for melee weapons.
-    meleeWeaponAffectedByAnimationComponent.AnimationBehaviour = meleeAnimationBehaviour;
+    meleeWeaponAffectedByAnimationComponent.AnimationBehaviour = WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour;
 
     coordinator->AddComponent(woodenSwordWeaponEntity, meleeWeaponAffectedByAnimationComponent);
 
@@ -373,13 +374,13 @@ MainLayer::MainLayer()
         coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
             SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
-            SubTexture2D::CreateFromCoords(transparentItemSpritesheet_, {1, 21}, {32, 32})));
-        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(meleeAnimationBehaviour));
+            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {1, 21}, {32, 32})));
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour));
         coordinator->AddComponent(ironSwordWeaponEntity, RigidBody2DComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
         coordinator->AddComponent(ironSwordWeaponEntity, PhysicsQuadtreeComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
-        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(meleePickupBehaviour));
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
     }
 #pragma endregion
 
@@ -408,8 +409,37 @@ MainLayer::MainLayer()
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
     coordinator->AddComponent(testPhysicsEntity, BreakableComponent([](Entity e)
     {
+        auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
         coordinator->DestroyEntity(e);
-        // coordinator->RemoveComponent<SpriteRendererComponent>(e);
+        auto ironSwordWeaponEntity = coordinator->CreateEntity();
+
+        WeaponComponent ironSwordMeleeWeaponComponent;
+        ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+        ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
+        ironSwordMeleeWeaponComponent.Damage = 12.0f;
+        ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
+        ironSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
+
+        CC_TRACE("Iron sword entity no: ", ironSwordWeaponEntity);
+        constexpr glm::vec2 offset = {0, 6.0f};
+        coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(glm::vec2(positionOfDestroyedEntity) + offset, -0.5f),
+            glm::vec3(0), glm::vec3(32, 32, 1)));
+        coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})));
+        coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
+            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {1, 21}, {32, 32})));
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour));
+
+        auto rigidbody = RigidBody2DComponent();
+        rigidbody.LinearVelocity.y = 40.0f;
+        coordinator->AddComponent(ironSwordWeaponEntity, rigidbody); 
+        coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(ironSwordWeaponEntity, physics_quadtree_component); 
+        coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
+        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
     }, 5.f));
     coordinator->AddComponent(testPhysicsEntity, HealthComponent(20));
 #pragma endregion
@@ -434,6 +464,10 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     playerSystem_->Update(ts);
     cameraController_.GetCamera().SetPosition(
         smoothCameraFollowSystem_->GetCalculatedPosition(ts));
+
+#if _DEBUG
+    pickupSystem_->Update(ts);
+#endif
 
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));

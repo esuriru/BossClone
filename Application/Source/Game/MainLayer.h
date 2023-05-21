@@ -43,7 +43,7 @@ private:
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> playerSpritesheet_;
-    Ref<Texture2D> transparentItemSpritesheet_;
+    static Ref<Texture2D> TransparentItemSpritesheet;
     
     // Render Systems 
     Ref<SpriteRenderSystem> spriteRenderSystem_;

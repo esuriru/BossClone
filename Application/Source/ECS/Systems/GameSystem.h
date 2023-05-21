@@ -43,6 +43,7 @@ public:
     auto OnEvent(Event& e) -> void;
 
     EventCallback eventCallback;
+    static auto DefaultMeleeAnimationBehaviour(Entity e, AnimationSpriteChangeEvent& ascEvent, const std::set<size_t>& activeIndices) -> void;
 private:
     auto OnItemAffectByAnimationEvent(ItemAffectByAnimationEvent& e) -> bool;
 
@@ -61,6 +62,7 @@ private:
 class PickupItemSystem : public System
 {
 public:
+    auto Update(Timestep ts) -> void;
     auto OnEvent(Event& e) -> void;
 
 private:
@@ -76,6 +78,7 @@ public:
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<PickupEvent>(CC_BIND_EVENT_FUNC(WeaponAffectedByPickupSystem::OnPickupEvent));
     }
+    static auto DefaultMeleePickupBehaviour(Entity e, PickupEvent& event) -> void; 
 
 private:
     auto OnPickupEvent(PickupEvent& e) -> bool;
