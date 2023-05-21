@@ -205,5 +205,19 @@ struct ItemComponent
 
 struct PickupComponent {};
 
+// NOTE - There will be a system with this component that intercepts the damage event such that the system
+// NOTE - with the breakable component handles it first.
+struct BreakableComponent
+{
+    using BreakBehaviourCallback = void(*)(Entity);
+    BreakBehaviourCallback OnBreakBehaviour;
+
+    float MinimumDamageToRegister = 0;
+
+    BreakableComponent() = default;
+    BreakableComponent(BreakBehaviourCallback obb, float mdtr = 0)
+        : OnBreakBehaviour(obb), MinimumDamageToRegister(mdtr) {}
+};
+
 
 

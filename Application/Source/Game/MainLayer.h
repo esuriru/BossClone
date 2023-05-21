@@ -48,6 +48,7 @@ private:
     // Render Systems 
     Ref<SpriteRenderSystem> spriteRenderSystem_;
     Ref<TilemapRenderSystem> tilemapRenderSystem_;
+    Ref<SmoothCameraFollowSystem> smoothCameraFollowSystem_;
 
     // Animation systems
     Ref<RunningAnimationSystem> runningAnimationSystem_;
@@ -64,6 +65,7 @@ private:
     Ref<WeaponSystem> weaponSystem_;
     Ref<PickupItemSystem> pickupSystem_;
     Ref<WeaponAffectedByPickupSystem> weaponAffectedByPickupSystem_;
+    Ref<BreakableBoxSystem> breakableBoxSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

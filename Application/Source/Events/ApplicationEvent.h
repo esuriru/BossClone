@@ -209,3 +209,17 @@ private:
     const Collision2D& collision_;
     bool pickedUp_ = false; 
 };
+
+class OnEntityDestroyedEvent : public Event
+{
+public:
+    OnEntityDestroyedEvent(Entity e) : destroyedEntity(e) {}
+
+    inline auto GetDestroyedEntity() -> Entity { return destroyedEntity; }
+
+    NR_EVENT_CLASS_TYPE(EntityDestroyed)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+private:
+    Entity destroyedEntity;
+
+};

@@ -4,6 +4,8 @@
 #include "Game/Tilemap.h"
 #include "Core/Core.h"
 
+#include "Utils/Util.h"
+
 #include "Renderer/Renderer2D.h"
 #include "Events/EventDispatcher.h"
 #include "Events/ApplicationEvent.h"
@@ -37,7 +39,7 @@ auto TilemapRenderSystem::Update(Timestep ts) -> void
         {
             for (int j = 0; j < TilemapData::TILEMAP_MAX_X_LENGTH; ++j)
             {
-                if (tile.MapData[i][j].Type == Tile::TileType::Empty)
+                if (tile.MapData[i][j].TextureIndex == 0)
                     continue;
 
                 glm::mat4 model = transformMatrix * glm::translate(glm::mat4(1.0f), 
@@ -62,3 +64,26 @@ auto TilemapRenderSystem::Update(Timestep ts) -> void
         }
     }
 }
+
+auto SmoothCameraFollowSystem::GetCalculatedPosition(Timestep ts) -> glm::vec3
+{
+    // constexpr float step = 1 / 50.f;
+    // static float accumulator = 0.f;
+
+    // accumulator += glm::min(static_cast<float>(ts), 0.25f);
+
+    // while (accumulator >= step)
+    // {
+        CC_ASSERT(entities.size() <= 1, "There should be only one player.");
+        auto& player = *entities.begin();
+
+        auto& transform = coordinator->GetComponent<TransformComponent>(player);
+        calculatedPosition_.z = transform.Position.z;
+
+        calculatedPosition_ = Utility::Lerp(calculatedPosition_, transform.Position, damping);
+
+        return calculatedPosition_;
+    //     accumulator -= step;
+    // }
+}
+

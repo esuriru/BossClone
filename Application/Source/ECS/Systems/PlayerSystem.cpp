@@ -33,8 +33,12 @@ auto PlayerSystem::Update(Timestep ts) -> void
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
         
     static bool wantsToDash = false;
+    static bool wantsToJump = false;
     if (input->IsKeyPressed(Key::F) && currentDashCooldown_ == 0)
         wantsToDash = true;
+    if (input->IsKeyPressed(Key::Space))
+        wantsToJump = true;
+
 
     while (accumulator >= step) 
     {
@@ -46,9 +50,6 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
             if (input->IsKeyDown(Key::J))
             {
-                // PhysicsSystem::AddForce(rigidbody,
-                //     glm::vec2(physicsSystem->onGroundBitset.test(e) ? -player_controller.HorizontalForce : -player_controller.AirHorizontalForce, 0),
-                //     step);
                 const float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
                     player_controller.AccelerationScalar :
                         Physics::AirSpeedMultiplier * player_controller.AccelerationScalar;
@@ -69,9 +70,6 @@ auto PlayerSystem::Update(Timestep ts) -> void
             }
             else if (input->IsKeyDown(Key::L))
             {
-                // PhysicsSystem::AddForce(rigidbody,
-                //     glm::vec2(physicsSystem->onGroundBitset.test(e) ? player_controller.HorizontalForce : player_controller.AirHorizontalForce, 0),
-                //     step);
                 const float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
                     player_controller.AccelerationScalar :
                         Physics::AirSpeedMultiplier * player_controller.AccelerationScalar;
@@ -100,11 +98,6 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 }
             }
 
-            if (input->IsKeyDown(Key::Space) && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
-            {
-                PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
-            }
-
             if (input->IsKeyDown(Key::K))
             {
                 if (physicsSystem->onPlatformBitset.test(e))
@@ -115,15 +108,24 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
             if (currentDashCooldown_ > 0)
                 --currentDashCooldown_;
+
+            bool hasJumped = false;
+            if (wantsToJump && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
+            {
+                wantsToJump = false;
+                PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
+                hasJumped = true;
+            }
             if (wantsToDash)
             {
                 wantsToDash = false;
                 currentDashCooldown_ += dashCooldownFrames_; 
-                PhysicsSystem::AddForce(rigidbody, glm::vec2(physicsSystem->onGroundBitset.test(e) ?
-                    player_controller.DashForce * (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) :
-                    player_controller.DashForce * (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * Physics::AirSpeedMultiplier
-                    , 0), step, Physics::ForceMode::Impulse);
+                rigidbody.LinearVelocity.x = !hasJumped && physicsSystem->onGroundBitset.test(e) ? 
+                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed : 
+                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed * Physics::AirSpeedMultiplier;
             }
+
+            // CC_TRACE("Player horizontal speed: ", rigidbody.LinearVelocity.x);
 
             // Using the item that the player currently holds.
             auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    

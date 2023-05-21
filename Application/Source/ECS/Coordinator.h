@@ -5,6 +5,7 @@
 #include "SystemManager.h"
 #include "Entity.h"
 #include "Utils/Singleton.h"
+#include "Core/Window.h"
 #include <memory>
 #include <vector>
 
@@ -78,10 +79,16 @@ public:
         return componentManager_->View<T>();
     }
 
+    inline auto SetEventCallback(EventCallback eventCallback)
+    {
+        eventCallback_ = eventCallback;
+    }
+
 #pragma endregion TEMPLATE_FUNCTIONS
 private:
     std::unique_ptr<EntityManager> entityManager_;
     std::unique_ptr<ComponentManager> componentManager_;
     std::unique_ptr<SystemManager> systemManager_;
+    EventCallback eventCallback_;
 
 };

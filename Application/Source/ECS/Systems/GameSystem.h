@@ -82,4 +82,17 @@ private:
 
 };
 
+class BreakableBoxSystem : public System
+{
+public:
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<DamageEvent>(CC_BIND_EVENT_FUNC(BreakableBoxSystem::OnDamageEvent));
+    }
+
+private:
+    auto OnDamageEvent(DamageEvent& e) -> bool;
+};
+
 

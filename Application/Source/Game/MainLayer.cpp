@@ -27,6 +27,7 @@ MainLayer::MainLayer()
 
     static Coordinator* coordinator = Coordinator::Instance();
     coordinator->Init();
+    coordinator->SetEventCallback(CC_BIND_EVENT_FUNC(MainLayer::OnEvent));
 
     // TODO - Consider using pragma region.
 
@@ -51,6 +52,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<ItemComponent>();
     coordinator->RegisterComponent<PickupComponent>();
     coordinator->RegisterComponent<WeaponAffectedByPickupComponent>();
+    coordinator->RegisterComponent<BreakableComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -74,6 +76,8 @@ MainLayer::MainLayer()
     pickupSystem_                     = coordinator->RegisterSystem<PickupItemSystem>();
     weaponAffectedByPickupSystem_     = coordinator->RegisterSystem<WeaponAffectedByPickupSystem>();
     playerHealthGUISystem_            = coordinator->RegisterSystem<PlayerHealthGUISystem>();
+    smoothCameraFollowSystem_         = coordinator->RegisterSystem<SmoothCameraFollowSystem>();
+    breakableBoxSystem_               = coordinator->RegisterSystem<BreakableBoxSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -171,6 +175,19 @@ MainLayer::MainLayer()
     playerHealthGUISystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
     playerHealthGUISystemSignature.set(coordinator->GetComponentType<HealthComponent>());
     coordinator->SetSystemSignature<PlayerHealthGUISystem>(playerHealthGUISystemSignature);
+
+    Signature smoothCameraFollowSystemSignature;
+    smoothCameraFollowSystemSignature.set(coordinator->GetComponentType<PlayerController2DComponent>());
+    smoothCameraFollowSystemSignature.set(coordinator->GetComponentType<TransformComponent>());
+    coordinator->SetSystemSignature<SmoothCameraFollowSystem>(smoothCameraFollowSystemSignature);
+
+    Signature breakableBoxSystemSignature;
+    breakableBoxSystemSignature.set(coordinator->GetComponentType<BreakableComponent>());
+    breakableBoxSystemSignature.set(coordinator->GetComponentType<HealthComponent>());
+    breakableBoxSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
+    breakableBoxSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
+    coordinator->SetSystemSignature<BreakableBoxSystem>(breakableBoxSystemSignature);
+
 #pragma endregion
 #pragma region TILEMAP_SETUP
     // TODO - Fix tilemap bleeding
@@ -380,15 +397,21 @@ MainLayer::MainLayer()
 #pragma region MISC_ENTITIES
     auto testPhysicsEntity = coordinator->CreateEntity();
     coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0),
-       glm::vec3(0), glm::vec3(12, 12, 1)));
-    coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent()); 
+       glm::vec3(0), glm::vec3(28, 24, 1)));
+    coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent(
+        SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Items/Boxes/Box2/Idle.png"), glm::vec2(1, 1), glm::vec2(28, 24)))); 
 
     auto testPhysicsEntityCollider = BoxCollider2DComponent();
-    testPhysicsEntityCollider.Extents = glm::vec2(6, 6);
+    testPhysicsEntityCollider.Extents = glm::vec2(10, 10);
     coordinator->AddComponent(testPhysicsEntity, testPhysicsEntityCollider); 
     coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
-    coordinator->AddComponent(testPhysicsEntity, HealthComponent(100));
+    coordinator->AddComponent(testPhysicsEntity, BreakableComponent([](Entity e)
+    {
+        coordinator->DestroyEntity(e);
+        // coordinator->RemoveComponent<SpriteRendererComponent>(e);
+    }, 5.f));
+    coordinator->AddComponent(testPhysicsEntity, HealthComponent(20));
 #pragma endregion
 }
 
@@ -404,11 +427,13 @@ auto MainLayer::OnDetach() -> void
 
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
-    cameraController_.OnUpdate(ts);
+    // cameraController_.OnUpdate(ts);
     weaponSystem_->Update(ts);
     damageableSystem_->Update(ts);
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
+    cameraController_.GetCamera().SetPosition(
+        smoothCameraFollowSystem_->GetCalculatedPosition(ts));
 
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
@@ -432,11 +457,13 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 10> on_events {
+    static const std::array<std::function<void(Event&)>, 12> on_events {
+        OEB(PhysicsSystem, physicsSystem_),
         OEB(WeaponSystem, weaponSystem_),
 
         OEB(OrthographicCameraController, &cameraController_),
 
+        OEB(BreakableBoxSystem, breakableBoxSystem_),
         OEB(DamageableSystem, damageableSystem_),
 
         OEB(PlayerSystem, playerSystem_),

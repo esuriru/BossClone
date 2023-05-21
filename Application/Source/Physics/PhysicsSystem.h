@@ -39,11 +39,15 @@ private:
 
 };
 
+
+class OnEntityDestroyedEvent;
 class PhysicsSystem : public System
 {
 public:
     auto Update(Timestep ts) -> void;
+    auto OnEvent(Event& e) -> void;
 
+    // TODO - Find out why this exists
     Entity tilemapEntity;
     Ref<ActiveTilemapSystem> tilemapSystem;
 
@@ -60,8 +64,13 @@ public:
 
     static auto AABBTest(const BoxCollider2DComponent& box1, const glm::vec2& box1pos, const BoxCollider2DComponent& box2, const glm::vec2& box2pos, glm::vec2& outOverlap) -> bool;
 
+    auto RemoveEntityFromQuadtree(Entity e) -> void;
+
 private:
     Timestep currentTimestep_;
+
+    // TODO - stupid name.
+    auto OnOnEntityDestroyedEvent(OnEntityDestroyedEvent& e) -> bool;
 
     auto CheckTilemapCollisionGround(const glm::vec2& oldPosition, const glm::vec2& newPosition,
         const BoxCollider2DComponent& boxCollider, const TilemapComponent& tilemap, const glm::vec3& tilemapPosition,

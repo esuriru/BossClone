@@ -13,7 +13,7 @@ public:
     auto OnUpdate(Timestep ts) -> void;
     auto OnEvent(Event& e) -> void;
 
-    inline auto GetCamera() -> const OrthographicCamera& 
+    inline auto GetCamera() -> OrthographicCamera& 
     {
         return camera_;
     }

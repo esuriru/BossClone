@@ -1,8 +1,8 @@
 - 2 levels at max, side-scrolling with gate lock by key,
 - end up at town centre?
 - scoring: time spent doing the beginning part
-- fix dashing + jumping
-- add camera scrolling to player
+- fix dashing + jumping - SHOULD BE DONE
+- add camera scrolling to player - DONE
 - add pots that drop stuff.
 - add an altar that will defo drop a better weapon.
 - add progressive breakables, gated by better weapons you find

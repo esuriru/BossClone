@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "ECS/Entity.h"
 #include "ECS/Component.h"
 #include "ECS/System.h"
@@ -165,5 +167,13 @@ private:
 using RunningAnimationSystem = AnimationSystem<RunningAnimationComponent>;
 using SwingingAnimationSystem = AnimationSystem<SwingingAnimationComponent>;
 
+class SmoothCameraFollowSystem : public System 
+{
+public:
+    auto GetCalculatedPosition(Timestep ts) -> glm::vec3;
 
+    float damping = 0.005f;
+private:
+    glm::vec3 calculatedPosition_;
+};
 

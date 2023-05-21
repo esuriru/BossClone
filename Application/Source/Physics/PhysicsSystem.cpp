@@ -11,6 +11,7 @@
 #include "Game/Tilemap.h"
 
 #include "Events/ApplicationEvent.h"
+#include "Events/EventDispatcher.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
@@ -164,7 +165,15 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             }
             else
             {
-                rigidbody.LinearVelocity.x = Physics::FrictionCoefficient * rigidbody.LinearVelocity.x;
+                if (fabs(rigidbody.LinearVelocity.x) > glm::epsilon<float>())
+                {
+                    rigidbody.LinearVelocity.x = Physics::FrictionCoefficient * rigidbody.LinearVelocity.x;
+                    if (fabs(rigidbody.LinearVelocity.x) < glm::epsilon<float>())
+                    {
+                        // Round it off.
+                        rigidbody.LinearVelocity.x = 0;
+                    }
+                }
                 // TODO - Maybe make it go all the way to 0 after it reaches a certain threshhold, do I need to introduce sleeping?
             }
 
@@ -247,6 +256,19 @@ auto PhysicsSystem::Update(Timestep ts) -> void
         tilemapSystem->CheckCollisions();
         accumulator -= step;
     }
+}
+
+auto PhysicsSystem::OnEvent(Event &e) -> void
+{
+    EventDispatcher dispatcher(e);
+    dispatcher.Dispatch<OnEntityDestroyedEvent>(CC_BIND_EVENT_FUNC(PhysicsSystem::OnOnEntityDestroyedEvent));
+}
+
+auto PhysicsSystem::OnOnEntityDestroyedEvent(OnEntityDestroyedEvent &e) -> bool
+{
+    if (entities.find(e.GetDestroyedEntity()) != entities.end())
+        RemoveEntityFromQuadtree(e.GetDestroyedEntity());
+    return false;
 }
 
 auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
@@ -556,6 +578,24 @@ auto PhysicsSystem::AABBTest(const BoxCollider2DComponent &box1, const glm::vec2
     return true;
 }
 
+auto PhysicsSystem::RemoveEntityFromQuadtree(Entity e) -> void
+{
+    auto& transform = coordinator->GetComponent<TransformComponent>(e);
+    auto nearestTilemap = tilemapSystem->GetClosestTilemap(glm::vec2(transform.Position));
+
+    auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    auto& areas = physics_quadtree_component.Areas;
+    auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
+
+    for (size_t i = 0; i < areas.size(); ++i)
+    {
+        RemoveObjectFromArea(areas[i], coordinator->GetComponent<TilemapComponent>(nearestTilemap), entities_in_areas[i], e);
+
+        Utility::RemoveAt(areas, i);
+        Utility::RemoveAt(entities_in_areas, i);
+    }
+}
+
 auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void
 {
     glm::vec2 pos_vec2 = glm::vec2(transform.Position);
@@ -615,7 +655,7 @@ auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec
     auto& areas = physics_quadtree_component.Areas;
     auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
 
-    for (int i = 0; i < areas.size(); ++i)
+    for (size_t i = 0; i < areas.size(); ++i)
     {
         if (!Utility::Contains(overlappingAreas, areas[i]))
         {

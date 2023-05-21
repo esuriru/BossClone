@@ -1,4 +1,5 @@
 #include "Coordinator.h"
+#include "Events/ApplicationEvent.h"
 
 void Coordinator::Init()
 {
@@ -14,9 +15,14 @@ Entity Coordinator::CreateEntity()
 
 void Coordinator::DestroyEntity(Entity entity)
 {
+    if (eventCallback_) 
+    {
+        OnEntityDestroyedEvent event(entity);
+        eventCallback_(event);
+    }
+
     entityManager_->DestroyEntity(entity);
-
     componentManager_->EntityDestroyed(entity);
-
     systemManager_->EntityDestroyed(entity);
+
 }

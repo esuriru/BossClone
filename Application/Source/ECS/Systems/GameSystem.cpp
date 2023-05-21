@@ -257,3 +257,37 @@ auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
     return true;
 }
 
+auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
+{
+    Entity target = e.GetTargetEntity();
+    if (entities.find(target) == entities.end() || !e.GetWeaponComponent().Active ||
+        coordinator->GetComponent<OwnedByComponent>(e.GetWeaponEntity()).Owner == target) return false;
+
+    auto& breakable = coordinator->GetComponent<BreakableComponent>(target);
+
+    if (e.GetWeaponComponent().Damage < breakable.MinimumDamageToRegister)
+        // NOTE - Should this return as true?
+        return true;
+
+    auto& health = coordinator->GetComponent<HealthComponent>(target);
+    health.Health -= e.GetWeaponComponent().Damage;
+
+    // Apply an i-frame to the enemy.
+    health.CurrentCooldownFrames += health.CooldownFramesOnHit;
+    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+#if _DEBUG
+    auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(target);
+    sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f , 1.0f };
+
+    if (health.Health <= 0)
+    {
+        // sprite_renderer.Texture = nullptr;
+        breakable.OnBreakBehaviour(target);
+    }
+#endif
+    physics_quadtree.Active = false;
+
+    CC_TRACE("New health: ", health.Health);
+
+    return true;
+}

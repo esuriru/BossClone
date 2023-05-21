@@ -353,7 +353,7 @@ auto Renderer2D::DrawQuad(const glm::mat4 &model, const Ref<SubTexture2D>& subte
     for (size_t i = 0; i < quadVertexCount; ++i)
     {
         s_data.QuadVertexBufferPtr->position = model * s_data.QuadVertexPositions[i];
-        s_data.QuadVertexBufferPtr->colour = white;
+        s_data.QuadVertexBufferPtr->colour = tintColour;
         s_data.QuadVertexBufferPtr->texCoord = texCoords[i];
         s_data.QuadVertexBufferPtr->texIndex = textureIndex;
         s_data.QuadVertexBufferPtr->tilingFactor = tilingFactor;
