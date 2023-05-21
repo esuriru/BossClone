@@ -599,19 +599,6 @@ auto PhysicsSystem::RemoveEntityFromQuadtree(Entity e) -> void
     {
         RemoveObjectFromArea(areas[i], tilemap, entities_in_areas[i], e);
 
-        for (auto& ent : entities_in_areas)
-        {
-            auto& pqc = coordinator->GetComponent<PhysicsQuadtreeComponent>(ent);
-            for (size_t j = 0; j < pqc.Collisions.size(); ++j)
-            {
-                if (pqc.Collisions[j].OtherEntity == e)
-                {
-                    Utility::RemoveAt(pqc.Collisions, j);
-                    break;
-                }
-            }
-        }
-
         Utility::RemoveAt(areas, i);
         Utility::RemoveAt(entities_in_areas, i);
     }
