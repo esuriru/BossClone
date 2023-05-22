@@ -62,7 +62,7 @@ public:
 
     inline auto Update(Timestep ts) -> void
     {
-        constexpr float step = 1 / 50.f;
+        constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
         constexpr float clamp = 1/ 30.f;
         static float accumulator = 0.f;
 
@@ -172,7 +172,7 @@ class SmoothCameraFollowSystem : public System
 public:
     auto GetCalculatedPosition(Timestep ts) -> glm::vec3;
 
-    float damping = 0.005f;
+    float damping = 0.1f;
 private:
     glm::vec3 calculatedPosition_;
 };

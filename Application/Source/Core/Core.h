@@ -18,6 +18,8 @@
 #	define CC_ASSERT(x, ...)
 #endif
 
+#define CC_FIXED_UPDATE_FRAME_RATE 60.0f
+
 #define CC_ASSIMP_LOAD_FLAGS (aiProcess_Triangulate | aiProcess_GenSmoothNormals /*| aiProcess_FlipUVs */ | aiProcess_CalcTangentSpace)
 
 // Bitshift to the left (multiply by 2)

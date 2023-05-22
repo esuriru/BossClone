@@ -67,7 +67,7 @@ auto TilemapRenderSystem::Update(Timestep ts) -> void
 
 auto SmoothCameraFollowSystem::GetCalculatedPosition(Timestep ts) -> glm::vec3
 {
-    constexpr float step = 1 / 50.f;
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
@@ -82,8 +82,8 @@ auto SmoothCameraFollowSystem::GetCalculatedPosition(Timestep ts) -> glm::vec3
 
         calculatedPosition_ = Utility::Lerp(calculatedPosition_, transform.Position, damping);
 
-        return calculatedPosition_;
         accumulator -= step;
     }
+    return calculatedPosition_;
 }
 

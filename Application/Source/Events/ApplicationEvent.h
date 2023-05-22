@@ -223,3 +223,22 @@ private:
     Entity destroyedEntity;
 
 };
+
+class PlayerEnterEvent : public Event
+{
+public:
+    PlayerEnterEvent(Entity playerEntity, Entity targetEntity, const Collision2D& collision)
+        : playerEntity_(playerEntity), targetEntity_(targetEntity), collision_(collision) {}
+
+    NR_EVENT_CLASS_TYPE(PlayerEnter)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetPlayerEntity() -> Entity { return playerEntity_; } 
+    inline auto GetTargetEntity() -> Entity { return targetEntity_; } 
+    inline auto GetCollision() -> const Collision2D& { return collision_; }
+
+private:
+    Entity playerEntity_, targetEntity_;
+    const Collision2D& collision_;
+
+};

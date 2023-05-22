@@ -27,7 +27,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
     static Input* input = Input::Instance();
 
-    constexpr float step = 1 / 50.f;
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
@@ -48,7 +48,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
             auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
 
-            if (input->IsKeyDown(Key::J))
+            if (input->IsKeyDown(Key::A))
             {
                 const float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
                     player_controller.AccelerationScalar :
@@ -68,7 +68,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 transform.Scale.x = -fabs(transform.Scale.x);
                 player_controller.IsFacingRight = false;
             }
-            else if (input->IsKeyDown(Key::L))
+            else if (input->IsKeyDown(Key::D))
             {
                 const float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
                     player_controller.AccelerationScalar :
@@ -98,7 +98,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 }
             }
 
-            if (input->IsKeyDown(Key::K))
+            if (input->IsKeyDown(Key::S))
             {
                 if (physicsSystem->onPlatformBitset.test(e))
                 {
@@ -110,19 +110,19 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 --currentDashCooldown_;
 
             bool hasJumped = false;
-            if (wantsToJump && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
+            if (wantsToJump && input->IsKeyDown(Key::Space) && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
             {
                 wantsToJump = false;
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
                 hasJumped = true;
             }
-            if (wantsToDash)
+            if (wantsToDash && input->IsKeyDown(Key::F))
             {
                 wantsToDash = false;
                 currentDashCooldown_ += dashCooldownFrames_; 
                 rigidbody.LinearVelocity.x = !hasJumped && physicsSystem->onGroundBitset.test(e) ? 
                     (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed : 
-                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed * Physics::AirSpeedMultiplier;
+                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed * Physics::AirSpeedMultiplier * 1.25f;
             }
 
             // CC_TRACE("Player horizontal speed: ", rigidbody.LinearVelocity.x);
@@ -198,7 +198,11 @@ auto PlayerSystem::OnCollisionEvent(CollisionEvent &e) -> bool
 
     // Send a pickup event.
     PickupEvent pickup(playerEntity, targetEntity, e.GetCollision());
+    // Send a player enter event.
+    PlayerEnterEvent playerEnter(playerEntity, targetEntity, e.GetCollision());
+
     eventCallback(pickup);
+    eventCallback(playerEnter);
 
     return false;
 }
@@ -216,10 +220,5 @@ auto PlayerSystem::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
     constexpr uint32_t max_slot = InventorySize - 1;
     if (inventory.Items.empty() || slot > max_slot || slot > (inventory.Items.size() - 1)) return false;
     inventory.CurrentlyHolding = inventory.Items.at(slot);
-    CC_TRACE("Currently holding: ", inventory.CurrentlyHolding);
-    for (int i = 0; i < inventory.Items.size(); ++i)
-    {
-        CC_TRACE("[", i, "] : ", inventory.Items[i]);
-    }
     return false;
 }

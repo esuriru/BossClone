@@ -132,7 +132,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
     // constexpr int8_t velocityIterations = 6;
     // constexpr int8_t positionIterations = 2;
 
-    constexpr float step = 1 / 50.f;
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);

@@ -38,12 +38,13 @@ private:
 
     // Background
     Ref<Texture2D> blueBackground_;
-    Ref<Texture2D> greenBackground_;
+    Ref<Texture2D> brownBackground_;
 
     // Spritesheet
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> playerSpritesheet_;
     static Ref<Texture2D> TransparentItemSpritesheet;
+    Ref<Texture2D> spikeTexture_;
     
     // Render Systems 
     Ref<SpriteRenderSystem> spriteRenderSystem_;
@@ -66,6 +67,7 @@ private:
     Ref<PickupItemSystem> pickupSystem_;
     Ref<WeaponAffectedByPickupSystem> weaponAffectedByPickupSystem_;
     Ref<BreakableBoxSystem> breakableBoxSystem_;
+    Ref<SpikeSystem> spikeSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

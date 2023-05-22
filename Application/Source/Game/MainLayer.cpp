@@ -24,7 +24,8 @@ MainLayer::MainLayer()
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
     TransparentItemSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/ShikashiFantasyIconPackV2/TIcons.png");
     blueBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Blue.png");
-    greenBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
+    brownBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
+    spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
 
     static Coordinator* coordinator = Coordinator::Instance();
     coordinator->Init();
@@ -54,6 +55,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<PickupComponent>();
     coordinator->RegisterComponent<WeaponAffectedByPickupComponent>();
     coordinator->RegisterComponent<BreakableComponent>();
+    coordinator->RegisterComponent<SpikeComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -79,6 +81,7 @@ MainLayer::MainLayer()
     playerHealthGUISystem_            = coordinator->RegisterSystem<PlayerHealthGUISystem>();
     smoothCameraFollowSystem_         = coordinator->RegisterSystem<SmoothCameraFollowSystem>();
     breakableBoxSystem_               = coordinator->RegisterSystem<BreakableBoxSystem>();
+    spikeSystem_                      = coordinator->RegisterSystem<SpikeSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -188,6 +191,11 @@ MainLayer::MainLayer()
     breakableBoxSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
     breakableBoxSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
     coordinator->SetSystemSignature<BreakableBoxSystem>(breakableBoxSystemSignature);
+
+    Signature spikeSystemSignature;
+    spikeSystemSignature.set(coordinator->GetComponentType<SpikeComponent>());
+    spikeSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
+    coordinator->SetSystemSignature<SpikeSystem>(spikeSystemSignature);
 
 #pragma endregion
 #pragma region TILEMAP_SETUP
@@ -393,7 +401,21 @@ MainLayer::MainLayer()
 #pragma endregion
 
     coordinator->AddComponent(playerEntity, PhysicsQuadtreeComponent());
-    coordinator->AddComponent(playerEntity, HealthComponent(100));
+    coordinator->AddComponent(playerEntity, HealthComponent(100, 60,
+    [](Entity e)
+    {
+        CC_TRACE("Player died.");
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour.a = 0.8f;
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour.a = 1.0f;
+    }));
 #pragma endregion
 #pragma region MISC_ENTITIES
     auto testPhysicsEntity = coordinator->CreateEntity();
@@ -407,7 +429,7 @@ MainLayer::MainLayer()
     coordinator->AddComponent(testPhysicsEntity, testPhysicsEntityCollider); 
     coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
-    coordinator->AddComponent(testPhysicsEntity, BreakableComponent([](Entity e)
+    coordinator->AddComponent(testPhysicsEntity, HealthComponent(20, 20, [](Entity e)
     {
         auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
         coordinator->DestroyEntity(e);
@@ -440,8 +462,37 @@ MainLayer::MainLayer()
         coordinator->AddComponent(ironSwordWeaponEntity, physics_quadtree_component); 
         coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
-    }, 5.f));
-    coordinator->AddComponent(testPhysicsEntity, HealthComponent(20));
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }));
+    coordinator->AddComponent(testPhysicsEntity, BreakableComponent(4));
+
+#pragma region SPIKE_SETUP
+    for (int i = 0; i < 4; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-176 + i * 16, 42, -0.5f),
+            glm::vec3(0), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {16.f, 6.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
+
+    }
+#pragma endregion
 #pragma endregion
 }
 
@@ -465,18 +516,14 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     cameraController_.GetCamera().SetPosition(
         smoothCameraFollowSystem_->GetCalculatedPosition(ts));
 
-#if _DEBUG
-    pickupSystem_->Update(ts);
-#endif
-
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
     RenderCommand::Clear();
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
-    constexpr float tiling_factor = 64.0f;
-    Renderer2D::DrawQuad(glm::vec3(), glm::vec2(1280, 1280), greenBackground_, tiling_factor);
+    constexpr float tiling_factor = 128.0f;
+    Renderer2D::DrawQuad(glm::vec3(), glm::vec2(2560, 2560), brownBackground_, tiling_factor);
 
     runningAnimationSystem_->Update(ts);
     swingingAnimationSystem_->Update(ts);
@@ -491,7 +538,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 12> on_events {
+    static const std::array<std::function<void(Event&)>, 13> on_events {
         OEB(PhysicsSystem, physicsSystem_),
         OEB(WeaponSystem, weaponSystem_),
 
@@ -502,6 +549,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 
         OEB(PlayerSystem, playerSystem_),
         OEB(PickupItemSystem, pickupSystem_),
+        OEB(SpikeSystem, spikeSystem_),
         OEB(WeaponAffectedByPickupSystem, weaponAffectedByPickupSystem_),
 
         OEB(RunningAnimationSystem, runningAnimationSystem_),

@@ -118,7 +118,7 @@ auto WeaponSystem::OnCollisionEvent(CollisionEvent &e) -> bool
 
 auto DamageableSystem::Update(Timestep ts) -> void
 {
-    constexpr float step = 1 / 50.f;
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 
     accumulator += glm::min(static_cast<float>(ts), 0.25f);
@@ -132,10 +132,9 @@ auto DamageableSystem::Update(Timestep ts) -> void
             // NOTE - Decrement in if statement
             if (health.CurrentCooldownFrames > 0 && --health.CurrentCooldownFrames == 0)
             {
-                coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
-#if _DEBUG
-                coordinator->GetComponent<SpriteRendererComponent>(e).Colour = { 1.0f, 1.f, 1.f , 1.0f };
-#endif
+                // TODO - A callback for when the iframe ends, i guess.
+                // coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = true;
+                health.OnIFrameEndBehaviour(e);
             }
         }
         accumulator -= step;
@@ -155,15 +154,19 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
         coordinator->GetComponent<OwnedByComponent>(e.GetWeaponEntity()).Owner == target) return false;
 
     auto& health = coordinator->GetComponent<HealthComponent>(target);
+    if (health.CurrentCooldownFrames > 0)
+        return true;
+
     health.Health -= e.GetWeaponComponent().Damage;
 
     // Apply an i-frame to the enemy.
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
-    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+    health.OnIFrameBehaviour(target);
+    // auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
 #if _DEBUG
     coordinator->GetComponent<SpriteRendererComponent>(target).Colour = { 1.0f, 0.f, 0.f , 1.0f };
 #endif
-    physics_quadtree.Active = false;
+    // physics_quadtree.Active = false;
 
     CC_TRACE("New health: ", health.Health);
 
@@ -224,7 +227,6 @@ auto PlayerAffectedByAnimationSystem::OnAnimationSpriteChangeEvent(AnimationSpri
 
 auto PickupItemSystem::Update(Timestep ts) -> void
 {
-    // CC_TRACE(entities.size());
 }
 
 auto PickupItemSystem::OnEvent(Event &e) -> void
@@ -297,16 +299,18 @@ auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
         return true;
 
     auto& health = coordinator->GetComponent<HealthComponent>(target);
+    if (health.CurrentCooldownFrames > 0)
+        return true;
+
     health.Health -= e.GetWeaponComponent().Damage;
 
     // Apply an i-frame to the enemy.
     health.CurrentCooldownFrames += health.CooldownFramesOnHit;
-    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
+    health.OnIFrameBehaviour(target);
+    // auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(target);
 #if _DEBUG
     auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(target);
-    physics_quadtree.Active = false;
-    sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f , 1.0f };
-
+    // physics_quadtree.Active = false;
     if (health.Health <= 0)
     {
         breakable.OnBreakBehaviour(target);
@@ -315,4 +319,31 @@ auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
     // NOTE - DO NOT HAVE ANYTHING AFTER THIS CAUSE THERE IS A POSSIBILITY THAT THIS ENTITY IS DESTROYED.
 
     return true;
+}
+
+auto SpikeSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
+{
+    if (entities.find(e.GetTargetEntity()) == entities.end())
+        return false;
+
+    auto& player_health = coordinator->GetComponent<HealthComponent>(e.GetPlayerEntity());
+    if (player_health.CurrentCooldownFrames > 0)
+        return false;
+
+    auto& spike = coordinator->GetComponent<SpikeComponent>(e.GetTargetEntity());
+
+    player_health.Health -= spike.Damage;
+    player_health.CurrentCooldownFrames += player_health.CooldownFramesOnHit;
+    player_health.OnIFrameBehaviour(e.GetPlayerEntity());
+
+    // TODO - Fix the health system such that the player can still detect pickups while not taking damage.
+    // auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e.GetPlayerEntity());
+    // physics_quadtree.Active = false;
+
+    if (player_health.Health <= 0)
+    {
+        player_health.OnDeathBehaviour(e.GetPlayerEntity());
+    }
+    
+    return false;
 }

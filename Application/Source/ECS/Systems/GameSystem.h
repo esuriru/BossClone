@@ -98,4 +98,17 @@ private:
     auto OnDamageEvent(DamageEvent& e) -> bool;
 };
 
+class SpikeSystem : public System 
+{
+public:
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<PlayerEnterEvent>(CC_BIND_EVENT_FUNC(SpikeSystem::OnPlayerEnterEvent));
+    }
+
+private:    
+    auto OnPlayerEnterEvent(PlayerEnterEvent& e) -> bool;
+
+};
 

@@ -6,6 +6,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <set>
 #include "ECS/Entity.h"
+#include "ECS/Coordinator.h"
 
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
@@ -154,11 +155,21 @@ struct OwnedByComponent
 
 struct HealthComponent
 {
+    using OnDeathCallback = void(*)(Entity);
+    using OnIFrameCallback = OnDeathCallback; 
+    using OnIFrameEndCallback = OnDeathCallback;
+
     HealthComponent() = default;
-    HealthComponent(float max, bool reset = true)
+    HealthComponent(float max, uint32_t cooldownFrames = 0, OnDeathCallback odCallback = [](Entity){},
+        OnIFrameCallback ifCallback = [](Entity){}, OnIFrameEndCallback ifeCallback = [](Entity){}, bool reset = true)
         : MaxHealth(max)
+        , CooldownFramesOnHit(cooldownFrames)
+        , OnDeathBehaviour(odCallback)
+        , OnIFrameBehaviour(ifCallback)
+        , OnIFrameEndBehaviour(ifeCallback)
     {
-        Health = MaxHealth;
+        if (reset)
+            Health = MaxHealth;
     }
 
     float Health = 0.f;
@@ -166,6 +177,11 @@ struct HealthComponent
 
     uint32_t CurrentCooldownFrames = 0;
     uint32_t CooldownFramesOnHit = 60;
+
+    OnDeathCallback OnDeathBehaviour;
+    OnIFrameCallback OnIFrameBehaviour;
+    OnIFrameEndCallback OnIFrameEndBehaviour;
+
 };
 
 struct AffectedByAnimationComponent
@@ -205,19 +221,32 @@ struct ItemComponent
 
 struct PickupComponent {};
 
+// NOTE - MUST HAVE HEALTH COMPONENT
 // NOTE - There will be a system with this component that intercepts the damage event such that the system
 // NOTE - with the breakable component handles it first.
 struct BreakableComponent
 {
     using BreakBehaviourCallback = void(*)(Entity);
-    BreakBehaviourCallback OnBreakBehaviour;
+    BreakBehaviourCallback OnBreakBehaviour = [](Entity e)
+    {
+        static Coordinator* coordinator = Coordinator::Instance();
+        coordinator->GetComponent<HealthComponent>(e).OnDeathBehaviour(e);
+    };
 
     float MinimumDamageToRegister = 0;
 
     BreakableComponent() = default;
     BreakableComponent(BreakBehaviourCallback obb, float mdtr = 0)
         : OnBreakBehaviour(obb), MinimumDamageToRegister(mdtr) {}
+    BreakableComponent(float mdtr)
+        : MinimumDamageToRegister(mdtr) {}
 };
 
+struct SpikeComponent
+{
+    SpikeComponent() = default;
+    SpikeComponent(float damage) : Damage(damage) {}
 
+    float Damage = 5.f;
+};
 

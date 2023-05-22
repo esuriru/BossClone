@@ -133,7 +133,7 @@ auto PlayerHealthGUISystem::OnImGuiRender() -> void
             percentage * (baseHealthBar_->GetWidth() * HealthBarSizeMultiplier)
             - (baseHealthBar_->GetWidth() * HealthBarSizeMultiplier * 0.5f)
         );
-        Utility::ImGuiImage(percentage < 0.5f ? emptyHealthBar_ : fullHealthBar_, HealthBarSizeMultiplier);
+        Utility::ImGuiImage(percentage <= 0.5f ? emptyHealthBar_ : fullHealthBar_, HealthBarSizeMultiplier);
 
     ImGui::End();
 }
