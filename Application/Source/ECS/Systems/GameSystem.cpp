@@ -244,6 +244,12 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     else
         return true;
 
+    for (auto& item : inventory.Items)
+    {
+        CC_TRACE(item);
+    }
+    CC_TRACE("Currently holding: ", inventory.CurrentlyHolding);
+
     e.IsPickedUp() = true;
     // TODO - Could have some issues where the player can hit things he owns.
     coordinator->AddComponent(e.GetTargetEntity(), OwnedByComponent(e.GetPlayerEntity()));

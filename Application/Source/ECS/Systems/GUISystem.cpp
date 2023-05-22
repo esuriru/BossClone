@@ -73,9 +73,9 @@ auto InventoryGUISystem::OnImGuiRender() -> void
             // float tableWidth = ImGui::GetContentRegionAvail().x; 
             // float cellPaddingX = (tableWidth - DefaultCellLength * 6) * 0.5f;
             float cellPaddingX = (1.75f * 32) - (1.5f * 32);
-            for (auto& e : entities)
+            auto& inventory = coordinator->GetComponent<InventoryComponent>(*helperSystem->entities.begin());
+            for (const auto& e : inventory.Items)
             {
-                auto& inventory = coordinator->GetComponent<InventoryComponent>(*helperSystem->entities.begin());
                 auto& item = coordinator->GetComponent<ItemComponent>(e);
 
                 ImGui::TableSetColumnIndex(i);

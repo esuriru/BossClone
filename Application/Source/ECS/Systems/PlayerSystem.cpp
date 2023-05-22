@@ -216,5 +216,10 @@ auto PlayerSystem::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
     constexpr uint32_t max_slot = InventorySize - 1;
     if (inventory.Items.empty() || slot > max_slot || slot > (inventory.Items.size() - 1)) return false;
     inventory.CurrentlyHolding = inventory.Items.at(slot);
+    CC_TRACE("Currently holding: ", inventory.CurrentlyHolding);
+    for (int i = 0; i < inventory.Items.size(); ++i)
+    {
+        CC_TRACE("[", i, "] : ", inventory.Items[i]);
+    }
     return false;
 }

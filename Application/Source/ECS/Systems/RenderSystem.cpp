@@ -67,13 +67,13 @@ auto TilemapRenderSystem::Update(Timestep ts) -> void
 
 auto SmoothCameraFollowSystem::GetCalculatedPosition(Timestep ts) -> glm::vec3
 {
-    // constexpr float step = 1 / 50.f;
-    // static float accumulator = 0.f;
+    constexpr float step = 1 / 50.f;
+    static float accumulator = 0.f;
 
-    // accumulator += glm::min(static_cast<float>(ts), 0.25f);
+    accumulator += glm::min(static_cast<float>(ts), 0.25f);
 
-    // while (accumulator >= step)
-    // {
+    while (accumulator >= step)
+    {
         CC_ASSERT(entities.size() <= 1, "There should be only one player.");
         auto& player = *entities.begin();
 
@@ -83,7 +83,7 @@ auto SmoothCameraFollowSystem::GetCalculatedPosition(Timestep ts) -> glm::vec3
         calculatedPosition_ = Utility::Lerp(calculatedPosition_, transform.Position, damping);
 
         return calculatedPosition_;
-    //     accumulator -= step;
-    // }
+        accumulator -= step;
+    }
 }
 
