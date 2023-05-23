@@ -235,6 +235,27 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
 
+    auto tilemapEntity2 = coordinator->CreateEntity();
+
+    TilemapComponent tilemapComponent2("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv");
+    tilemapComponent2.SubTextureMap[1] = grassTileTopLeft;
+    tilemapComponent2.SubTextureMap[2] = grassTileTopMiddle;
+    tilemapComponent2.SubTextureMap[3] = grassTileTopRight;
+    tilemapComponent2.SubTextureMap[4] = grassTileMiddleLeft;
+    tilemapComponent2.SubTextureMap[5] = grassTileMiddleMiddle;
+    tilemapComponent2.SubTextureMap[6] = grassTileMiddleRight;
+    tilemapComponent2.SubTextureMap[7] = grassTileBottomLeft;
+    tilemapComponent2.SubTextureMap[8] = grassTileBottomMiddle;
+    tilemapComponent2.SubTextureMap[9] = grassTileBottomRight;
+    tilemapComponent2.SubTextureMap[10] = platformStart;
+    tilemapComponent2.SubTextureMap[11] = platformEnd;
+
+    coordinator->AddComponent(tilemapEntity2, TransformComponent {
+        glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -1.5f * tilemapComponent.TileSize.x, -70, 0),
+    });
+
+    coordinator->AddComponent(tilemapEntity2, tilemapComponent2);
+
 #pragma endregion
 #pragma region PLAYER_SETUP
     auto playerEntity = coordinator->CreateEntity();
@@ -486,7 +507,7 @@ MainLayer::MainLayer()
             glm::vec3(0), glm::vec3(16, 16, 1)));
         coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
-        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {16.f, 6.f})); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
         physics_quadtree_component.Active = true;
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
@@ -503,11 +524,43 @@ MainLayer::MainLayer()
             glm::vec3(0), glm::vec3(16, 16, 1)));
         coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
-        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {16.f, 6.f})); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
         physics_quadtree_component.Active = true;
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
 
+    }
+
+    for (int i = 0; i < 2; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-320 + i * -16, -22, -0.5f),
+            glm::vec3(0), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-528 + i * -16, 106, -0.5f),
+            glm::vec3(0, 0, glm::pi<float>()), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, 4.f}, {8.f, 3.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
     }
 #pragma endregion
 #pragma endregion

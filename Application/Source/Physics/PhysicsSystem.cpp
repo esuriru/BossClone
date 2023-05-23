@@ -149,7 +149,10 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             bool entityOnGround = onGroundBitset.test(e);
 
             // Broad phase chunking 
-            tilemapEntity = tilemapSystem->GetClosestTilemap(transform.Position);
+            glm::vec2 position_vec2 = glm::vec2(transform.Position);
+            glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
+
+            tilemapEntity = tilemapSystem->GetClosestTilemap(proposedPosition);
             if (tilemapEntity == 0)
             {
                 continue;
@@ -184,8 +187,6 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 // TODO - Maybe make it go all the way to 0 after it reaches a certain threshhold, do I need to introduce sleeping?
             }
 
-            glm::vec2 position_vec2 = glm::vec2(transform.Position);
-            glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
 
             // Tilemap collision
 
@@ -416,6 +417,7 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
     size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomLeft.x);
     size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.x) - 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
+    CC_TRACE(fromX);
     
     for (size_t index_x = fromX; index_x >= destinationX; --index_x)
     {
