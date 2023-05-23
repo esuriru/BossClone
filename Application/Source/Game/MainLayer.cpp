@@ -59,14 +59,14 @@ MainLayer::MainLayer()
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
-    spriteRenderSystem_ = coordinator->RegisterSystem<SpriteRenderSystem>();
+    spriteRenderSystem_  = coordinator->RegisterSystem<SpriteRenderSystem>();
     tilemapRenderSystem_ = coordinator->RegisterSystem<TilemapRenderSystem>();
-    physicsSystem_ = coordinator->RegisterSystem<PhysicsSystem>();
+    physicsSystem_       = coordinator->RegisterSystem<PhysicsSystem>();
 
-    // NOTE - Don't need to update this tilemap system for now.
+      // NOTE - Don't need to update this tilemap system for now.
     physicsSystem_->tilemapSystem = coordinator->RegisterSystem<ActiveTilemapSystem>();
-    playerSystem_ = coordinator->RegisterSystem<PlayerSystem>();
-    playerSystem_->physicsSystem = physicsSystem_;
+    playerSystem_                 = coordinator->RegisterSystem<PlayerSystem>();
+    playerSystem_->physicsSystem  = physicsSystem_;
 
     runningAnimationSystem_           = coordinator->RegisterSystem<RunningAnimationSystem>();
     swingingAnimationSystem_          = coordinator->RegisterSystem<SwingingAnimationSystem>();
@@ -202,17 +202,17 @@ MainLayer::MainLayer()
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
-    auto grassTileTopLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
-    auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);
-    auto grassTileTopRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), pixelAdventureTileSize);
-    auto grassTileMiddleLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), pixelAdventureTileSize);
+    auto grassTileTopLeft      = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
+    auto grassTileTopMiddle    = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);
+    auto grassTileTopRight     = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), pixelAdventureTileSize);
+    auto grassTileMiddleLeft   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), pixelAdventureTileSize);
     auto grassTileMiddleMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), pixelAdventureTileSize);
-    auto grassTileMiddleRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), pixelAdventureTileSize);
-    auto grassTileBottomLeft = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), pixelAdventureTileSize);
+    auto grassTileMiddleRight  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), pixelAdventureTileSize);
+    auto grassTileBottomLeft   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), pixelAdventureTileSize);
     auto grassTileBottomMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 8),pixelAdventureTileSize);
-    auto grassTileBottomRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
-    auto platformStart = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
-    auto platformEnd = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
+    auto grassTileBottomRight  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
+    auto platformStart         = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
+    auto platformEnd           = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
 
     auto tilemapEntity = coordinator->CreateEntity();
 
@@ -473,7 +473,7 @@ MainLayer::MainLayer()
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
     }));
-    coordinator->AddComponent(testPhysicsEntity, BreakableComponent(4));
+    coordinator->AddComponent(testPhysicsEntity, BreakableComponent(8));
 
 #pragma region SPIKE_SETUP
     for (int i = 0; i < 4; ++i)

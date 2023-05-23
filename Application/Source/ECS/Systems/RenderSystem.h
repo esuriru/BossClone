@@ -172,7 +172,7 @@ class SmoothCameraFollowSystem : public System
 public:
     auto GetCalculatedPosition(Timestep ts) -> glm::vec3;
 
-    float damping = 0.1f;
+    float damping = 0.07f;
 private:
     glm::vec3 calculatedPosition_;
 };
