@@ -586,14 +586,17 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     cameraController_.GetCamera().SetPosition(
         smoothCameraFollowSystem_->GetCalculatedPosition(ts));
 
-    constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
-    RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
-    RenderCommand::Clear();
-
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
     constexpr float tiling_factor = 128.0f;
     Renderer2D::DrawQuad(glm::vec3(), glm::vec2(2560, 2560), brownBackground_, tiling_factor);
+
+    constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
+    RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
+    RenderCommand::Clear();
+
+
+
 
     runningAnimationSystem_->Update(ts);
     swingingAnimationSystem_->Update(ts);

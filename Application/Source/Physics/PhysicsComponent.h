@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include "Core/Timestep.h"
 #include "Utils/Util.h"
+#include "ECS/Entity.h"
 
 #include <vector>
 #include <set>
@@ -88,5 +89,6 @@ struct PhysicsQuadtreeComponent
 
     // TODO - Make the list a dictionary instead so it's a hashmap search instead.
     std::vector<Collision2D> Collisions;
+    Entity LastKnownTilemap = 0;
 };
 

@@ -18,6 +18,10 @@
 #include <glm/common.hpp>
 #include <glm/gtx/norm.hpp>
 
+#if _DEBUG
+#include <Renderer/Renderer2D.h>
+#endif
+
 #include <utility>
 
 #include "Utils/Util.h"
@@ -37,8 +41,8 @@ auto ActiveTilemapSystem::GetClosestTilemap(const glm::vec2 &position) -> Entity
     float nearestDistance = std::numeric_limits<float>::max();
     for (auto& e : entities)
     {
-        TransformComponent transform = coordinator->GetComponent<TransformComponent>(e);
-        TilemapComponent tilemap = coordinator->GetComponent<TilemapComponent>(e);
+        TransformComponent& transform = coordinator->GetComponent<TransformComponent>(e);
+        TilemapComponent& tilemap = coordinator->GetComponent<TilemapComponent>(e);
 
         // NOTE - We want the centre of the tilemap such that it is equidistant from each other to allow only collision checking inside of that tilemap 'chunk'
         float distanceBetween = glm::distance2(GetTilemapCentre(tilemap, transform), position);
@@ -148,21 +152,26 @@ auto PhysicsSystem::Update(Timestep ts) -> void
 
             bool entityOnGround = onGroundBitset.test(e);
 
-            // Broad phase chunking 
-            glm::vec2 position_vec2 = glm::vec2(transform.Position);
-            glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
-
-            tilemapEntity = tilemapSystem->GetClosestTilemap(proposedPosition);
+            tilemapEntity = tilemapSystem->GetClosestTilemap(transform.Position);
             if (tilemapEntity == 0)
             {
                 continue;
             }
 
+            // Broad phase chunking 
+            glm::vec2 position_vec2 = glm::vec2(transform.Position);
+            glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
+
             auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
             glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
 
-            UpdateAreas(nearestTilemap, tilemapPosition, e, transform, box_collider);
             auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+            if (physics_quadtree_component.LastKnownTilemap != tilemapEntity && physics_quadtree_component.LastKnownTilemap != 0)
+            {
+                RemoveEntityFromSpecificQuadtree(e, physics_quadtree_component.LastKnownTilemap);
+            }
+            UpdateAreas(nearestTilemap, tilemapPosition, e, transform, box_collider);
+            physics_quadtree_component.LastKnownTilemap = tilemapEntity;
             physics_quadtree_component.Collisions.clear();
 
             if (rigidbody.BodyType == Physics::RigidBodyType::Static)
@@ -196,60 +205,165 @@ auto PhysicsSystem::Update(Timestep ts) -> void
 
             float leftTileX = 0.f, rightTileX = 0.f;
 
-            auto tilemapLeftCollisionDetectionResult = 
-                CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, leftTileX);
-            if (rigidbody.LinearVelocity.x <= 0.f && tilemapLeftCollisionDetectionResult)
+            bool tilemapLeftCollisionDetectionResult;
+            Entity possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(proposedPosition);
+
+            if (tilemapEntity != possibleNewTilemapEntity)
             {
-                if ((position_vec2.x - box_collider.Extents.x + box_collider.Offset.x) >= leftTileX)
+                // New tilemap, use overload
+                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
+                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
+                tilemapLeftCollisionDetectionResult = CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
+                    nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, leftTileX);
+                CC_TRACE("Other method : Left, Result: ", tilemapLeftCollisionDetectionResult, "Old Tilemap: ", tilemapEntity, "New tilemap: ", possibleNewTilemapEntity);
+            }
+            else
+            {
+                tilemapLeftCollisionDetectionResult = CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
+                    nearestTilemap, tilemapPosition, leftTileX);
+                // CC_TRACE("Normal method.");
+            }
+            if (rigidbody.LinearVelocity.x <= 0.f)
+            {
+                if (tilemapLeftCollisionDetectionResult)
                 {
-                    proposedPosition.x = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
+                    if ((position_vec2.x - box_collider.Extents.x + box_collider.Offset.x) >= leftTileX)
+                    {
+                        proposedPosition.x = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
+                    }
+                    rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
                 }
-                rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
+                else
+                {
+                    if (tilemapEntity != possibleNewTilemapEntity)
+                    {
+                    //     tilemapEntity = possibleNewTilemapEntity;
+                    //     CC_TRACE("Tilemap entity changed.");
+                        // RemoveEntityFromQuadtree(e);
+                    }
+                }
             }
 
             glm::vec2 newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
 
-            auto tilemapRightCollisionDetectionResult = 
-                CheckTilemapCollisionRight(proposedPosition, newProposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, rightTileX);
-            if (rigidbody.LinearVelocity.x >= 0.f && tilemapRightCollisionDetectionResult)
+            bool tilemapRightCollisionDetectionResult;
+            if (tilemapEntity != possibleNewTilemapEntity)
             {
-                if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
+                // New tilemap, use overload
+                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
+                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
+                tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(proposedPosition, newProposedPosition,
+                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, rightTileX);
+                CC_TRACE("Other method : Right, Result: ", tilemapRightCollisionDetectionResult);
+            }
+            else
+            {
+                tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(proposedPosition, 
+                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, rightTileX);
+            }
+            if (rigidbody.LinearVelocity.x > 0.f)
+            {
+                if (tilemapRightCollisionDetectionResult)
                 {
-                    proposedPosition.x = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
+                    if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
+                    {
+                        proposedPosition.x = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
+                    }
+                    rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
+
                 }
-                rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
+                else
+                {
+                    if (tilemapEntity != possibleNewTilemapEntity)
+                    {
+                    //     tilemapEntity = possibleNewTilemapEntity;
+                    //     CC_TRACE("Tilemap entity changed.");
+                        // RemoveEntityFromQuadtree(e);
+                    }
+                }
             }
 
             newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
 
             float ceilingLevel = 0.f;
-            auto tilemapCeilingCollisionDetectionResult = 
-                CheckTilemapCollisionCeiling(proposedPosition, newProposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, ceilingLevel);
-            if (rigidbody.LinearVelocity.y >= 0.f && tilemapCeilingCollisionDetectionResult)
+            bool tilemapCeilingCollisionDetectionResult;
+            if (tilemapEntity != possibleNewTilemapEntity)
             {
-                proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
-                rigidbody.LinearVelocity.y = 0.f;
-                onGroundBitset.set(e, false);
+                // New tilemap, use overload
+                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
+                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
+                tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition, newProposedPosition, 
+                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, ceilingLevel);
+                CC_TRACE("Other method : Ceiling, Result: ", tilemapCeilingCollisionDetectionResult);
+            }
+            else
+            {
+                tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition,
+                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, ceilingLevel);
+            }
+            if (rigidbody.LinearVelocity.y > 0.f)
+            {
+                if (tilemapCeilingCollisionDetectionResult)
+                {
+                    proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
+                    rigidbody.LinearVelocity.y = 0.f;
+                    onGroundBitset.set(e, false);
+                }
+                else
+                {
+                    if (tilemapEntity != possibleNewTilemapEntity)
+                    {
+                    //     tilemapEntity = possibleNewTilemapEntity;
+                    //     CC_TRACE("Tilemap entity changed.");
+                        // RemoveEntityFromQuadtree(e);
+                    }
+                }
             }
 
             newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
+            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
 
-            auto tilemapGroundCollisionDetectionResult = 
-                CheckTilemapCollisionGround(proposedPosition, newProposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, groundLevel, onPlatform);
+            bool tilemapGroundCollisionDetectionResult;
+            if (tilemapEntity != possibleNewTilemapEntity)
+            {
+                // New tilemap, use overload
+                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
+                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
+                tilemapGroundCollisionDetectionResult = CheckTilemapCollisionGround(proposedPosition, newProposedPosition, 
+                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, groundLevel, onPlatform);
+                CC_TRACE("Other method : Ground, Result: ", tilemapGroundCollisionDetectionResult);
+            }
+            else
+            {
+                tilemapGroundCollisionDetectionResult = CheckTilemapCollisionGround(proposedPosition,
+                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, groundLevel, onPlatform);
+                // if (e == 3)
+                //     CC_TRACE("Tilemap check for this one: ", tilemapEntity, " Positive?", tilemapGroundCollisionDetectionResult);
+            }
 
             if (rigidbody.LinearVelocity.y <= 0.f && tilemapGroundCollisionDetectionResult)
             {
-                proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
-                rigidbody.LinearVelocity.y = 0.f;
-                resolved = true;
-                onGroundBitset.set(e, true);
-                if (onPlatform)
+                if (tilemapGroundCollisionDetectionResult)
                 {
-                    onPlatformBitset.set(e, true);
+                    proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
+                    rigidbody.LinearVelocity.y = 0.f;
+                    resolved = true;
+                    onGroundBitset.set(e, true);
+                    if (onPlatform)
+                    {
+                        onPlatformBitset.set(e, true);
+                    }
+                }
+                else
+                {
+                    if (tilemapEntity != possibleNewTilemapEntity)
+                    {
+                    //     tilemapEntity = possibleNewTilemapEntity;
+                    //     CC_TRACE("Tilemap entity changed.");
+                        // RemoveEntityFromQuadtree(e);
+                    }
                 }
             }
             else
@@ -284,8 +398,91 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
                                                 const BoxCollider2DComponent &boxCollider,
                                                 const TilemapComponent &tilemap,
                                                 const glm::vec3 &tilemapPosition,
+                                                const TilemapComponent &newTilemap,
+                                                const glm::vec3 &newTilemapPosition,
                                                 float &groundLevel,
                                                 bool &onPlatform) -> bool
+{
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+
+    const glm::vec2 bottomLeftOffset = boxCollider.Extents - glm::vec2(1, -1);
+
+    glm::vec2 oldBottomLeft = glm::round(oldCentre - bottomLeftOffset);
+
+    glm::vec2 newBottomLeft = glm::round(newCentre - bottomLeftOffset); 
+    glm::vec2 newBottomRight = glm::round(glm::vec2(newBottomLeft.x + boxCollider.Extents.x * 2.0f - 2.0f, newBottomLeft.y));
+
+    size_t destinationY = GetTileIndexYAtWorldPoint(newTilemapPosition, tilemap.TileSize, newBottomLeft.y) ; // 72
+    size_t fromY = glm::max(GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.y) + TilemapData::TILEMAP_MAX_Y_LENGTH, destinationY);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationY - fromY)), 1);
+
+    // TODO - Early end when out of bounds.
+    int index_x = 0;
+
+    // NOTE - From the previous position, to the next position, go through all the possible tiles.
+    for (int index_y = static_cast<int>(fromY); index_y >= static_cast<int>(destinationY); --index_y)
+    {
+        glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationY - index_y)) * inverseDistInTiles);
+        glm::vec2 bottomRight = glm::vec2(bottomLeft.x + boxCollider.Extents.x * 2.0f - 2.0f, bottomLeft.y);
+        // NOTE - Basically, scan from the bottom left to the bottom right of the AABB for tiles.
+        for (glm::vec2 checkedTile = bottomLeft;; checkedTile.x += tilemap.TileSize.x)
+        {
+            checkedTile.x = glm::min(checkedTile.x, bottomRight.x);
+
+            if (index_y >= TilemapData::TILEMAP_MAX_Y_LENGTH)
+            {
+                index_x = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.x);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > (TilemapData::TILEMAP_MAX_Y_LENGTH * 2 - 1))
+                {
+                    break;
+                }
+            }
+            else
+            {
+                index_x = GetTileIndexXAtWorldPoint(newTilemapPosition, tilemap.TileSize, checkedTile.x);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+                {
+                    break;
+                }
+            }
+
+
+
+            Tile::TileType tileType;
+            if (index_y >= TilemapData::TILEMAP_MAX_Y_LENGTH)
+            {
+                tileType = tilemap.MapData[index_y - TilemapData::TILEMAP_MAX_Y_LENGTH][index_x].Type;
+                groundLevel = static_cast<float>(index_y - TilemapData::TILEMAP_MAX_Y_LENGTH) * tilemap.TileSize.y + tilemap.TileSize.y * 0.5f + tilemapPosition.y;
+            }
+            else
+            {
+                tileType = newTilemap.MapData[index_y][index_x].Type;
+                groundLevel = static_cast<float>(index_y) * newTilemap.TileSize.y + newTilemap.TileSize.y * 0.5f + newTilemapPosition.y;
+            }
+
+            if (tileType == Tile::TileType::Solid)
+            {
+                onPlatform = false;
+                return true;
+            }
+            else if (tileType == Tile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
+            {
+                onPlatform = true;  
+            }
+
+            if (checkedTile.x >= bottomRight.x)
+            {
+                if (onPlatform)
+                    return true;
+                break;
+            }
+        }
+    }
+    return false;
+}
+
+auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, float &groundLevel, bool &onPlatform) -> bool
 {
     glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
     glm::vec2 newCentre = newPosition + boxCollider.Offset;
@@ -303,10 +500,9 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
 
     // TODO - Early end when out of bounds.
     size_t index_x = 0;
-    size_t index_y = 0;
 
     // NOTE - From the previous position, to the next position, go through all the possible tiles.
-    for (size_t index_y = fromY; index_y >= destinationY; --index_y)
+    for (int index_y = static_cast<int>(fromY); index_y >= static_cast<int>(destinationY); --index_y)
     {
         glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationY - index_y)) * inverseDistInTiles);
         glm::vec2 bottomRight = glm::vec2(bottomLeft.x + boxCollider.Extents.x * 2.0f - 2.0f, bottomLeft.y);
@@ -366,7 +562,7 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
 
     size_t index_x = 0;
 
-    for (size_t index_y = fromY; index_y <= destinationY; ++index_y)
+    for (int index_y = static_cast<int>(fromY); index_y <= static_cast<int>(destinationY); ++index_y)
     {
         glm::vec2 topRight = Utility::Lerp(newTopRight, oldTopRight, static_cast<float>(glm::abs(destinationY - index_y)) * inverseDistInTiles);
         glm::vec2 topLeft = glm::vec2(topRight.x - boxCollider.Extents.x * 2.0f + 2.0f, topRight.y);
@@ -399,6 +595,83 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
     return false;
 }
 
+// Overload
+auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, const TilemapComponent &newTilemap, const glm::vec3 &newTilemapPosition, float &ceilingLevel) -> bool
+{
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+
+    ceilingLevel = 0.0f; 
+
+    const glm::vec2 topRightOffset = boxCollider.Extents + glm::vec2(-1, 1);
+    glm::vec2 oldTopRight = glm::round(oldCentre + topRightOffset);
+
+    glm::vec2 newTopRight = glm::round(newCentre + topRightOffset);
+    glm::vec2 newTopLeft = glm::round(glm::vec2(newTopRight.x - boxCollider.Extents.x * 2.0f + 2.0f, newTopRight.y));
+
+    int destinationY = GetTileIndexYAtWorldPoint(newTilemapPosition, tilemap.TileSize, newTopRight.y);
+    int fromY = glm::min(static_cast<int>(GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, oldTopRight.y)) - 
+        static_cast<int>(TilemapData::TILEMAP_MAX_Y_LENGTH), destinationY);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationY - fromY)), 1);
+
+    int index_x = 0;
+
+    for (int index_y = fromY; index_y <= destinationY; ++index_y)
+    {
+        glm::vec2 topRight = Utility::Lerp(newTopRight, oldTopRight, static_cast<float>(glm::abs(destinationY - index_y)) * inverseDistInTiles);
+        glm::vec2 topLeft = glm::vec2(topRight.x - boxCollider.Extents.x * 2.0f + 2.0f, topRight.y);
+        // NOTE - Basically, scan from the bottom left to the bottom right of the AABB for tiles.
+        for (glm::vec2 checkedTile = topLeft;; checkedTile.x += tilemap.TileSize.x)
+        {
+            checkedTile.x = glm::min(checkedTile.x, topRight.x);
+
+            if (index_y < 0)
+            {
+                index_x = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.x);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || (index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) < 0 || (index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+                {
+                    break;
+                }
+            }
+            else
+            {
+                index_x = GetTileIndexXAtWorldPoint(newTilemapPosition, tilemap.TileSize, checkedTile.x);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+                {
+                    break;
+                }
+            }
+            // Check if it is in bounds.
+
+            Tile::TileType tileType;
+            if (index_y < 0)
+            {
+                tileType = tilemap.MapData[index_y + TilemapData::TILEMAP_MAX_Y_LENGTH][index_x].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    ceilingLevel = static_cast<float>(index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) * tilemap.TileSize.y - tilemap.TileSize.y * 0.5f + tilemapPosition.y;
+                    return true;
+                }
+            }
+            else
+            {
+                tileType = newTilemap.MapData[index_y][index_x].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    ceilingLevel = static_cast<float>(index_y) * tilemap.TileSize.y - tilemap.TileSize.y * 0.5f + tilemapPosition.y;
+                    return true;
+                }
+            }
+
+            if (checkedTile.x >= topRight.x)
+            {
+                break;
+            }
+        }
+    }
+    return false;
+}
+
 auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, float &wallX) -> bool
 {
     glm::vec2 newCentre = newPosition + boxCollider.Offset;
@@ -417,9 +690,8 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
     size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomLeft.x);
     size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.x) - 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
-    CC_TRACE(fromX);
     
-    for (size_t index_x = fromX; index_x >= destinationX; --index_x)
+    for (int index_x = static_cast<int>(fromX); index_x >= static_cast<int>(destinationX); --index_x)
     {
         glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
         glm::vec2 topLeft = bottomLeft + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
@@ -453,6 +725,80 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
     return false;
 }
 
+auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, const TilemapComponent &newTilemap, const glm::vec3 &newTilemapPosition, float &wallX) -> bool
+{
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+
+    wallX = 0.f;
+
+    const glm::vec2 bottomLeftOffset = boxCollider.Extents + glm::vec2(1, 0);
+    glm::vec2 oldBottomLeft = glm::round(oldCentre - bottomLeftOffset);
+
+    glm::vec2 newBottomLeft = glm::round(newCentre - bottomLeftOffset);
+    glm::vec2 newTopLeft = glm::round(newBottomLeft + glm::vec2(0, boxCollider.Extents.y * 2.0f));
+
+    size_t index_y;
+
+    size_t destinationX = GetTileIndexXAtWorldPoint(newTilemapPosition, tilemap.TileSize, newBottomLeft.x);
+    size_t fromX = glm::max(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomLeft.x) + TilemapData::TILEMAP_MAX_X_LENGTH, destinationX);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
+    
+    for (int index_x = static_cast<int>(fromX); index_x >= static_cast<int>(destinationX); --index_x)
+    {
+        glm::vec2 bottomLeft = Utility::Lerp(newBottomLeft, oldBottomLeft, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
+        glm::vec2 topLeft = bottomLeft + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
+
+        for (glm::vec2 checkedTile = bottomLeft; ; checkedTile.y += tilemap.TileSize.y)
+        {
+            checkedTile.y = glm::min(checkedTile.y, topLeft.y);
+
+            if (index_x >= TilemapData::TILEMAP_MAX_X_LENGTH)
+            {
+                index_y = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.y);
+            }
+            else
+            {
+                index_y = GetTileIndexYAtWorldPoint(newTilemapPosition, tilemap.TileSize, checkedTile.y);
+            }
+
+            // Check if it is in bounds.
+            if (index_x < 0 || index_x > (TilemapData::TILEMAP_MAX_X_LENGTH * 2 - 1) || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+            {
+                break;
+            }
+
+            Tile::TileType tileType;
+            if (index_x >= TilemapData::TILEMAP_MAX_X_LENGTH)
+            {
+                tileType = tilemap.MapData[index_y][index_x - TilemapData::TILEMAP_MAX_X_LENGTH].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    wallX = static_cast<float>(index_x - TilemapData::TILEMAP_MAX_X_LENGTH) * tilemap.TileSize.x + tilemap.TileSize.x * 0.5f + tilemapPosition.x;
+                    return true;
+                }
+            }
+            else
+            {
+                tileType = newTilemap.MapData[index_y][index_x].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    wallX = static_cast<float>(index_x) * newTilemap.TileSize.x + newTilemap.TileSize.x * 0.5f + newTilemapPosition.x;
+                    return true;
+                }
+            }
+
+            
+            if (checkedTile.y >= topLeft.y)
+            {
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
 auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, float &wallX) -> bool
 {
     glm::vec2 newCentre = newPosition + boxCollider.Offset;
@@ -471,7 +817,7 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
     size_t fromX = glm::min(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
     float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
     
-    for (size_t index_x = fromX; index_x <= destinationX; ++index_x)
+    for (int index_x = static_cast<int>(fromX); index_x <= static_cast<int>(destinationX); ++index_x)
     {
         glm::vec2 bottomRight = Utility::Lerp(newBottomRight, oldBottomRight, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
         glm::vec2 topRight = bottomRight + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
@@ -495,6 +841,84 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
                 return true;
             }
             
+            if (checkedTile.y >= topRight.y)
+            {
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
+// Overload
+auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, const glm::vec2 &newPosition, const BoxCollider2DComponent &boxCollider, const TilemapComponent &tilemap, const glm::vec3 &tilemapPosition, const TilemapComponent &newTilemap, const glm::vec3 &newTilemapPosition, float &wallX) -> bool
+{
+    glm::vec2 newCentre = newPosition + boxCollider.Offset;
+    glm::vec2 oldCentre = oldPosition + boxCollider.Offset;
+
+    wallX = 0.f;
+
+    const glm::vec2 bottomRightOffset = glm::vec2(boxCollider.Extents.x, -boxCollider.Extents.y) + glm::vec2(1, 0);
+    glm::vec2 oldBottomRight = glm::round(oldCentre + bottomRightOffset);
+    glm::vec2 newBottomRight = glm::round(newCentre + bottomRightOffset);
+    glm::vec2 newTopRight = glm::round(newBottomRight + glm::vec2(0, boxCollider.Extents.y * 2.0f));
+
+    int index_y;
+
+    int destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomRight.x);
+    int fromX = glm::min(static_cast<int>(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x)) - 
+        static_cast<int>(TilemapData::TILEMAP_MAX_X_LENGTH), destinationX);
+    float inverseDistInTiles = 1.f / glm::max(static_cast<int>(glm::abs(destinationX - fromX)), 1);
+    
+    for (int index_x = fromX; index_x <= destinationX; ++index_x)
+    {
+        glm::vec2 bottomRight = Utility::Lerp(newBottomRight, oldBottomRight, static_cast<float>(glm::abs(destinationX - index_x)) * inverseDistInTiles);
+        glm::vec2 topRight = bottomRight + glm::vec2(0.f, boxCollider.Extents.y * 2.0f);
+
+        for (glm::vec2 checkedTile = bottomRight;; checkedTile.y += tilemap.TileSize.y)
+        {
+            checkedTile.y = glm::min(checkedTile.y, topRight.y);
+
+            if (index_x < 0)
+            {
+                index_y = GetTileIndexYAtWorldPoint(tilemapPosition, tilemap.TileSize, checkedTile.y);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || (index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) < 0 || (index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+                {
+                    break;
+                }
+            }
+            else 
+            {
+                index_y = GetTileIndexYAtWorldPoint(newTilemapPosition, tilemap.TileSize, checkedTile.y);
+                if (index_x < 0 || index_x > TilemapData::TILEMAP_MAX_X_LENGTH - 1 || index_y < 0 || index_y > TilemapData::TILEMAP_MAX_Y_LENGTH - 1)
+                {
+                    break;
+                }
+            }
+
+
+            // Check if it is in bounds.
+            Tile::TileType tileType;
+            if (index_x < 0)
+            {
+                tileType = tilemap.MapData[index_y][index_x + TilemapData::TILEMAP_MAX_X_LENGTH].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    wallX = static_cast<float>(index_x + TilemapData::TILEMAP_MAX_X_LENGTH) * tilemap.TileSize.x - tilemap.TileSize.x * 0.5f + tilemapPosition.x;
+                    return true;
+                }
+            }
+            else
+            {
+                tileType = newTilemap.MapData[index_y][index_x].Type;
+                if (tileType == Tile::TileType::Solid)
+                {
+                    wallX = static_cast<float>(index_x) * newTilemap.TileSize.x - newTilemap.TileSize.x * 0.5f + newTilemapPosition.x;
+                    return true;
+                }
+            }
+
             if (checkedTile.y >= topRight.y)
             {
                 break;
@@ -608,6 +1032,26 @@ auto PhysicsSystem::RemoveEntityFromQuadtree(Entity e) -> void
     physics_quadtree_component.Collisions.clear();
 }
 
+auto PhysicsSystem::RemoveEntityFromSpecificQuadtree(Entity e, Entity tilemapEntity) -> void
+{
+    auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    auto& areas = physics_quadtree_component.Areas;
+    auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
+    auto& tilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
+
+    for (size_t i = 0; i < areas.size(); ++i)
+    {
+        RemoveObjectFromArea(areas[i], tilemap, entities_in_areas[i], e);
+
+        Utility::RemoveAt(areas, i);
+        Utility::RemoveAt(entities_in_areas, i);
+    }
+
+    physics_quadtree_component.Collisions.clear();
+    areas.clear();
+    entities_in_areas.clear();
+}
+
 auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec3& tilemapWorldPosition, Entity e, TransformComponent& transform, BoxCollider2DComponent& collider) -> void
 {
     glm::vec2 pos_vec2 = glm::vec2(transform.Position);
@@ -662,6 +1106,9 @@ auto PhysicsSystem::UpdateAreas(TilemapComponent& nearestTilemap, const glm::vec
         overlappingAreas[3] = (bottomRightTile);
         count = 4;
     }
+
+    if (count == 0)
+        return;
 
     auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
     auto& areas = physics_quadtree_component.Areas;
