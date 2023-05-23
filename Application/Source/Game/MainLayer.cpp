@@ -492,6 +492,23 @@ MainLayer::MainLayer()
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
 
     }
+    
+    for (int i = 0; i < 8; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-608 + i * -16, -22, -0.5f),
+            glm::vec3(0), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {16.f, 6.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
+
+    }
 #pragma endregion
 #pragma endregion
 }
