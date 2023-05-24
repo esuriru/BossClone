@@ -371,8 +371,6 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
                 }
             }
 
-
-
             Tile::TileType tileType;
             if (index_y >= TilemapData::TILEMAP_MAX_Y_LENGTH)
             {

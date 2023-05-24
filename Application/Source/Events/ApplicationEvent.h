@@ -242,3 +242,22 @@ private:
     const Collision2D& collision_;
 
 };
+
+class HealingEvent : public Event
+{
+public:
+    HealingEvent(Entity potionEntity, HealthPotionComponent& healthPotionComponent, Entity targetEntity) :
+        potionEntity_(potionEntity), healthPotionComponent_(healthPotionComponent), targetEntity_(targetEntity) {}
+
+    NR_EVENT_CLASS_TYPE(Healing)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetPotionEntity() -> Entity { return potionEntity_; } 
+    inline auto GetTargetEntity() -> Entity { return targetEntity_; } 
+    inline auto GetHealthPotionComponent() -> HealthPotionComponent& { return healthPotionComponent_; }
+
+private:
+    Entity potionEntity_, targetEntity_;
+    HealthPotionComponent& healthPotionComponent_;
+
+};

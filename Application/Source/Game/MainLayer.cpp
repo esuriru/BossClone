@@ -56,6 +56,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<WeaponAffectedByPickupComponent>();
     coordinator->RegisterComponent<BreakableComponent>();
     coordinator->RegisterComponent<SpikeComponent>();
+    coordinator->RegisterComponent<HealthPotionComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -82,6 +83,7 @@ MainLayer::MainLayer()
     smoothCameraFollowSystem_         = coordinator->RegisterSystem<SmoothCameraFollowSystem>();
     breakableBoxSystem_               = coordinator->RegisterSystem<BreakableBoxSystem>();
     spikeSystem_                      = coordinator->RegisterSystem<SpikeSystem>();
+    healingPotionSystem_              = coordinator->RegisterSystem<HealingPotionSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -91,6 +93,7 @@ MainLayer::MainLayer()
     swingingAnimationSystem_->eventCallback = 
     weaponAffectedByAnimationSystem_->eventCallback =
     playerAffectedByAnimationSystem_->eventCallback =
+    healingPotionSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
 #pragma endregion
@@ -196,6 +199,11 @@ MainLayer::MainLayer()
     spikeSystemSignature.set(coordinator->GetComponentType<SpikeComponent>());
     spikeSystemSignature.set(coordinator->GetComponentType<PhysicsQuadtreeComponent>());
     coordinator->SetSystemSignature<SpikeSystem>(spikeSystemSignature);
+
+    Signature healingPotionSystemSignature;
+    healingPotionSystemSignature.set(coordinator->GetComponentType<HealthPotionComponent>());
+    healingPotionSystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
+    coordinator->SetSystemSignature<HealingPotionSystem>(healingPotionSystemSignature);
 
 #pragma endregion
 #pragma region TILEMAP_SETUP
@@ -502,6 +510,54 @@ MainLayer::MainLayer()
     }));
     coordinator->AddComponent(testPhysicsEntity, BreakableComponent(5));
 
+    auto healthPotionBoxCave = coordinator->CreateEntity();
+    coordinator->AddComponent(healthPotionBoxCave, TransformComponent(glm::vec3(-520, 202, 0),
+       glm::vec3(0), glm::vec3(28, 24, 1)));
+    coordinator->AddComponent(healthPotionBoxCave, SpriteRendererComponent(
+        SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Items/Boxes/Box2/Idle.png"), glm::vec2(1, 1), glm::vec2(28, 24)))); 
+
+    auto hpbEntityCollider = BoxCollider2DComponent();
+    hpbEntityCollider.Extents = glm::vec2(10, 10);
+    coordinator->AddComponent(healthPotionBoxCave, hpbEntityCollider); 
+    coordinator->AddComponent(healthPotionBoxCave, RigidBody2DComponent());
+    coordinator->AddComponent(healthPotionBoxCave, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(healthPotionBoxCave, HealthComponent(20, 20, [](Entity e)
+    {
+        auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
+        coordinator->DestroyEntity(e);
+
+        auto healthPot = coordinator->CreateEntity();
+
+        constexpr glm::vec2 offset = {0, 6.0f};
+        coordinator->AddComponent(healthPot, TransformComponent(glm::vec3(glm::vec2(positionOfDestroyedEntity) + offset, -0.5f),
+            glm::vec3(0), glm::vec3(32, 32, 1)));
+        coordinator->AddComponent(healthPot, ItemComponent(
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {0, 9}, {32, 32})));
+        coordinator->AddComponent(healthPot, SpriteRendererComponent(
+            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {0, 17}, {32, 32})));
+
+        auto rigidbody = RigidBody2DComponent();
+        rigidbody.LinearVelocity.y = 40.0f;
+        coordinator->AddComponent(healthPot, rigidbody); 
+        coordinator->AddComponent(healthPot, BoxCollider2DComponent({}, {10.f, 10.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(healthPot, physics_quadtree_component); 
+        coordinator->AddComponent(healthPot, PickupComponent()); 
+        coordinator->AddComponent(healthPot, HealthPotionComponent(50.f)); 
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }));
+    coordinator->AddComponent(healthPotionBoxCave, BreakableComponent(5));
+
 #pragma region SPIKE_SETUP
     for (int i = 0; i < 4; ++i)
     {
@@ -568,6 +624,22 @@ MainLayer::MainLayer()
         physics_quadtree_component.Active = true;
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
     }
+
+    for (int i = 0; i < 4; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-592 + i * -16, 170, -0.5f),
+            glm::vec3(0), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
+    }
 #pragma endregion
 #pragma endregion
 }
@@ -602,9 +674,6 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
     RenderCommand::Clear();
 
-
-
-
     runningAnimationSystem_->Update(ts);
     swingingAnimationSystem_->Update(ts);
 
@@ -618,9 +687,10 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 13> on_events {
+    static const std::array<std::function<void(Event&)>, 14> on_events {
         OEB(PhysicsSystem, physicsSystem_),
         OEB(WeaponSystem, weaponSystem_),
+        OEB(HealingPotionSystem, healingPotionSystem_),
 
         OEB(OrthographicCameraController, &cameraController_),
 

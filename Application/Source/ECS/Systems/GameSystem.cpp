@@ -145,6 +145,7 @@ auto DamageableSystem::OnEvent(Event &e) -> void
 {
     EventDispatcher dispatcher(e);
     dispatcher.Dispatch<DamageEvent>(CC_BIND_EVENT_FUNC(DamageableSystem::OnDamageEvent));
+    dispatcher.Dispatch<HealingEvent>(CC_BIND_EVENT_FUNC(DamageableSystem::OnHealingEvent));
 }
 
 auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
@@ -167,6 +168,24 @@ auto DamageableSystem::OnDamageEvent(DamageEvent &e) -> bool
     coordinator->GetComponent<SpriteRendererComponent>(target).Colour = { 1.0f, 0.f, 0.f , 1.0f };
 #endif
     // physics_quadtree.Active = false;
+
+    CC_TRACE("New health: ", health.Health);
+
+    return true;
+}
+
+auto DamageableSystem::OnHealingEvent(HealingEvent &e) -> bool
+{
+    Entity target = e.GetTargetEntity();
+    if (entities.find(target) == entities.end())
+        return false;
+
+    auto& health = coordinator->GetComponent<HealthComponent>(target);
+    if (health.CurrentCooldownFrames > 0)
+        return true;
+
+    health.Health += e.GetHealthPotionComponent().Healing;
+    health.Health = glm::min(health.Health, health.MaxHealth);
 
     CC_TRACE("New health: ", health.Health);
 
@@ -278,6 +297,9 @@ auto WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour(Entity e, PickupE
 auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
 {
     Entity weaponEntity = e.GetTargetEntity();
+    if (entities.find(weaponEntity) == entities.end())
+        return false;
+
     if (e.IsPickedUp()) 
     {
         auto& weaponAffectedByPickupComponent = coordinator->GetComponent<WeaponAffectedByPickupComponent>(weaponEntity);
@@ -346,4 +368,32 @@ auto SpikeSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
     }
     
     return false;
+}
+
+auto HealingPotionSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool
+{
+    if (entities.find(e.GetWeapon()) == entities.end())
+        return false;
+
+    auto& healing_potion = coordinator->GetComponent<HealthPotionComponent>(e.GetWeapon());
+    auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e.GetWeapon());
+    if (owned_by.Owner != e.GetOwner())
+        return false;
+    auto& player_inventory = coordinator->GetComponent<InventoryComponent>(e.GetOwner());
+
+    HealingEvent healingEvent(e.GetWeapon(), healing_potion, e.GetOwner());
+    eventCallback(healingEvent);
+
+    // NOTE - IT'S ONE USE FOR NOW
+    // Remove the potion. 
+    for (int i = 0; i < player_inventory.Items.size(); ++i)
+    {
+        if (player_inventory.Items[i] == e.GetWeapon())
+        {
+            Utility::RemoveAt(player_inventory.Items, i);
+            break;
+        }
+    }
+
+    player_inventory.CurrentlyHolding = player_inventory.Items.empty() ? 0 : player_inventory.Items.back();
 }

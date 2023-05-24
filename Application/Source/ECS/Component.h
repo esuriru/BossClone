@@ -250,3 +250,10 @@ struct SpikeComponent
     float Damage = 5.f;
 };
 
+struct HealthPotionComponent
+{
+    HealthPotionComponent() = default;
+    HealthPotionComponent(float healing) : Healing(healing) {}
+
+    float Healing = 50.f;
+};

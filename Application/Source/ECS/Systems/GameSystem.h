@@ -35,6 +35,7 @@ public:
 
 private:
     auto OnDamageEvent(DamageEvent& e) -> bool;
+    auto OnHealingEvent(HealingEvent& e) -> bool;
 };
 
 class WeaponAffectedByAnimationSystem : public System
@@ -112,3 +113,17 @@ private:
 
 };
 
+class HealingPotionSystem : public System
+{
+public:
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<WeaponUseEvent>(CC_BIND_EVENT_FUNC(HealingPotionSystem::OnWeaponUseEvent));
+    }
+
+    EventCallback eventCallback;
+private:
+    // TODO - Rename this.
+    auto OnWeaponUseEvent(WeaponUseEvent& e) -> bool;
+};

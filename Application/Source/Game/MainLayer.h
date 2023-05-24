@@ -68,6 +68,7 @@ private:
     Ref<WeaponAffectedByPickupSystem> weaponAffectedByPickupSystem_;
     Ref<BreakableBoxSystem> breakableBoxSystem_;
     Ref<SpikeSystem> spikeSystem_;
+    Ref<HealingPotionSystem> healingPotionSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;
