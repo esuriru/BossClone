@@ -175,15 +175,16 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             // Broad phase chunking 
             glm::vec2 position_vec2 = glm::vec2(transform.Position);
             glm::vec2 proposedPosition = position_vec2 + (rigidbody.LinearVelocity * static_cast<float>(step));
+            float proposedPositionX = position_vec2.x + rigidbody.LinearVelocity.x * static_cast<float>(step);
 
             auto& nearestTilemap = coordinator->GetComponent<TilemapComponent>(tilemapEntity);
             glm::vec3& tilemapPosition = coordinator->GetComponent<TransformComponent>(tilemapEntity).Position;
 
             auto& physics_quadtree_component = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
-            if (physics_quadtree_component.LastKnownTilemap != tilemapEntity && physics_quadtree_component.LastKnownTilemap != 0)
-            {
-                RemoveEntityFromSpecificQuadtree(e, physics_quadtree_component.LastKnownTilemap);
-            }
+            // if (physics_quadtree_component.LastKnownTilemap != tilemapEntity && physics_quadtree_component.LastKnownTilemap != 0)
+            // {
+            //     RemoveEntityFromSpecificQuadtree(e, physics_quadtree_component.LastKnownTilemap);
+            // }
             UpdateAreas(nearestTilemap, tilemapPosition, e, transform, box_collider);
             physics_quadtree_component.LastKnownTilemap = tilemapEntity;
             physics_quadtree_component.Collisions.clear();
@@ -223,162 +224,69 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             bool tilemapLeftCollisionDetectionResult;
             Entity possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(proposedPosition);
 
-            if (tilemapEntity != possibleNewTilemapEntity)
-            {
-                // New tilemap, use overload
-                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
-                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
-                tilemapLeftCollisionDetectionResult = CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, leftTileX);
-                CC_TRACE("Other method : Left, Result: ", tilemapLeftCollisionDetectionResult, "Old Tilemap: ", tilemapEntity, "New tilemap: ", possibleNewTilemapEntity);
-            }
-            else
-            {
-                tilemapLeftCollisionDetectionResult = CheckTilemapCollisionLeft(position_vec2, proposedPosition, box_collider,
-                    nearestTilemap, tilemapPosition, leftTileX);
-                // CC_TRACE("Normal method.");
-            }
-            if (rigidbody.LinearVelocity.x <= 0.f)
+            tilemapLeftCollisionDetectionResult = CheckTilemapCollisionLeft(position_vec2, glm::vec2(proposedPositionX, position_vec2.y), box_collider,
+                nearestTilemap, tilemapPosition, leftTileX);
+            if (rigidbody.LinearVelocity.x < 0.f)
             {
                 if (tilemapLeftCollisionDetectionResult)
                 {
                     if ((position_vec2.x - box_collider.Extents.x + box_collider.Offset.x) >= leftTileX)
                     {
-                        proposedPosition.x = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
+                        proposedPositionX = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
                     }
                     rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
+                    CC_TRACE("Left");
                 }
-                else
-                {
-                    if (tilemapEntity != possibleNewTilemapEntity)
-                    {
-                    //     tilemapEntity = possibleNewTilemapEntity;
-                    //     CC_TRACE("Tilemap entity changed.");
-                        // RemoveEntityFromQuadtree(e);
-                    }
-                }
-            }
-
-            glm::vec2 newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
-            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
-
-            bool tilemapRightCollisionDetectionResult;
-            if (tilemapEntity != possibleNewTilemapEntity)
-            {
-                // New tilemap, use overload
-                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
-                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
-                tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(proposedPosition, newProposedPosition,
-                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, rightTileX);
-                CC_TRACE("Other method : Right, Result: ", tilemapRightCollisionDetectionResult);
             }
             else
             {
-                tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(proposedPosition, 
-                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, rightTileX);
-            }
-            if (rigidbody.LinearVelocity.x >= 0.f)
-            {
-                if (tilemapRightCollisionDetectionResult)
+                bool tilemapRightCollisionDetectionResult;
+                tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(position_vec2,
+                    glm::vec2(proposedPositionX, position_vec2.y), box_collider, nearestTilemap, tilemapPosition, rightTileX);
+                if (rigidbody.LinearVelocity.x > 0.f)
                 {
-                    if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
+                    if (tilemapRightCollisionDetectionResult)
                     {
-                        proposedPosition.x = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
-                    }
-                    rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
+                        CC_TRACE("Right");
+                        if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
+                        {
+                            proposedPositionX = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
+                        }
+                        rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
 
-                }
-                else
-                {
-                    if (tilemapEntity != possibleNewTilemapEntity)
-                    {
-                    //     tilemapEntity = possibleNewTilemapEntity;
-                    //     CC_TRACE("Tilemap entity changed.");
-                        // RemoveEntityFromQuadtree(e);
                     }
                 }
             }
 
-            newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
-            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
+            proposedPosition = glm::vec2(proposedPositionX, position_vec2.y);
+            float proposedPositionY = proposedPosition.y + (rigidbody.LinearVelocity.y) * static_cast<float>(step);
 
             float ceilingLevel = 0.f;
             bool tilemapCeilingCollisionDetectionResult;
-            if (tilemapEntity != possibleNewTilemapEntity)
-            {
-                // New tilemap, use overload
-                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
-                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
-                tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition, newProposedPosition, 
-                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, ceilingLevel);
-                CC_TRACE("Other method : Ceiling, Result: ", tilemapCeilingCollisionDetectionResult);
-            }
-            else
-            {
-                tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition,
-                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, ceilingLevel);
-            }
+            tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition,
+                glm::vec2(proposedPositionX, proposedPositionY), box_collider, nearestTilemap, tilemapPosition, ceilingLevel);
             if (rigidbody.LinearVelocity.y >= 0.f)
             {
                 if (tilemapCeilingCollisionDetectionResult)
                 {
-                    proposedPosition.y = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
+                    proposedPositionY = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
                     rigidbody.LinearVelocity.y = 0.f;
                     onGroundBitset.set(e, false);
                 }
-                else
-                {
-                    if (tilemapEntity != possibleNewTilemapEntity)
-                    {
-                    //     tilemapEntity = possibleNewTilemapEntity;
-                    //     CC_TRACE("Tilemap entity changed.");
-                        // RemoveEntityFromQuadtree(e);
-                    }
-                }
             }
-
-            newProposedPosition = proposedPosition + (rigidbody.LinearVelocity * static_cast<float>(step));
-            possibleNewTilemapEntity = tilemapSystem->GetClosestTilemap(newProposedPosition);
-
             bool tilemapGroundCollisionDetectionResult;
-            if (tilemapEntity != possibleNewTilemapEntity)
-            {
-                // New tilemap, use overload
-                auto& newTilemap = coordinator->GetComponent<TilemapComponent>(possibleNewTilemapEntity);
-                auto& newTilemapPos = coordinator->GetComponent<TransformComponent>(possibleNewTilemapEntity).Position;
-                tilemapGroundCollisionDetectionResult = CheckTilemapCollisionGround(proposedPosition, newProposedPosition, 
-                    box_collider, nearestTilemap, tilemapPosition, newTilemap, newTilemapPos, groundLevel, onPlatform);
-                CC_TRACE("Other method : Ground, Result: ", tilemapGroundCollisionDetectionResult);
-            }
-            else
-            {
-                tilemapGroundCollisionDetectionResult = CheckTilemapCollisionGround(proposedPosition,
-                    newProposedPosition, box_collider, nearestTilemap, tilemapPosition, groundLevel, onPlatform);
-                // if (e == 3)
-                //     CC_TRACE("Tilemap check for this one: ", tilemapEntity, " Positive?", tilemapGroundCollisionDetectionResult);
-            }
+            tilemapGroundCollisionDetectionResult = CheckTilemapCollisionGround(proposedPosition,
+                glm::vec2(proposedPositionX, proposedPositionY), box_collider, nearestTilemap, tilemapPosition, groundLevel, onPlatform);
 
             if (rigidbody.LinearVelocity.y <= 0.f && tilemapGroundCollisionDetectionResult)
             {
-                if (tilemapGroundCollisionDetectionResult)
+                proposedPositionY = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
+                rigidbody.LinearVelocity.y = 0.f;
+                resolved = true;
+                onGroundBitset.set(e, true);
+                if (onPlatform)
                 {
-                    proposedPosition.y = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
-                    rigidbody.LinearVelocity.y = 0.f;
-                    resolved = true;
-                    onGroundBitset.set(e, true);
-                    if (onPlatform)
-                    {
-                        onPlatformBitset.set(e, true);
-                    }
-                }
-                else
-                {
-                    if (tilemapEntity != possibleNewTilemapEntity)
-                    {
-                    //     tilemapEntity = possibleNewTilemapEntity;
-                    //     CC_TRACE("Tilemap entity changed.");
-                        // RemoveEntityFromQuadtree(e);
-                    }
+                    onPlatformBitset.set(e, true);
                 }
             }
             else
@@ -387,7 +295,8 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 onPlatformBitset.set(e, false);
             }
 
-            transform.Position = glm::vec3(proposedPosition, 0);
+
+            transform.Position = glm::vec3(proposedPositionX, proposedPositionY, 0);
         }
 
         tilemapSystem->CheckCollisions();
@@ -826,7 +735,7 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
     glm::vec2 newBottomRight = glm::round(newCentre + bottomRightOffset);
     glm::vec2 newTopRight = glm::round(newBottomRight + glm::vec2(0, boxCollider.Extents.y * 2.0f));
 
-    size_t index_y;
+    int index_y;
 
     size_t destinationX = GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, newBottomRight.x);
     size_t fromX = glm::min(GetTileIndexXAtWorldPoint(tilemapPosition, tilemap.TileSize, oldBottomRight.x) + 1, destinationX);
