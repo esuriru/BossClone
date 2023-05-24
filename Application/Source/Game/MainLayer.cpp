@@ -213,6 +213,9 @@ MainLayer::MainLayer()
     auto grassTileBottomRight  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
     auto platformStart         = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
     auto platformEnd           = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
+    auto goldBlockStart        = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 2), pixelAdventureTileSize);
+    auto goldBlockMiddle       = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(18, 2), pixelAdventureTileSize);
+    auto goldBlockEnd          = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 2), pixelAdventureTileSize);
 
     auto tilemapEntity = coordinator->CreateEntity();
 
@@ -228,6 +231,9 @@ MainLayer::MainLayer()
     tilemapComponent.SubTextureMap[9] = grassTileBottomRight;
     tilemapComponent.SubTextureMap[10] = platformStart;
     tilemapComponent.SubTextureMap[11] = platformEnd;
+    tilemapComponent.SubTextureMap[12] = goldBlockStart;
+    tilemapComponent.SubTextureMap[13] = goldBlockMiddle;
+    tilemapComponent.SubTextureMap[14] = goldBlockEnd;
 
     coordinator->AddComponent(tilemapEntity, TransformComponent {
         glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, -70, 0),
@@ -235,26 +241,26 @@ MainLayer::MainLayer()
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);
 
-    auto tilemapEntity2 = coordinator->CreateEntity();
+    // auto tilemapEntity2 = coordinator->CreateEntity();
 
-    TilemapComponent tilemapComponent2("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv");
-    tilemapComponent2.SubTextureMap[1] = grassTileTopLeft;
-    tilemapComponent2.SubTextureMap[2] = grassTileTopMiddle;
-    tilemapComponent2.SubTextureMap[3] = grassTileTopRight;
-    tilemapComponent2.SubTextureMap[4] = grassTileMiddleLeft;
-    tilemapComponent2.SubTextureMap[5] = grassTileMiddleMiddle;
-    tilemapComponent2.SubTextureMap[6] = grassTileMiddleRight;
-    tilemapComponent2.SubTextureMap[7] = grassTileBottomLeft;
-    tilemapComponent2.SubTextureMap[8] = grassTileBottomMiddle;
-    tilemapComponent2.SubTextureMap[9] = grassTileBottomRight;
-    tilemapComponent2.SubTextureMap[10] = platformStart;
-    tilemapComponent2.SubTextureMap[11] = platformEnd;
+    // TilemapComponent tilemapComponent2("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv");
+    // tilemapComponent2.SubTextureMap[1] = grassTileTopLeft;
+    // tilemapComponent2.SubTextureMap[2] = grassTileTopMiddle;
+    // tilemapComponent2.SubTextureMap[3] = grassTileTopRight;
+    // tilemapComponent2.SubTextureMap[4] = grassTileMiddleLeft;
+    // tilemapComponent2.SubTextureMap[5] = grassTileMiddleMiddle;
+    // tilemapComponent2.SubTextureMap[6] = grassTileMiddleRight;
+    // tilemapComponent2.SubTextureMap[7] = grassTileBottomLeft;
+    // tilemapComponent2.SubTextureMap[8] = grassTileBottomMiddle;
+    // tilemapComponent2.SubTextureMap[9] = grassTileBottomRight;
+    // tilemapComponent2.SubTextureMap[10] = platformStart;
+    // tilemapComponent2.SubTextureMap[11] = platformEnd;
 
-    coordinator->AddComponent(tilemapEntity2, TransformComponent {
-        glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -1.5f * tilemapComponent.TileSize.x, -70, 0),
-    });
+    // coordinator->AddComponent(tilemapEntity2, TransformComponent {
+    //     glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -1.5f * tilemapComponent.TileSize.x, -70, 0),
+    // });
 
-    coordinator->AddComponent(tilemapEntity2, tilemapComponent2);
+    // coordinator->AddComponent(tilemapEntity2, tilemapComponent2);
 
 #pragma endregion
 #pragma region PLAYER_SETUP
@@ -386,24 +392,24 @@ MainLayer::MainLayer()
     coordinator->AddComponent(woodenSwordWeaponEntity, meleeBoxCollider); 
     coordinator->AddComponent(woodenSwordWeaponEntity, PhysicsQuadtreeComponent()); 
 
-    for (int i = 0; i < 6; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         auto ironSwordWeaponEntity = coordinator->CreateEntity();
 
         WeaponComponent ironSwordMeleeWeaponComponent;
         ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
-        ironSwordMeleeWeaponComponent.Damage = 12.0f;
+        ironSwordMeleeWeaponComponent.Damage = 20.0f;
         ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
         ironSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
 
         coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(40 + i * 35, 20, -0.5f),
+        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(-909, 30, -0.5f),
             glm::vec3(0), glm::vec3(32, 32, 1)));
         coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
-            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})));
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {2, 5}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
-            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {1, 21}, {32, 32})));
+            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {2, 21}, {32, 32})));
         coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour));
         coordinator->AddComponent(ironSwordWeaponEntity, RigidBody2DComponent()); 
         coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
@@ -430,7 +436,7 @@ MainLayer::MainLayer()
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
-        sprite_renderer.Colour.a = 0.8f;
+        sprite_renderer.Colour.a = 0.5f;
     },
     [](Entity e)
     {
@@ -494,7 +500,7 @@ MainLayer::MainLayer()
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
     }));
-    coordinator->AddComponent(testPhysicsEntity, BreakableComponent(8));
+    coordinator->AddComponent(testPhysicsEntity, BreakableComponent(5));
 
 #pragma region SPIKE_SETUP
     for (int i = 0; i < 4; ++i)
@@ -579,6 +585,7 @@ auto MainLayer::OnDetach() -> void
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
     // cameraController_.OnUpdate(ts);
+    physicsSystem_->tilemapSystem->Update(ts);
     weaponSystem_->Update(ts);
     damageableSystem_->Update(ts);
     physicsSystem_->Update(ts);

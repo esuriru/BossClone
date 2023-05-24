@@ -11,7 +11,9 @@ TilemapComponent::TilemapComponent(const std::string &map_csv, bool make_tiles_s
 
 TilemapComponent::TilemapComponent(const std::string &map_csv, const char* tile_type_csv) 
 {
-    ImportTilemapCSV(map_csv, std::string(tile_type_csv));
+    TilemapPath = map_csv;
+    TilemapTypesPath = std::string(tile_type_csv);
+    ImportTilemapCSV(map_csv, TilemapTypesPath);
     InitializeQuadtree();
 }
 

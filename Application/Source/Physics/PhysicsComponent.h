@@ -33,8 +33,8 @@ struct PlayerController2DComponent
     float MaxHorizontalSpeed = 400.f;
     float AccelerationScalar = 0.05f;    
 
-    float JumpForce = 700.f; 
-    float DashForce = 700.f; 
+    float JumpForce = 750.f; 
+    float DashForce = 230.f; 
 
     std::set<size_t> ActiveMeleeWeaponIndices;
     bool IsFacingRight = true;
@@ -46,6 +46,7 @@ public:
     float Restitution = 0.f;
     Physics::RigidBodyType BodyType = Physics::RigidBodyType::Dynamic;
     glm::vec2 LinearVelocity = glm::vec2(0.0f);
+    bool IgnoreFriction = false;
 
     inline auto GetMass() const -> float
     {

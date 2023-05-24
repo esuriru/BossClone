@@ -16,10 +16,10 @@
 
 namespace Physics
 {
-    constexpr float GravityAccelerationScalar = -20.8f;
+    constexpr float GravityAccelerationScalar = -25.8f;
     constexpr glm::vec2 GravityAccelerationVector = { 0.f, GravityAccelerationScalar };
     constexpr float TimeScale = 15.0f;
-    constexpr float FrictionCoefficient = 0.87f;
+    constexpr float FrictionCoefficient = 0.93f;
     constexpr float PlatformCollisionDetectionThreshold = 2.0f;
     constexpr float AirSpeedMultiplier = 0.3f;
 }

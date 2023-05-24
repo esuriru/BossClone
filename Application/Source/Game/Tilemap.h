@@ -65,6 +65,9 @@ struct TilemapComponent
 
     int HorizontalAreasCount = 0;
     int VerticalAreasCount = 0;
+    
+    std::string TilemapPath;
+    std::string TilemapTypesPath;
 
     std::vector<std::vector<std::vector<Entity>>> ObjectsInArea;
 

@@ -48,6 +48,8 @@ auto PlayerSystem::Update(Timestep ts) -> void
             auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
 
+            rigidbody.IgnoreFriction = (DashFrames > 0 && --DashFrames != 0);
+
             if (input->IsKeyDown(Key::A))
             {
                 const float accelerationScalar = physicsSystem->onGroundBitset.test(e) ?
@@ -110,7 +112,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 --currentDashCooldown_;
 
             bool hasJumped = false;
-            if (wantsToJump && input->IsKeyDown(Key::Space) && physicsSystem && physicsSystem->onGroundBitset.test(e) && rigidbody.LinearVelocity.y <= 0.0f)
+            if (wantsToJump && input->IsKeyDown(Key::Space) && (physicsSystem->onGroundBitset.test(e) || physicsSystem->onPlatformBitset.test(e)) && rigidbody.LinearVelocity.y <= 0.0f)
             {
                 wantsToJump = false;
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
@@ -120,9 +122,22 @@ auto PlayerSystem::Update(Timestep ts) -> void
             {
                 wantsToDash = false;
                 currentDashCooldown_ += dashCooldownFrames_; 
-                rigidbody.LinearVelocity.x = !hasJumped && physicsSystem->onGroundBitset.test(e) ? 
-                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed : 
-                    (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.MaxHorizontalSpeed * Physics::AirSpeedMultiplier * 1.25f;
+                // rigidbody.LinearVelocity.x = !hasJumped && (physicsSystem->onGroundBitset.test(e) || physicsSystem->onPlatformBitset.test(e)) ? 
+                //     (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce : 
+                //     (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce * Physics::FrictionCoefficient;
+                if (!hasJumped && (physicsSystem->onGroundBitset.test(e) || physicsSystem->onPlatformBitset.test(e)))
+                {
+                    rigidbody.LinearVelocity.x = (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce;
+                    DashFrames = 14;
+                }
+                else
+                {
+                    rigidbody.LinearVelocity.x = (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce * Physics::FrictionCoefficient;
+                    // PhysicsSystem::AddForce(rigidbody,
+                    //     glm::vec2((-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce * Physics::FrictionCoefficient, 0),
+                    //     step, Physics::ForceMode::Impulse);
+                }
+
             }
 
             // CC_TRACE("Player horizontal speed: ", rigidbody.LinearVelocity.x);

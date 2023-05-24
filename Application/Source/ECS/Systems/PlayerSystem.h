@@ -26,6 +26,8 @@ private:
     // TODO - Probably make this a bool also, waste of memory.
     std::bitset<MaxEntities> runningBitset_;
 
+    uint32_t DashFrames = 0;
+
     auto OnCollisionEvent(CollisionEvent& e) -> bool;
     auto OnKeyPressedEvent(KeyPressedEvent& e) -> bool;
 

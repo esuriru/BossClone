@@ -2,6 +2,7 @@
 
 #include "PhysicsComponent.h"
 #include "ECS/Component.h"
+#include "Core/KeyCodes.h"
 
 #include "Physics/Collision2D.h"
 
@@ -25,6 +26,7 @@
 #include <utility>
 
 #include "Utils/Util.h"
+#include "Utils/Input.h"
 
 #include <limits>
 
@@ -32,11 +34,23 @@ static Coordinator* coordinator = Coordinator::Instance();
 
 auto ActiveTilemapSystem::Update(Timestep ts) -> void
 {
+    static Input* input = Input::Instance();
+    if (input->IsKeyPressed(Key::M))
+    {
+        for (auto& e : entities) 
+        {
+            auto& tilemap = coordinator->GetComponent<TilemapComponent>(e);
+            tilemap.ImportTilemapCSV(tilemap.TilemapPath, tilemap.TilemapTypesPath);
+        }
+    }
 }
 
 auto ActiveTilemapSystem::GetClosestTilemap(const glm::vec2 &position) -> Entity
 {
     Entity tilemapEntity;
+
+    if (entities.size() == 1)
+        return *entities.begin();
 
     float nearestDistance = std::numeric_limits<float>::max();
     for (auto& e : entities)
@@ -186,7 +200,8 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             {
                 if (fabs(rigidbody.LinearVelocity.x) > glm::epsilon<float>())
                 {
-                    rigidbody.LinearVelocity.x = Physics::FrictionCoefficient * rigidbody.LinearVelocity.x;
+                    if (!rigidbody.IgnoreFriction)
+                        rigidbody.LinearVelocity.x = Physics::FrictionCoefficient * rigidbody.LinearVelocity.x;
                     if (fabs(rigidbody.LinearVelocity.x) < glm::epsilon<float>())
                     {
                         // Round it off.
@@ -262,7 +277,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 tilemapRightCollisionDetectionResult = CheckTilemapCollisionRight(proposedPosition, 
                     newProposedPosition, box_collider, nearestTilemap, tilemapPosition, rightTileX);
             }
-            if (rigidbody.LinearVelocity.x > 0.f)
+            if (rigidbody.LinearVelocity.x >= 0.f)
             {
                 if (tilemapRightCollisionDetectionResult)
                 {
@@ -303,7 +318,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 tilemapCeilingCollisionDetectionResult = CheckTilemapCollisionCeiling(proposedPosition,
                     newProposedPosition, box_collider, nearestTilemap, tilemapPosition, ceilingLevel);
             }
-            if (rigidbody.LinearVelocity.y > 0.f)
+            if (rigidbody.LinearVelocity.y >= 0.f)
             {
                 if (tilemapCeilingCollisionDetectionResult)
                 {
