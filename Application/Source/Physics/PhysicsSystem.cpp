@@ -313,7 +313,9 @@ auto PhysicsSystem::OnEvent(Event &e) -> void
 auto PhysicsSystem::OnOnEntityDestroyedEvent(OnEntityDestroyedEvent &e) -> bool
 {
     if (entities.find(e.GetDestroyedEntity()) != entities.end())
+    {
         RemoveEntityFromQuadtree(e.GetDestroyedEntity());
+    }
     return false;
 }
 
@@ -943,12 +945,11 @@ auto PhysicsSystem::RemoveEntityFromQuadtree(Entity e) -> void
     auto& entities_in_areas = physics_quadtree_component.EntitiesInAreas;
     auto& tilemap = coordinator->GetComponent<TilemapComponent>(nearestTilemap);
 
+    CC_TRACE("Entity removed from quadtree.");
+    CC_TRACE("Areas: ", areas.size());
     for (size_t i = 0; i < areas.size(); ++i)
     {
         RemoveObjectFromArea(areas[i], tilemap, entities_in_areas[i], e);
-
-        Utility::RemoveAt(areas, i);
-        Utility::RemoveAt(entities_in_areas, i);
     }
 
     physics_quadtree_component.Collisions.clear();

@@ -14,6 +14,8 @@
 class AnimationSpriteChangeEvent;
 class WeaponUseEvent;
 class PickupEvent;
+class PlayerEnterEvent;
+class TilemapComponent;
 
 // NOTE - Components are mainly for storing data. All the logic processes will be done in Systems.
 
@@ -256,4 +258,21 @@ struct HealthPotionComponent
     HealthPotionComponent(float healing) : Healing(healing) {}
 
     float Healing = 50.f;
+};
+
+struct PortalComponent
+{
+    using PortalBehaviour = void(*)(Entity, PlayerEnterEvent&);
+
+    PortalComponent() = default;
+    PortalComponent(PortalBehaviour behaviour) : Behaviour(behaviour) {}
+
+    PortalBehaviour Behaviour;
+};
+
+struct ReferenceComponent 
+{
+    ReferenceComponent() = default;
+    ReferenceComponent(Entity entity) : RefEntity(entity) {}
+    Entity RefEntity;
 };

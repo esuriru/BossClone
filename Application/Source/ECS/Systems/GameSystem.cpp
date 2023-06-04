@@ -397,3 +397,11 @@ auto HealingPotionSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool
 
     player_inventory.CurrentlyHolding = player_inventory.Items.empty() ? 0 : player_inventory.Items.back();
 }
+
+auto PortalSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
+{
+    if (entities.find(e.GetTargetEntity()) == entities.end()) return false;
+    auto& portal = coordinator->GetComponent<PortalComponent>(e.GetTargetEntity());
+    portal.Behaviour(e.GetTargetEntity(), e);
+    return true;
+}

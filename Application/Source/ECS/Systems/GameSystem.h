@@ -127,3 +127,17 @@ private:
     // TODO - Rename this.
     auto OnWeaponUseEvent(WeaponUseEvent& e) -> bool;
 };
+
+
+class PortalSystem : public System
+{
+public:
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<PlayerEnterEvent>(CC_BIND_EVENT_FUNC(PortalSystem::OnPlayerEnterEvent));
+    }
+
+private:
+    auto OnPlayerEnterEvent(PlayerEnterEvent& e) -> bool;
+};

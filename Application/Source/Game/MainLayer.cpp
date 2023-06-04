@@ -57,6 +57,8 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<BreakableComponent>();
     coordinator->RegisterComponent<SpikeComponent>();
     coordinator->RegisterComponent<HealthPotionComponent>();
+    coordinator->RegisterComponent<PortalComponent>();
+    coordinator->RegisterComponent<ReferenceComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -210,38 +212,50 @@ MainLayer::MainLayer()
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
     constexpr glm::vec2 pixelAdventureTileSize = glm::vec2(16 ,16);
-    auto grassTileTopLeft      = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
-    auto grassTileTopMiddle    = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);
-    auto grassTileTopRight     = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), pixelAdventureTileSize);
-    auto grassTileMiddleLeft   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), pixelAdventureTileSize);
-    auto grassTileMiddleMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), pixelAdventureTileSize);
-    auto grassTileMiddleRight  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), pixelAdventureTileSize);
-    auto grassTileBottomLeft   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), pixelAdventureTileSize);
-    auto grassTileBottomMiddle = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 8),pixelAdventureTileSize);
-    auto grassTileBottomRight  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
-    auto platformStart         = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
-    auto platformEnd           = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
-    auto goldBlockStart        = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 2), pixelAdventureTileSize);
-    auto goldBlockMiddle       = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(18, 2), pixelAdventureTileSize);
-    auto goldBlockEnd          = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 2), pixelAdventureTileSize);
+    auto grassTileTopLeft       = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 10), pixelAdventureTileSize);
+    auto grassTileTopMiddle     = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 10), pixelAdventureTileSize);
+    auto grassTileTopRight      = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 10), pixelAdventureTileSize);
+    auto grassTileMiddleLeft    = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 9), pixelAdventureTileSize);
+    auto grassTileMiddleMiddle  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 9), pixelAdventureTileSize);
+    auto grassTileMiddleRight   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 9), pixelAdventureTileSize);
+    auto grassTileBottomLeft    = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(6, 8), pixelAdventureTileSize);
+    auto grassTileBottomMiddle  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(7, 8),pixelAdventureTileSize);
+    auto grassTileBottomRight   = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(8, 8), pixelAdventureTileSize);
+    auto platformStart          = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 9), pixelAdventureTileSize);
+    auto platformEnd            = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 9), pixelAdventureTileSize);
+    auto goldBlockStart         = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(17, 2), pixelAdventureTileSize);
+    auto goldBlockMiddle        = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(18, 2), pixelAdventureTileSize);
+    auto goldBlockEnd           = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 2), pixelAdventureTileSize);
+    // auto silverBlockBottomRight = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(14, 4), pixelAdventureTileSize);
+    // auto silverBlockBottomLeft  = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(13, 4), pixelAdventureTileSize);
+    // auto silverBlockTopRight    = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(14, 5), pixelAdventureTileSize);
+    // auto silverBlockTopLeft     = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(13, 5), pixelAdventureTileSize);
+
+    platformStart->InsetInwardsY(0.001f);
+
+    platformEnd->InsetInwardsY(0.001f);
 
     auto tilemapEntity = coordinator->CreateEntity();
 
     TilemapComponent tilemapComponent("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv");
-    tilemapComponent.SubTextureMap[1] = grassTileTopLeft;
-    tilemapComponent.SubTextureMap[2] = grassTileTopMiddle;
-    tilemapComponent.SubTextureMap[3] = grassTileTopRight;
-    tilemapComponent.SubTextureMap[4] = grassTileMiddleLeft;
-    tilemapComponent.SubTextureMap[5] = grassTileMiddleMiddle;
-    tilemapComponent.SubTextureMap[6] = grassTileMiddleRight;
-    tilemapComponent.SubTextureMap[7] = grassTileBottomLeft;
-    tilemapComponent.SubTextureMap[8] = grassTileBottomMiddle;
-    tilemapComponent.SubTextureMap[9] = grassTileBottomRight;
+    tilemapComponent.SubTextureMap[1 ] = grassTileTopLeft;
+    tilemapComponent.SubTextureMap[2 ] = grassTileTopMiddle;
+    tilemapComponent.SubTextureMap[3 ] = grassTileTopRight;
+    tilemapComponent.SubTextureMap[4 ] = grassTileMiddleLeft;
+    tilemapComponent.SubTextureMap[5 ] = grassTileMiddleMiddle;
+    tilemapComponent.SubTextureMap[6 ] = grassTileMiddleRight;
+    tilemapComponent.SubTextureMap[7 ] = grassTileBottomLeft;
+    tilemapComponent.SubTextureMap[8 ] = grassTileBottomMiddle;
+    tilemapComponent.SubTextureMap[9 ] = grassTileBottomRight;
     tilemapComponent.SubTextureMap[10] = platformStart;
     tilemapComponent.SubTextureMap[11] = platformEnd;
     tilemapComponent.SubTextureMap[12] = goldBlockStart;
     tilemapComponent.SubTextureMap[13] = goldBlockMiddle;
     tilemapComponent.SubTextureMap[14] = goldBlockEnd;
+    // tilemapComponent.SubTextureMap[15] = silverBlockBottomLeft;
+    // tilemapComponent.SubTextureMap[16] = silverBlockTopLeft;
+    // tilemapComponent.SubTextureMap[17] = silverBlockTopRight; 
+    // tilemapComponent.SubTextureMap[18] = silverBlockBottomRight;
 
     coordinator->AddComponent(tilemapEntity, TransformComponent {
         glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, -70, 0),
@@ -287,7 +301,7 @@ MainLayer::MainLayer()
         glm::vec2(7.0f, 14.f)
     ));
 
-    constexpr glm::vec2 playerTextureSize = glm::vec2(32.f, 32.f);
+    constexpr glm::vec2 playerTextureSize = glm::vec2(32.0f, 32.0f);
 
     auto playerSpriteRendererComponent = SpriteRendererComponent();
     playerSpriteRendererComponent.Texture =
@@ -311,8 +325,13 @@ MainLayer::MainLayer()
     auto& runningAnimation = runningAnimationComponent.Animation;
     for (int i = 0; i < 4; ++i)
     {
-        runningAnimation.SpriteTextures.emplace_back(
-            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 6), playerTextureSize));
+        auto texture = 
+            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 6), playerTextureSize);
+
+        // texture inset 
+        texture->Inset(0.001f);
+
+        runningAnimation.SpriteTextures.emplace_back(texture);
     }
 
     for (size_t i = 0; i < runningAnimation.SpriteTextures.size(); ++i)
@@ -334,8 +353,12 @@ MainLayer::MainLayer()
 
     for (int i = 0; i < 8; ++i)
     {
-        swingingAnimation.SpriteTextures.emplace_back(
-            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 0), playerTextureSize));
+        auto texture = 
+            SubTexture2D::CreateFromCoords(playerSpritesheet_, glm::vec2(i , 0), playerTextureSize);
+
+        texture->Inset(0.001f);
+
+        swingingAnimation.SpriteTextures.emplace_back(texture);
     }
 
     for (size_t i = 0; i < swingingAnimation.SpriteTextures.size(); ++i)
@@ -453,8 +476,43 @@ MainLayer::MainLayer()
     }));
 #pragma endregion
 #pragma region MISC_ENTITIES
+    // TODO - Box blocking.
+    auto blockingEntity = coordinator->CreateEntity(); 
+    coordinator->AddComponent(blockingEntity, TransformComponent(glm::vec3(-24, 130, 0),
+       glm::vec3(0), glm::vec3(32, 32, 1)));
+    coordinator->AddComponent(blockingEntity, SpriteRendererComponent(
+        SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png"), glm::vec2(6.5f, 2), glm::vec2(32, 32)))); 
+    coordinator->AddComponent(blockingEntity, BoxCollider2DComponent({0, 0}, {32, 32})); 
+    coordinator->AddComponent(blockingEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(blockingEntity, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(blockingEntity, ReferenceComponent(tilemapEntity));
+    coordinator->AddComponent(blockingEntity, HealthComponent(100, 20, [](Entity e)
+    {
+        auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
+        auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
+
+        tilemap.MapData[12][62].Type = Tile::TileType::Empty;
+        tilemap.MapData[12][63].Type = Tile::TileType::Empty;
+        tilemap.MapData[13][62].Type = Tile::TileType::Empty;
+        tilemap.MapData[13][63].Type = Tile::TileType::Empty;
+
+        coordinator->DestroyEntity(e);
+         
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }));
+    coordinator->AddComponent(blockingEntity, BreakableComponent(20.0f));
+
     auto testPhysicsEntity = coordinator->CreateEntity();
-    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(20, 0, 0),
+    coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(-10, 0, 0),
        glm::vec3(0), glm::vec3(28, 24, 1)));
     coordinator->AddComponent(testPhysicsEntity, SpriteRendererComponent(
         SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Items/Boxes/Box2/Idle.png"), glm::vec2(1, 1), glm::vec2(28, 24)))); 
@@ -462,7 +520,7 @@ MainLayer::MainLayer()
     auto testPhysicsEntityCollider = BoxCollider2DComponent();
     testPhysicsEntityCollider.Extents = glm::vec2(10, 10);
     coordinator->AddComponent(testPhysicsEntity, testPhysicsEntityCollider); 
-    coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent());
+    coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
     coordinator->AddComponent(testPhysicsEntity, HealthComponent(20, 20, [](Entity e)
     {
@@ -473,7 +531,7 @@ MainLayer::MainLayer()
         WeaponComponent ironSwordMeleeWeaponComponent;
         ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
-        ironSwordMeleeWeaponComponent.Damage = 12.0f;
+        ironSwordMeleeWeaponComponent.Damage = 50.0f;
         ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
         ironSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
 
@@ -559,6 +617,9 @@ MainLayer::MainLayer()
     coordinator->AddComponent(healthPotionBoxCave, BreakableComponent(5));
 
 #pragma region SPIKE_SETUP
+    auto spike_texture = SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f});
+    spike_texture->Inset(0.009f);
+
     for (int i = 0; i < 4; ++i)
     {
         auto spikeEntity = coordinator->CreateEntity();
@@ -567,7 +628,7 @@ MainLayer::MainLayer()
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
         coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-176 + i * 16, 42, -0.5f),
             glm::vec3(0), glm::vec3(16, 16, 1)));
-        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
         coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
@@ -584,7 +645,7 @@ MainLayer::MainLayer()
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
         coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-608 + i * -16, -22, -0.5f),
             glm::vec3(0), glm::vec3(16, 16, 1)));
-        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
         coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
@@ -601,7 +662,7 @@ MainLayer::MainLayer()
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
         coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-320 + i * -16, -22, -0.5f),
             glm::vec3(0), glm::vec3(16, 16, 1)));
-        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
         coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
@@ -617,7 +678,7 @@ MainLayer::MainLayer()
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
         coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-528 + i * -16, 106, -0.5f),
             glm::vec3(0, 0, glm::pi<float>()), glm::vec3(16, 16, 1)));
-        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
         coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, 4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
@@ -633,7 +694,7 @@ MainLayer::MainLayer()
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
         coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-592 + i * -16, 170, -0.5f),
             glm::vec3(0), glm::vec3(16, 16, 1)));
-        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(SubTexture2D::CreateFromCoords(spikeTexture_, {1.00f, 1.00f}, {16.00f, 16.00f})));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
         coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
         auto physics_quadtree_component = PhysicsQuadtreeComponent();

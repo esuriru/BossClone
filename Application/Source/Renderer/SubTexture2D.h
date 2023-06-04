@@ -16,9 +16,31 @@ public:
         return texture_;
     }
 
-    inline auto GetTexCoordsArray() const -> const std::array<glm::vec2, 4>&
+    inline auto GetTexCoordsArray() -> std::array<glm::vec2, 4>&
     {
         return textureCoordinates_;
+    }
+
+    inline auto Inset(float amount) -> void
+    {
+        textureCoordinates_[1].x -= amount;
+        textureCoordinates_[2].x -= amount;
+        textureCoordinates_[2].y -= amount;
+        textureCoordinates_[3].y -= amount;
+    }
+
+    inline auto InsetInwardsY(float amount) -> void
+    {
+        textureCoordinates_[0].y += amount;
+        textureCoordinates_[1].y += amount;
+        textureCoordinates_[2].y -= amount;
+        textureCoordinates_[3].y -= amount;
+    }
+
+    inline auto InsetY(float amount) -> void
+    {
+        textureCoordinates_[2].y -= amount;
+        textureCoordinates_[3].y -= amount;
     }
 
     inline auto GetTexCoords() const -> const glm::vec2*

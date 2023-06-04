@@ -43,6 +43,9 @@ struct PlayerController2DComponent
 struct RigidBody2DComponent
 {
 public:
+    RigidBody2DComponent() = default;
+    RigidBody2DComponent(Physics::RigidBodyType type) : BodyType(type) {}
+
     float Restitution = 0.f;
     Physics::RigidBodyType BodyType = Physics::RigidBodyType::Dynamic;
     glm::vec2 LinearVelocity = glm::vec2(0.0f);
