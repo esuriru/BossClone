@@ -15,23 +15,24 @@ EventCallback WeaponSystem::eventCallback;
 static Coordinator* coordinator = Coordinator::Instance();
 auto WeaponSystem::Update(Timestep ts) -> void
 {
-    for (auto& e : entities)
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
+    static float accumulator = 0.f;
+
+    accumulator += glm::min(static_cast<float>(ts), 0.25f);
+
+    while (accumulator >= step)
     {
-        auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
-        if (weapon.Active)
+        for (auto& e : entities)
         {
-            auto& transform = coordinator->GetComponent<TransformComponent>(e);
-            auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
-            auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
-            auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+            auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
+            if (weapon.Active)
+            {
+                weapon.ActiveBehaviour(e);
 
-            bool ownerIsFacingRight = coordinator->GetComponent<PlayerController2DComponent>(owned_by.Owner).IsFacingRight;
-
-            // For detecting collision.
-            transform.Position = owner_centre +
-                glm::vec3((-1.f + 2.f * static_cast<float>(ownerIsFacingRight)) * weapon.HandOffset.x, weapon.HandOffset.y, 0.f);
-        }
-    } 
+            }
+        } 
+        accumulator -= step;
+    }
 }
 
 auto WeaponSystem::OnEvent(Event &e) -> void
@@ -56,6 +57,63 @@ auto WeaponSystem::MeleeBehaviour(Entity e, WeaponUseEvent& event) -> void
     weapon.Active = event.IsMouseDown();
     if (!weapon.Active)
         physics_quadtree.Active = false;
+}
+
+auto WeaponSystem::MageBehaviour(Entity e, WeaponUseEvent &event) -> void
+{
+    auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
+    weapon.Active = event.IsMouseDown();
+    if (!event.IsMouseDown())
+        weapon.CooldownFrames = 0;
+}
+
+auto WeaponSystem::MeleeActiveBehaviour(Entity e) -> void
+{
+    auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
+    auto& transform = coordinator->GetComponent<TransformComponent>(e);
+    auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
+    auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
+    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+
+    bool ownerIsFacingRight = coordinator->GetComponent<PlayerController2DComponent>(owned_by.Owner).IsFacingRight;
+
+    // For detecting collision.
+    transform.Position = owner_centre +
+        glm::vec3((-1.f + 2.f * static_cast<float>(ownerIsFacingRight)) * weapon.HandOffset.x, weapon.HandOffset.y, 0.f);
+}
+
+auto WeaponSystem::MageActiveBehaviour(Entity e) -> void
+{
+    auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
+    auto& transform = coordinator->GetComponent<TransformComponent>(e);
+    auto& owned_by = coordinator->GetComponent<OwnedByComponent>(e);
+    auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
+    bool ownerIsFacingRight = coordinator->GetComponent<PlayerController2DComponent>(owned_by.Owner).IsFacingRight;
+
+    if (weapon.CooldownFrames > 0)
+        --weapon.CooldownFrames;
+
+    if (weapon.CooldownFrames == 0)
+    {
+        // NOTE - This will throw if spark is invalid.
+        auto& reference_component = coordinator->GetComponent<ReferenceComponent>(e);
+        auto spark_entity = reference_component.RefEntity;
+        auto& projectile = coordinator->GetComponent<ProjectileComponent>(spark_entity);
+        auto& projectile_transform = coordinator->GetComponent<TransformComponent>(spark_entity);
+        auto& projectile_physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(spark_entity);
+        auto& projectile_sprite = coordinator->GetComponent<SpriteRendererComponent>(spark_entity);
+
+        projectile.Active = true; 
+        projectile.LifetimeFrames = 60; 
+        projectile_physics_quadtree.Active = true;
+        projectile_transform.Scale.x = (ownerIsFacingRight) ? -fabs(projectile_transform.Scale.x) : fabs(projectile_transform.Scale.x);
+        projectile_transform.Position = owner_centre + 
+            glm::vec3((-1.f + 2.f * static_cast<float>(ownerIsFacingRight)) * weapon.HandOffset.x, weapon.HandOffset.y, 0.f);
+        projectile_sprite.Colour.a = 1;
+
+        weapon.CooldownFrames = 60;
+    }
 }
 
 auto WeaponSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool 
@@ -303,7 +361,8 @@ auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
     if (e.IsPickedUp()) 
     {
         auto& weaponAffectedByPickupComponent = coordinator->GetComponent<WeaponAffectedByPickupComponent>(weaponEntity);
-        weaponAffectedByPickupComponent.PickupBehaviour(weaponEntity, e);
+        if (weaponAffectedByPickupComponent.PickupBehaviour)
+            weaponAffectedByPickupComponent.PickupBehaviour(weaponEntity, e);
     }
     return true;
 }
@@ -398,10 +457,103 @@ auto HealingPotionSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool
     player_inventory.CurrentlyHolding = player_inventory.Items.empty() ? 0 : player_inventory.Items.back();
 }
 
+auto PortalSystem::Update(Timestep ts) -> void
+{
+    for (auto& e : entities)
+    {
+        auto& transform = coordinator->GetComponent<TransformComponent>(e);
+        transform.Rotation.z += 2.0f * ts;
+        if (transform.Rotation.z >= glm::two_pi<float>())
+            transform.Rotation.z -= glm::two_pi<float>();
+        // transform.Scale.x = remainderf()
+    }
+}
+
 auto PortalSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
 {
     if (entities.find(e.GetTargetEntity()) == entities.end()) return false;
     auto& portal = coordinator->GetComponent<PortalComponent>(e.GetTargetEntity());
     portal.Behaviour(e.GetTargetEntity(), e);
+    return true;
+}
+
+auto ProjectileSystem::Update(Timestep ts) -> void
+{
+    constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
+    static float accumulator = 0.f;
+
+    accumulator += glm::min(static_cast<float>(ts), 0.25f);
+
+    while (accumulator >= step)
+    {
+        for (auto& e : entities)
+        {
+            auto& projectile = coordinator->GetComponent<ProjectileComponent>(e);
+            if (!projectile.Active) continue;
+            auto& transform = coordinator->GetComponent<TransformComponent>(e);
+            transform.Position.x += ((transform.Scale.x > 0) ? -projectile.Speed : projectile.Speed) * step;
+            if (projectile.LifetimeFrames > 0)
+                --projectile.LifetimeFrames;
+            if (projectile.LifetimeFrames == 0)
+            {
+                projectile.Active = false;
+                auto& physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+                physics_quadtree.Active = false;
+                auto& sprite = coordinator->GetComponent<SpriteRendererComponent>(e);
+                sprite.Colour.a = 0;
+            }
+        }
+        accumulator -= step;
+    }
+}
+
+auto ProjectileSystem::OnCollisionEvent(CollisionEvent &e) -> bool
+{
+    const auto& collision = e.GetCollision();
+
+    bool originWeapon = false;
+    Entity weaponEntity;
+
+    auto otherEntityQuery = entities.find(collision.OtherEntity);
+    auto originEntityQuery = entities.find(e.GetOriginEntity());
+    if (otherEntityQuery == entities.end())
+    {
+        if (originEntityQuery == entities.end())
+            return false; 
+        else
+            originWeapon = true;
+    }
+    else
+    {
+        if (originEntityQuery == entities.end())
+            originWeapon = false;
+        else 
+            return false;
+    }
+
+    Entity targetEntity;
+    if (originWeapon)
+    {
+        weaponEntity = e.GetOriginEntity();
+        targetEntity = collision.OtherEntity;
+    }
+    else
+    {
+        weaponEntity = collision.OtherEntity;
+        targetEntity = e.GetOriginEntity();
+    }
+    auto& projectile = coordinator->GetComponent<ProjectileComponent>(weaponEntity);
+    auto& weaponComponent = coordinator->GetComponent<WeaponComponent>(projectile.WeaponOwner);
+    // Send a damage event.
+    DamageEvent damageEvent(projectile.WeaponOwner, weaponComponent, targetEntity);
+    eventCallback(damageEvent);
+
+    return true;
+}
+
+auto ProjectileSystem::OnWallCollisionEvent(WallCollisionEvent &e) -> bool
+{
+    if (entities.find(e.GetEntity()) == entities.end()) return false;
+    coordinator->GetComponent<ProjectileComponent>(e.GetEntity()).LifetimeFrames = 0;
     return true;
 }

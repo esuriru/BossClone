@@ -50,6 +50,7 @@ public:
     // TODO - Find out why this exists
     Entity tilemapEntity;
     Ref<ActiveTilemapSystem> tilemapSystem;
+    EventCallback eventCallback;
 
     static auto AddForce(RigidBody2DComponent& rigidbody, const glm::vec2& force, float deltaTime, Physics::ForceMode mode = Physics::ForceMode::Force) -> void;
 

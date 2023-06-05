@@ -20,6 +20,11 @@ public:
     auto OnEvent(Event& e) -> void;
 
     static auto MeleeBehaviour(Entity e, WeaponUseEvent& event) -> void;
+    static auto MageBehaviour(Entity e, WeaponUseEvent& event) -> void;
+
+    static auto MeleeActiveBehaviour(Entity e) -> void;
+    static auto MageActiveBehaviour(Entity e) -> void;
+
     static EventCallback eventCallback;
 
 private:
@@ -132,6 +137,8 @@ private:
 class PortalSystem : public System
 {
 public:
+    auto Update(Timestep ts) -> void;
+
     inline auto OnEvent(Event& e) -> void
     {
         EventDispatcher dispatcher(e);
@@ -140,4 +147,23 @@ public:
 
 private:
     auto OnPlayerEnterEvent(PlayerEnterEvent& e) -> bool;
+};
+
+class ProjectileSystem : public System
+{
+public:
+    auto Update(Timestep ts) -> void;
+
+    inline auto OnEvent(Event& e) -> void
+    {
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<CollisionEvent>(CC_BIND_EVENT_FUNC(ProjectileSystem::OnCollisionEvent));
+        dispatcher.Dispatch<WallCollisionEvent>(CC_BIND_EVENT_FUNC(ProjectileSystem::OnWallCollisionEvent));
+    }
+
+    EventCallback eventCallback;
+
+private:
+    auto OnCollisionEvent(CollisionEvent& e) -> bool;
+    auto OnWallCollisionEvent(WallCollisionEvent& e) -> bool;
 };

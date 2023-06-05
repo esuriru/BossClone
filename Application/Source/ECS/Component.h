@@ -62,6 +62,9 @@ struct SpriteRendererComponent
         : Colour(colour) {}
     SpriteRendererComponent(const Ref<SubTexture2D>& texture)
         : Texture(texture) {}
+    SpriteRendererComponent(const Ref<SubTexture2D>& texture, const glm::vec4& colour)
+        : Texture(texture), Colour(colour) {}
+
 };
 
 struct TileRendererComponent
@@ -117,6 +120,7 @@ struct InventoryComponent
 
     std::vector<Entity> Items;
     Entity CurrentlyHolding;
+    size_t CurrentlyHoldingIndex;
 };
 
 struct DescriptionComponent
@@ -131,11 +135,14 @@ enum class WeaponType
 };
 
 struct WeaponComponent;
-using WeaponBehaviour = void(*)(Entity, WeaponUseEvent&);
 struct WeaponComponent
 {
+    using WeaponBehaviour = void(*)(Entity, WeaponUseEvent&);
+    using WeaponActiveBehaviour = void(*)(Entity);
+
     float Damage = 0.f;
     WeaponBehaviour Behaviour;  
+    WeaponActiveBehaviour ActiveBehaviour;
 
     // For collision
     glm::vec2 GroundExtents{};
@@ -145,6 +152,7 @@ struct WeaponComponent
     bool Active = false;
     bool HiddenOnActive = true;
 
+    uint32_t CooldownFrames = 0;
 };
 
 struct OwnedByComponent
@@ -210,7 +218,7 @@ struct WeaponAffectedByPickupComponent
     WeaponAffectedByPickupComponent(WeaponPickupBehaviour wpb)
         : PickupBehaviour(wpb) {}
 
-    WeaponPickupBehaviour PickupBehaviour;    
+    WeaponPickupBehaviour PickupBehaviour = nullptr;    
 };
 
 struct ItemComponent 
@@ -275,4 +283,16 @@ struct ReferenceComponent
     ReferenceComponent() = default;
     ReferenceComponent(Entity entity) : RefEntity(entity) {}
     Entity RefEntity;
+};
+
+struct ProjectileComponent
+{
+    ProjectileComponent() = default;
+    ProjectileComponent(Entity owner, float speed) : WeaponOwner(owner), Speed(speed) {}
+
+    bool Active = false;
+    float Speed;
+    uint32_t LifetimeFrames;
+
+    Entity WeaponOwner;
 };

@@ -89,8 +89,9 @@ auto InventoryGUISystem::OnImGuiRender() -> void
             for (; i < InventorySize; ++i)
             {
                 ImGui::TableSetColumnIndex(i);
-                ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cellPaddingX);
-                Utility::ImGuiImage(emptySpriteTexture_);
+                if (i != inventory.CurrentlyHoldingIndex)
+                    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + cellPaddingX);
+                Utility::ImGuiImage(emptySpriteTexture_, (i == inventory.CurrentlyHoldingIndex) ? 1.75f : 1.5f);
             }
 
             ImGui::EndTable();

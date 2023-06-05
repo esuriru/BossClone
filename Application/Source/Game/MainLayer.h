@@ -69,6 +69,8 @@ private:
     Ref<BreakableBoxSystem> breakableBoxSystem_;
     Ref<SpikeSystem> spikeSystem_;
     Ref<HealingPotionSystem> healingPotionSystem_;
+    Ref<PortalSystem> portalSystem_;
+    Ref<ProjectileSystem> projectileSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

@@ -48,6 +48,11 @@ auto PlayerSystem::Update(Timestep ts) -> void
             auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
 
+            if (input->IsKeyDown(Key::L))
+            {
+                CC_TRACE(glm::to_string(transform.Position));
+            }
+
             rigidbody.IgnoreFriction = (DashFrames > 0 && --DashFrames != 0);
 
             if (input->IsKeyDown(Key::A))
@@ -149,6 +154,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 if (!mouseDown_)
                 {
                     WeaponUseEvent event(e, inventory.CurrentlyHolding, true, player_controller.IsFacingRight); 
+                    lastKnownHolding_ = inventory.CurrentlyHolding;
                     eventCallback(event);
                     mouseDown_ = true;
                 }
@@ -158,7 +164,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                 if (mouseDown_)
                 {
                     mouseDown_ = false;
-                    WeaponUseEvent event(e, inventory.CurrentlyHolding, false, player_controller.IsFacingRight); 
+                    WeaponUseEvent event(e, lastKnownHolding_, false, player_controller.IsFacingRight); 
                     eventCallback(event);
                 }
             }
@@ -233,7 +239,31 @@ auto PlayerSystem::OnKeyPressedEvent(KeyPressedEvent &e) -> bool
     auto& inventory = coordinator->GetComponent<InventoryComponent>(*(entities.begin()));
     size_t slot = KeyToInventorySlot(e.GetKeyCode());
     constexpr uint32_t max_slot = InventorySize - 1;
-    if (inventory.Items.empty() || slot > max_slot || slot > (inventory.Items.size() - 1)) return false;
-    inventory.CurrentlyHolding = inventory.Items.at(slot);
+    if (inventory.Items.empty() || slot > max_slot) return false;
+    if (slot > (inventory.Items.size() - 1))
+    {
+        inventory.CurrentlyHolding = 0; 
+        inventory.CurrentlyHoldingIndex = slot;
+        if (mouseDown_)
+        {
+            auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(*(entities.begin()));
+            mouseDown_ = false;
+            WeaponUseEvent event(*(entities.begin()), lastKnownHolding_, false, player_controller.IsFacingRight); 
+            eventCallback(event);
+        }
+    }
+    else
+    {
+        inventory.CurrentlyHolding = inventory.Items.at(slot);
+        inventory.CurrentlyHoldingIndex = slot;
+        if (mouseDown_ && inventory.CurrentlyHolding != lastKnownHolding_)
+        {
+            auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(*(entities.begin()));
+            mouseDown_ = false;
+            WeaponUseEvent event(*(entities.begin()), lastKnownHolding_, false, player_controller.IsFacingRight); 
+            eventCallback(event);
+        }
+    }
     return false;
 }
+

@@ -153,6 +153,20 @@ private:
     Collision2D& collision_;
 };
 
+class WallCollisionEvent : public Event
+{
+public:
+    WallCollisionEvent(Entity entity) : target_(entity) {}
+
+    NR_EVENT_CLASS_TYPE(WallCollision)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetEntity() -> Entity { return target_; };
+
+private:
+    Entity target_;
+};
+
 class DamageEvent : public Event
 {
 public:

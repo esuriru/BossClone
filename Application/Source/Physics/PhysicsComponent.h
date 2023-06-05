@@ -4,11 +4,12 @@
 #include "Core/Timestep.h"
 #include "Utils/Util.h"
 #include "ECS/Entity.h"
+#include "Physics/Collision2D.h"
 
 #include <vector>
 #include <set>
 
-struct Collision2D;
+// struct Collision2D;
 
 namespace Physics
 {
@@ -82,9 +83,11 @@ struct BoxCollider2DComponent
     BoxCollider2DComponent() = default;
 };
 
+
 struct PhysicsQuadtreeComponent
 {
     PhysicsQuadtreeComponent() = default;
+    PhysicsQuadtreeComponent(bool active) : Active(active) {}
 
     bool Active = true;
 

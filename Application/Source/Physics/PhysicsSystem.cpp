@@ -234,8 +234,8 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                     {
                         proposedPositionX = leftTileX + box_collider.Extents.x - box_collider.Offset.x;
                     }
+                    resolved = true;
                     rigidbody.LinearVelocity.x = glm::max(rigidbody.LinearVelocity.x, 0.f);
-                    CC_TRACE("Left");
                 }
             }
             else
@@ -247,11 +247,11 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 {
                     if (tilemapRightCollisionDetectionResult)
                     {
-                        CC_TRACE("Right");
                         if ((position_vec2.x + box_collider.Extents.x + box_collider.Offset.x) <= rightTileX)
                         {
                             proposedPositionX = rightTileX - box_collider.Extents.x - box_collider.Offset.x;
                         }
+                        resolved = true;
                         rigidbody.LinearVelocity.x = glm::min(rigidbody.LinearVelocity.x, 0.f);
 
                     }
@@ -269,6 +269,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             {
                 if (tilemapCeilingCollisionDetectionResult)
                 {
+                    resolved = true;
                     proposedPositionY = ceilingLevel - box_collider.Extents.y - box_collider.Offset.y - 1.0f;
                     rigidbody.LinearVelocity.y = 0.f;
                     onGroundBitset.set(e, false);
@@ -295,6 +296,11 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 onPlatformBitset.set(e, false);
             }
 
+            if (resolved)
+            {
+                WallCollisionEvent event(e);
+                eventCallback(event);
+            }
 
             transform.Position = glm::vec3(proposedPositionX, proposedPositionY, 0);
         }

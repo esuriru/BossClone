@@ -35,4 +35,5 @@ private:
     bool mouseDown_ = false;
     uint32_t dashCooldownFrames_ = 50;
     uint32_t currentDashCooldown_ = 0;
+    Entity lastKnownHolding_;
 };

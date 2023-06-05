@@ -5,6 +5,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
+#include <type_traits>
+
 #include "Physics/PhysicsComponent.h"
 
 #include "Utils/Input.h"
@@ -59,6 +61,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<HealthPotionComponent>();
     coordinator->RegisterComponent<PortalComponent>();
     coordinator->RegisterComponent<ReferenceComponent>();
+    coordinator->RegisterComponent<ProjectileComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -86,9 +89,12 @@ MainLayer::MainLayer()
     breakableBoxSystem_               = coordinator->RegisterSystem<BreakableBoxSystem>();
     spikeSystem_                      = coordinator->RegisterSystem<SpikeSystem>();
     healingPotionSystem_              = coordinator->RegisterSystem<HealingPotionSystem>();
+    portalSystem_                     = coordinator->RegisterSystem<PortalSystem>();
+    projectileSystem_                 = coordinator->RegisterSystem<ProjectileSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
+    physicsSystem_->eventCallback = 
     physicsSystem_->tilemapSystem->eventCallback =
     runningAnimationSystem_->eventCallback = 
     weaponSystem_->eventCallback =
@@ -96,6 +102,7 @@ MainLayer::MainLayer()
     weaponAffectedByAnimationSystem_->eventCallback =
     playerAffectedByAnimationSystem_->eventCallback =
     healingPotionSystem_->eventCallback =
+    projectileSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
 #pragma endregion
@@ -206,6 +213,14 @@ MainLayer::MainLayer()
     healingPotionSystemSignature.set(coordinator->GetComponentType<HealthPotionComponent>());
     healingPotionSystemSignature.set(coordinator->GetComponentType<OwnedByComponent>());
     coordinator->SetSystemSignature<HealingPotionSystem>(healingPotionSystemSignature);
+
+    Signature portalSystemSignature;
+    portalSystemSignature.set(coordinator->GetComponentType<PortalComponent>());
+    coordinator->SetSystemSignature<PortalSystem>(portalSystemSignature);
+
+    Signature projectileSystemSignature;
+    projectileSystemSignature.set(coordinator->GetComponentType<ProjectileComponent>());
+    coordinator->SetSystemSignature<ProjectileSystem>(projectileSystemSignature);
 
 #pragma endregion
 #pragma region TILEMAP_SETUP
@@ -370,6 +385,13 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, swingingAnimationComponent);
 #pragma endregion
 
+#pragma region MAGE_WEAPON_SETUP
+    
+
+
+
+#pragma endregion
+
 #pragma region MELEE_WEAPON_SETUP
     // auto WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour = 
     //     [](Entity weaponEntity, AnimationSpriteChangeEvent& ascEvent,
@@ -393,6 +415,7 @@ MainLayer::MainLayer()
 
     WeaponComponent woodenSwordMeleeWeaponComponent;
     woodenSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+    woodenSwordMeleeWeaponComponent.ActiveBehaviour = WeaponSystem::MeleeActiveBehaviour;
     woodenSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
     woodenSwordMeleeWeaponComponent.Damage = 5.0f;
     woodenSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
@@ -429,6 +452,7 @@ MainLayer::MainLayer()
 
         WeaponComponent ironSwordMeleeWeaponComponent;
         ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
+        ironSwordMeleeWeaponComponent.ActiveBehaviour = WeaponSystem::MeleeActiveBehaviour;
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
         ironSwordMeleeWeaponComponent.Damage = 20.0f;
         ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
@@ -453,6 +477,7 @@ MainLayer::MainLayer()
 #pragma region INVENTORY_INIT
     auto inventoryComponent = InventoryComponent();
     inventoryComponent.Items.emplace_back(woodenSwordWeaponEntity);
+    // inventoryComponent.Items.emplace_back(starterWandEntity);
     inventoryComponent.CurrentlyHolding = woodenSwordWeaponEntity;
 
     coordinator->AddComponent(playerEntity, inventoryComponent);
@@ -520,41 +545,44 @@ MainLayer::MainLayer()
     auto testPhysicsEntityCollider = BoxCollider2DComponent();
     testPhysicsEntityCollider.Extents = glm::vec2(10, 10);
     coordinator->AddComponent(testPhysicsEntity, testPhysicsEntityCollider); 
-    coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(testPhysicsEntity, RigidBody2DComponent(Physics::RigidBodyType::Dynamic));
     coordinator->AddComponent(testPhysicsEntity, PhysicsQuadtreeComponent());
     coordinator->AddComponent(testPhysicsEntity, HealthComponent(20, 20, [](Entity e)
     {
         auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
         coordinator->DestroyEntity(e);
-        auto ironSwordWeaponEntity = coordinator->CreateEntity();
+        auto starterWandEntity = coordinator->CreateEntity();
+        auto wandSparkEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(wandSparkEntity, TransformComponent({}, {}, {6, 2, 1}));
+        coordinator->AddComponent(wandSparkEntity, SpriteRendererComponent(Utility::Colour32BitConvert({255.f, 252.f, 127.f, 0.f})));
+        coordinator->AddComponent(wandSparkEntity, RigidBody2DComponent(Physics::RigidBodyType::Kinematic));
+        coordinator->AddComponent(wandSparkEntity, PhysicsQuadtreeComponent(false));
+        coordinator->AddComponent(wandSparkEntity, BoxCollider2DComponent({}, {3, 1}));
+        coordinator->AddComponent(wandSparkEntity, ProjectileComponent(starterWandEntity, 150.0f));
 
-        WeaponComponent ironSwordMeleeWeaponComponent;
-        ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
-        ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
-        ironSwordMeleeWeaponComponent.Damage = 50.0f;
-        ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
-        ironSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
+        WeaponComponent starterWandWeaponComponent;
+        starterWandWeaponComponent.Behaviour = WeaponSystem::MageBehaviour;
+        starterWandWeaponComponent.ActiveBehaviour = WeaponSystem::MageActiveBehaviour;
+        starterWandWeaponComponent.HandOffset = { 12, -2 };
+        starterWandWeaponComponent.Damage = 5.0f;
 
-        CC_TRACE("Iron sword entity no: ", ironSwordWeaponEntity);
-        constexpr glm::vec2 offset = {0, 6.0f};
-        coordinator->AddComponent(ironSwordWeaponEntity, ironSwordMeleeWeaponComponent);
-        coordinator->AddComponent(ironSwordWeaponEntity, TransformComponent(glm::vec3(glm::vec2(positionOfDestroyedEntity) + offset, -0.5f),
+        coordinator->AddComponent(starterWandEntity, ReferenceComponent(wandSparkEntity));
+        coordinator->AddComponent(starterWandEntity, PhysicsQuadtreeComponent()); 
+        coordinator->AddComponent(starterWandEntity, BoxCollider2DComponent({}, {10, 10})); 
+        coordinator->AddComponent(starterWandEntity, WeaponComponent(starterWandWeaponComponent));
+        coordinator->AddComponent(starterWandEntity, TransformComponent(glm::vec3(0.f, 0, 0),
             glm::vec3(0), glm::vec3(32, 32, 1)));
-        coordinator->AddComponent(ironSwordWeaponEntity, ItemComponent(
-            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {1, 5}, {32, 32})));
-        coordinator->AddComponent(ironSwordWeaponEntity, SpriteRendererComponent(
-            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {1, 21}, {32, 32})));
-        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByAnimationComponent(WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour));
-
+        // coordinator->AddComponent(starterWandEntity, OwnedByComponent(playerEntity));
+        coordinator->AddComponent(starterWandEntity, ItemComponent(
+            SubTexture2D::CreateFromCoords(InventoryGUISystem::ItemSpritesheet, {8, 6}, {32, 32})
+        ));
+        coordinator->AddComponent(starterWandEntity, SpriteRendererComponent(
+            SubTexture2D::CreateFromCoords(TransparentItemSpritesheet, {8, 20}, {32, 32})));
         auto rigidbody = RigidBody2DComponent();
         rigidbody.LinearVelocity.y = 40.0f;
-        coordinator->AddComponent(ironSwordWeaponEntity, rigidbody); 
-        coordinator->AddComponent(ironSwordWeaponEntity, BoxCollider2DComponent({}, {10.f, 10.f})); 
-        auto physics_quadtree_component = PhysicsQuadtreeComponent();
-        physics_quadtree_component.Active = true;
-        coordinator->AddComponent(ironSwordWeaponEntity, physics_quadtree_component); 
-        coordinator->AddComponent(ironSwordWeaponEntity, PickupComponent()); 
-        coordinator->AddComponent(ironSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
+        coordinator->AddComponent(starterWandEntity, rigidbody); 
+        coordinator->AddComponent(starterWandEntity, PickupComponent()); 
+        coordinator->AddComponent(starterWandEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
     },
     [](Entity e)
     {
@@ -567,6 +595,20 @@ MainLayer::MainLayer()
         sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
     }));
     coordinator->AddComponent(testPhysicsEntity, BreakableComponent(5));
+
+    auto portalEntity = coordinator->CreateEntity();
+    coordinator->AddComponent(portalEntity, TransformComponent(glm::vec3(29.5f, 130.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
+    coordinator->AddComponent(portalEntity, SpriteRendererComponent(
+        CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
+    coordinator->AddComponent(portalEntity, PortalComponent([](Entity e, PlayerEnterEvent& event)
+    {
+        auto& player_transform = coordinator->GetComponent<TransformComponent>(event.GetPlayerEntity());
+        player_transform.Position.x = -1000;
+        player_transform.Position.y = 480;
+    }));
+    coordinator->AddComponent(portalEntity, BoxCollider2DComponent({}, {15, 15}));
+    coordinator->AddComponent(portalEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(portalEntity, PhysicsQuadtreeComponent());
 
     auto healthPotionBoxCave = coordinator->CreateEntity();
     coordinator->AddComponent(healthPotionBoxCave, TransformComponent(glm::vec3(-520, 202, 0),
@@ -701,6 +743,22 @@ MainLayer::MainLayer()
         physics_quadtree_component.Active = true;
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
     }
+
+    for (int i = 0; i < 20; ++i)
+    {
+        auto spikeEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
+        auto spikeRigidbody = RigidBody2DComponent();
+        spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-780 + i * 16, 442, -0.5f),
+            glm::vec3(0), glm::vec3(16, 16, 1)));
+        coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
+        coordinator->AddComponent(spikeEntity, spikeRigidbody); 
+        coordinator->AddComponent(spikeEntity, BoxCollider2DComponent({0, -4.f}, {8.f, 3.f})); 
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        physics_quadtree_component.Active = true;
+        coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
+    }
 #pragma endregion
 #pragma endregion
 }
@@ -723,6 +781,8 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     damageableSystem_->Update(ts);
     physicsSystem_->Update(ts);
     playerSystem_->Update(ts);
+    portalSystem_->Update(ts);
+    projectileSystem_->Update(ts);
     cameraController_.GetCamera().SetPosition(
         smoothCameraFollowSystem_->GetCalculatedPosition(ts));
 
@@ -747,26 +807,28 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 
 auto MainLayer::OnEvent(Event &e) -> void 
 {
-#define OEB(x, y) std::bind(&x::OnEvent, y, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 14> on_events {
-        OEB(PhysicsSystem, physicsSystem_),
-        OEB(WeaponSystem, weaponSystem_),
-        OEB(HealingPotionSystem, healingPotionSystem_),
+#define OEB(x) std::bind(&std::remove_reference<decltype(*(x))>::type::OnEvent, x, std::placeholders::_1)
+    static const std::array<std::function<void(Event&)>, 16> on_events {
+        OEB(physicsSystem_),
+        OEB(projectileSystem_),
+        OEB(weaponSystem_),
+        OEB(healingPotionSystem_),
 
-        OEB(OrthographicCameraController, &cameraController_),
+        OEB(&cameraController_),
 
-        OEB(BreakableBoxSystem, breakableBoxSystem_),
-        OEB(DamageableSystem, damageableSystem_),
+        OEB(breakableBoxSystem_),
+        OEB(damageableSystem_),
 
-        OEB(PlayerSystem, playerSystem_),
-        OEB(PickupItemSystem, pickupSystem_),
-        OEB(SpikeSystem, spikeSystem_),
-        OEB(WeaponAffectedByPickupSystem, weaponAffectedByPickupSystem_),
+        OEB(playerSystem_),
+        OEB(pickupSystem_),
+        OEB(spikeSystem_),
+        OEB(portalSystem_),
+        OEB(weaponAffectedByPickupSystem_),
 
-        OEB(RunningAnimationSystem, runningAnimationSystem_),
-        OEB(SwingingAnimationSystem, swingingAnimationSystem_),
-        OEB(PlayerAffectedByAnimationSystem, playerAffectedByAnimationSystem_),
-        OEB(WeaponAffectedByAnimationSystem, weaponAffectedByAnimationSystem_)
+        OEB(runningAnimationSystem_),
+        OEB(swingingAnimationSystem_),
+        OEB(playerAffectedByAnimationSystem_),
+        OEB(weaponAffectedByAnimationSystem_)
     };
 #undef OEB 
 
