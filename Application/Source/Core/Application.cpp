@@ -7,6 +7,7 @@
 #include "ECS/Coordinator.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/Renderer2D.h"
+#include "Game/GameManager.h"
 
 #include "Scene/SceneManager.h"
 #include <chrono>
@@ -15,6 +16,7 @@
 #include "Layer.h"
 #include "Events/EventDispatcher.h"
 #include "Scene/Scene.h"
+#include "Game/MenuLayer.h"
 
 #include "ImGui/ImGuiLayer.h"
 
@@ -40,6 +42,8 @@ auto Application::OnEvent(Event& e) -> void
 	dispatcher.Dispatch<KeyPressedEvent>(CC_BIND_EVENT_FUNC(Application::OnKeyPress));
 	dispatcher.Dispatch<KeyReleasedEvent>(CC_BIND_EVENT_FUNC(Application::OnKeyRelease));
 
+	dispatcher.Dispatch<GameStateChangeEvent>(CC_BIND_EVENT_FUNC(Application::OnGameStateChange));
+
 	for (auto it = layerStack_.end(); it != layerStack_.begin();)
 	{
 		if (e.Handled)
@@ -56,16 +60,47 @@ auto Application::PerformRunCycle() -> void
 		const Timestep deltaTime = Timestep(static_cast<float>(timer_.getElapsedTime()));
 
 		for (const auto& layer : layerStack_)
+        {
 			layer->OnUpdate(deltaTime);
+        }
 
         imGuiLayer_->Begin();
         for (const auto& layer : layerStack_)
+        {
             layer->OnImGuiRender();
+        }
         imGuiLayer_->End(); 
 	}
-
+    if (changingToPlay_)
+    {
+        changingToPlay_ = false;
+        layerStack_.PopLayer(menuLayer_);
+        PushLayer(mainLayer_);
+    }
+    if (changingToMenu_)
+    {
+        changingToMenu_ = false;
+        layerStack_.PopLayer(mainLayer_);
+        PushLayer(menuLayer_);
+    }
 	input->PostUpdateKeys();
 	window_->OnUpdate();
+}
+
+auto Application::OnGameStateChange(GameStateChangeEvent &e) -> bool
+{
+    switch (e.GetNewState())
+    {
+    case GameState::PlayingLevel: 
+        changingToPlay_ = true;
+        break;
+    case GameState::MenuLevel:
+        changingToMenu_ = true;
+        break;
+    default:
+        break;
+    }
+    return true;
 }
 
 auto Application::OnWindowClose(WindowCloseEvent& e) -> bool 
@@ -182,10 +217,15 @@ Application::Application()
     RenderCommand::Init();
     Renderer2D::Init();
 
-    PushLayer(new MainLayer());
+    mainLayer_ = new MainLayer();
+    menuLayer_ = new MenuLayer();
+
+    PushLayer(menuLayer_);
 
     imGuiLayer_ = new ImGuiLayer();
     PushOverlay(imGuiLayer_);
+
+    GameManager::Instance()->SetEventCallback(CC_BIND_EVENT_FUNC(Application::OnEvent));
 
 	running_ = true;
 }

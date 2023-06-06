@@ -2,7 +2,7 @@
 #include "Layer.h"
 
 LayerStack::LayerStack()
-	: layerIterator_(layers_.begin())
+	: layerInsertIndex_(0)
 {
 }
 
@@ -14,7 +14,8 @@ LayerStack::~LayerStack()
 
 void LayerStack::PushLayer(Layer* layer)
 {
-	layerIterator_ = layers_.emplace(layerIterator_, layer);
+	layers_.emplace(layers_.begin() + layerInsertIndex_, layer);
+    layerInsertIndex_++;
 	layer->OnAttach();
 }
 
@@ -30,10 +31,10 @@ void LayerStack::PopLayer(Layer* layer)
 	auto it = std::find(layers_.begin(), layers_.end(), layer);
 	if (it != layers_.end())
 	{
+        layer->OnDetach();
 		layers_.erase(it);
-		--layerIterator_;
+        layerInsertIndex_--;
 	}
-	layer->OnDetach();
 }
 
 void LayerStack::PopOverlay(Layer* overlay)

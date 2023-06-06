@@ -27,6 +27,8 @@ public:
     auto OnImGuiRender() -> void override;
 
 private:
+    float timer_ = 0.f;
+
     OrthographicCameraController cameraController_;
 
     Ref<Texture2D> nareLogoTexture_;

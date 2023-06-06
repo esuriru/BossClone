@@ -42,6 +42,8 @@ public:
 
 #pragma region EVENTS
 
+    auto OnGameStateChange(GameStateChangeEvent& e) -> bool;
+
 	// Window Events
 
 	bool OnWindowClose(WindowCloseEvent& e);
@@ -93,6 +95,11 @@ private:
 	std::shared_ptr<Window> window_;
 
     ImGuiLayer* imGuiLayer_;
+    Layer* mainLayer_;
+    Layer* menuLayer_;
+
+    bool changingToPlay_ = false;
+    bool changingToMenu_ = false;
 };
 
 #endif

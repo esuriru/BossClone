@@ -5,6 +5,14 @@
 #include "Renderer/SubTexture2D.h"
 #include "Renderer/Texture.h"
 
+namespace Utility
+{
+    auto ImGuiImage(const Ref<Texture2D>& icon, float imageSizeMultiplier = 1.5f) -> void;
+    auto ImGuiImage(const Ref<Texture2D>& icon, float width, float height) -> void;
+    auto ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier = 1.5f) -> void;
+}
+
+
 // NOTE - This system is literally just to get the player entity for the inventory GUI to get the inventory component
 class InventoryGUIHelperSystem : public System {};
 

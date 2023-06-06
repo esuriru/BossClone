@@ -5,7 +5,7 @@
 #include <array>
 
 using Entity = uint32_t;
-constexpr Entity MaxEntities = 10000;
+constexpr Entity MaxEntities = 100;
 
 using ComponentType = uint8_t;
 constexpr ComponentType MaxComponents = 32;

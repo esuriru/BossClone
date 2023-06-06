@@ -8,9 +8,22 @@ void Coordinator::Init()
     systemManager_ = std::make_unique<SystemManager>();
 }
 
+void Coordinator::Clear()
+{
+    for (auto& e : entities_)
+    {
+        entityManager_->DestroyEntity(e);
+        componentManager_->EntityDestroyed(e);
+        systemManager_->EntityDestroyed(e);
+    }
+    entities_.clear();
+}
+
 Entity Coordinator::CreateEntity()
 {
-    return entityManager_->CreateEntity();
+    Entity newEntity = entityManager_->CreateEntity();
+    entities_.insert(newEntity);
+    return newEntity;
 }
 
 void Coordinator::DestroyEntity(Entity entity)
@@ -24,5 +37,5 @@ void Coordinator::DestroyEntity(Entity entity)
     entityManager_->DestroyEntity(entity);
     componentManager_->EntityDestroyed(entity);
     systemManager_->EntityDestroyed(entity);
-
+    entities_.erase(entity);
 }

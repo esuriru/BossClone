@@ -139,10 +139,12 @@ struct WeaponComponent
 {
     using WeaponBehaviour = void(*)(Entity, WeaponUseEvent&);
     using WeaponActiveBehaviour = void(*)(Entity);
+    using WeaponReadyToDamage = bool(*)(WeaponComponent&);
 
     float Damage = 0.f;
     WeaponBehaviour Behaviour;  
     WeaponActiveBehaviour ActiveBehaviour;
+    WeaponReadyToDamage DamageCondition = nullptr;
 
     // For collision
     glm::vec2 GroundExtents{};

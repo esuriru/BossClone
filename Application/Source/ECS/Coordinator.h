@@ -1,6 +1,7 @@
 #pragma once
 
 #include <bitset>
+#include <set>
 #include "ComponentManager.h"
 #include "SystemManager.h"
 #include "Entity.h"
@@ -13,6 +14,7 @@ class Coordinator : public Utility::Singleton<Coordinator>
 {
 public:
     void Init();
+    void Clear();
 
     Entity CreateEntity();
 
@@ -86,6 +88,7 @@ public:
 
 #pragma endregion TEMPLATE_FUNCTIONS
 private:
+    std::set<Entity> entities_;
     std::unique_ptr<EntityManager> entityManager_;
     std::unique_ptr<ComponentManager> componentManager_;
     std::unique_ptr<SystemManager> systemManager_;

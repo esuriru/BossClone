@@ -24,6 +24,8 @@ public:
 
     static auto MeleeActiveBehaviour(Entity e) -> void;
     static auto MageActiveBehaviour(Entity e) -> void;
+    
+    static auto MeleeDamageCondition(WeaponComponent& wc) -> bool;
 
     static EventCallback eventCallback;
 
@@ -85,6 +87,7 @@ public:
         dispatcher.Dispatch<PickupEvent>(CC_BIND_EVENT_FUNC(WeaponAffectedByPickupSystem::OnPickupEvent));
     }
     static auto DefaultMeleePickupBehaviour(Entity e, PickupEvent& event) -> void; 
+    static auto DefaultMagePickupBehaviour(Entity e, PickupEvent& event) -> void; 
 
 private:
     auto OnPickupEvent(PickupEvent& e) -> bool;

@@ -32,6 +32,7 @@ set(Header_Files
     "Source/Renderer/OrthographicCamera.h"
 
     "Source/Game/MainLayer.h"
+    "Source/Game/MenuLayer.h"
     "Source/Game/OrthographicCameraController.h"
     "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
@@ -90,6 +91,7 @@ set(Source_Files
     "Source/Scene/SceneManager.cpp"
     "Source/Scene/Scene.cpp"
 
+    "Source/Game/MenuLayer.cpp"
     "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
     "Source/Game/Tilemap.cpp"

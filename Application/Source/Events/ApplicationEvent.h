@@ -9,6 +9,7 @@
 #include "ECS/Component.h"
 
 #include "Physics/Collision2D.h"
+#include "Game/GameManager.h"
 
 class WindowResizeEvent : public Event
 {
@@ -274,4 +275,19 @@ private:
     Entity potionEntity_, targetEntity_;
     HealthPotionComponent& healthPotionComponent_;
 
+};
+
+class GameStateChangeEvent : public Event 
+{
+public:
+    GameStateChangeEvent(GameState oldState, GameState newState) : oldState_(oldState), newState_(newState) {}
+
+    NR_EVENT_CLASS_TYPE(GameStateChange)
+    NR_EVENT_CLASS_CATEGORY(EventCategoryApplication)
+
+    inline auto GetOldState() -> GameState { return oldState_; } 
+    inline auto GetNewState() -> GameState { return newState_; } 
+
+private:
+    GameState oldState_, newState_;
 };

@@ -13,33 +13,6 @@
 Ref<Texture2D> InventoryGUISystem::ItemSpritesheet;
 static Coordinator* coordinator = Coordinator::Instance();
 
-namespace Utility
-{
-    auto ImGuiImage(const Ref<Texture2D>& icon, float imageSizeMultiplier = 1.5f) -> void
-    {
-        ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
-            ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
-                imageSizeMultiplier * static_cast<float>(icon->GetHeight()))
-        );
-    }
-
-    auto ImGuiImage(const Ref<Texture2D>& icon, float width, float height) -> void
-    {
-        ImGui::Image(reinterpret_cast<ImTextureID>(
-            static_cast<intptr_t>(icon->GetRendererID())), ImVec2(width, height));
-    }
-
-    auto ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier = 1.5f) -> void
-    {
-        ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
-            ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
-                imageSizeMultiplier * static_cast<float>(icon->GetHeight())),
-            ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
-            ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
-        );
-    }
-}
-
 
 InventoryGUISystem::InventoryGUISystem()
 {
@@ -137,4 +110,28 @@ auto PlayerHealthGUISystem::OnImGuiRender() -> void
         Utility::ImGuiImage(percentage <= 0.5f ? emptyHealthBar_ : fullHealthBar_, HealthBarSizeMultiplier);
 
     ImGui::End();
+}
+
+auto Utility::ImGuiImage(const Ref<Texture2D> &icon, float width, float height) -> void
+{
+    ImGui::Image(reinterpret_cast<ImTextureID>(
+        static_cast<intptr_t>(icon->GetRendererID())), ImVec2(width, height));
+}
+
+auto Utility::ImGuiImage(const Ref<Texture2D> &icon, float imageSizeMultiplier) -> void
+{
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID())),
+        ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
+            imageSizeMultiplier * static_cast<float>(icon->GetHeight()))
+    );
+}
+
+auto Utility::ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier) -> void
+{
+    ImGui::Image(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID())),
+        ImVec2(imageSizeMultiplier * static_cast<float>(icon->GetWidth()),
+            imageSizeMultiplier * static_cast<float>(icon->GetHeight())),
+        ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
+        ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
+    );
 }

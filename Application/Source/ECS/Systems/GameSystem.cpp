@@ -116,6 +116,11 @@ auto WeaponSystem::MageActiveBehaviour(Entity e) -> void
     }
 }
 
+auto WeaponSystem::MeleeDamageCondition(WeaponComponent &wc) -> bool
+{
+    return wc.Active;
+}
+
 auto WeaponSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool 
 {
     Entity weaponEntity = e.GetWeapon();
@@ -352,6 +357,12 @@ auto WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour(Entity e, PickupE
     box_collider.Extents = weapon_component.EquippedExtents;
 }
 
+auto WeaponAffectedByPickupSystem::DefaultMagePickupBehaviour(Entity e, PickupEvent &event) -> void
+{
+    auto& physics = coordinator->GetComponent<PhysicsQuadtreeComponent>(e);
+    physics.Active = false;
+}
+
 auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
 {
     Entity weaponEntity = e.GetTargetEntity();
@@ -370,8 +381,18 @@ auto WeaponAffectedByPickupSystem::OnPickupEvent(PickupEvent &e) -> bool
 auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
 {
     Entity target = e.GetTargetEntity();
-    if (entities.find(target) == entities.end() || !e.GetWeaponComponent().Active ||
-        coordinator->GetComponent<OwnedByComponent>(e.GetWeaponEntity()).Owner == target) return false;
+    if (entities.find(target) == entities.end())
+    {
+        return false;
+    }
+    if (e.GetWeaponComponent().DamageCondition && !e.GetWeaponComponent().DamageCondition(e.GetWeaponComponent()))
+    {
+        return false;
+    }
+    if (coordinator->GetComponent<OwnedByComponent>(e.GetWeaponEntity()).Owner == target)
+    {
+        return false;
+    }
 
     auto& breakable = coordinator->GetComponent<BreakableComponent>(target);
 
@@ -392,11 +413,11 @@ auto BreakableBoxSystem::OnDamageEvent(DamageEvent &e) -> bool
 #if _DEBUG
     auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(target);
     // physics_quadtree.Active = false;
+#endif
     if (health.Health <= 0)
     {
         breakable.OnBreakBehaviour(target);
     }
-#endif
     // NOTE - DO NOT HAVE ANYTHING AFTER THIS CAUSE THERE IS A POSSIBILITY THAT THIS ENTITY IS DESTROYED.
 
     return true;

@@ -5,6 +5,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
+#include "GameManager.h"
+
 #include <type_traits>
 
 #include "Physics/PhysicsComponent.h"
@@ -16,6 +18,7 @@
 
 #include "imgui.h"
 
+static Coordinator* coordinator = Coordinator::Instance();
 Ref<Texture2D> MainLayer::TransparentItemSpritesheet;
 MainLayer::MainLayer()
     : Layer("Main")
@@ -29,7 +32,6 @@ MainLayer::MainLayer()
     brownBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
     spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
 
-    static Coordinator* coordinator = Coordinator::Instance();
     coordinator->Init();
     coordinator->SetEventCallback(CC_BIND_EVENT_FUNC(MainLayer::OnEvent));
 
@@ -223,6 +225,11 @@ MainLayer::MainLayer()
     coordinator->SetSystemSignature<ProjectileSystem>(projectileSystemSignature);
 
 #pragma endregion
+}
+
+auto MainLayer::OnAttach() -> void 
+{
+    timer_ = 0;
 #pragma region TILEMAP_SETUP
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
@@ -304,7 +311,7 @@ MainLayer::MainLayer()
     auto playerEntity = coordinator->CreateEntity();
 
     coordinator->AddComponent(playerEntity, TransformComponent{
-        glm::vec3(), 
+        glm::vec3(48, -3, 0), 
         glm::vec3(), 
         glm::vec3(32, 32, 1), 
     });
@@ -420,6 +427,7 @@ MainLayer::MainLayer()
     woodenSwordMeleeWeaponComponent.Damage = 5.0f;
     woodenSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
     woodenSwordMeleeWeaponComponent.EquippedExtents = { 4, 9 };
+    woodenSwordMeleeWeaponComponent.DamageCondition = WeaponSystem::MeleeDamageCondition;
     coordinator->AddComponent(woodenSwordWeaponEntity, woodenSwordMeleeWeaponComponent);
     coordinator->AddComponent(woodenSwordWeaponEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
     coordinator->AddComponent(woodenSwordWeaponEntity, TransformComponent(glm::vec3(0.f, 0, 0),
@@ -453,6 +461,7 @@ MainLayer::MainLayer()
         WeaponComponent ironSwordMeleeWeaponComponent;
         ironSwordMeleeWeaponComponent.Behaviour = WeaponSystem::MeleeBehaviour;
         ironSwordMeleeWeaponComponent.ActiveBehaviour = WeaponSystem::MeleeActiveBehaviour;
+        ironSwordMeleeWeaponComponent.DamageCondition = WeaponSystem::MeleeDamageCondition;
         ironSwordMeleeWeaponComponent.HandOffset = { 12, -2 };
         ironSwordMeleeWeaponComponent.Damage = 20.0f;
         ironSwordMeleeWeaponComponent.GroundExtents = { 10, 10 };
@@ -487,7 +496,10 @@ MainLayer::MainLayer()
     coordinator->AddComponent(playerEntity, HealthComponent(100, 60,
     [](Entity e)
     {
-        CC_TRACE("Player died.");
+        auto& health = coordinator->GetComponent<HealthComponent>(e);
+        health.Health = health.MaxHealth;
+        auto& transform = coordinator->GetComponent<TransformComponent>(e);
+        transform.Position = glm::vec3(48, -3, 0);
     },
     [](Entity e)
     {
@@ -507,7 +519,7 @@ MainLayer::MainLayer()
        glm::vec3(0), glm::vec3(32, 32, 1)));
     coordinator->AddComponent(blockingEntity, SpriteRendererComponent(
         SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png"), glm::vec2(6.5f, 2), glm::vec2(32, 32)))); 
-    coordinator->AddComponent(blockingEntity, BoxCollider2DComponent({0, 0}, {32, 32})); 
+    coordinator->AddComponent(blockingEntity, BoxCollider2DComponent({0, 0}, {16, 16})); 
     coordinator->AddComponent(blockingEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(blockingEntity, PhysicsQuadtreeComponent());
     coordinator->AddComponent(blockingEntity, ReferenceComponent(tilemapEntity));
@@ -535,6 +547,82 @@ MainLayer::MainLayer()
         sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
     }));
     coordinator->AddComponent(blockingEntity, BreakableComponent(20.0f));
+
+    auto blockingEntity2 = coordinator->CreateEntity(); 
+    coordinator->AddComponent(blockingEntity2, TransformComponent(glm::vec3(-656, 633, 0),
+       glm::vec3(0), glm::vec3(48, 48, 1)));
+    coordinator->AddComponent(blockingEntity2, SpriteRendererComponent(
+        SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png"), glm::vec2(6.5f, 2), glm::vec2(32, 32)))); 
+    coordinator->AddComponent(blockingEntity2, BoxCollider2DComponent({0, 0}, {28, 28})); 
+    coordinator->AddComponent(blockingEntity2, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(blockingEntity2, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(blockingEntity2, ReferenceComponent(tilemapEntity));
+    coordinator->AddComponent(blockingEntity2, HealthComponent(25, 20, [](Entity e)
+    {
+        auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
+
+        tilemap.MapData[43][22].Type = Tile::TileType::Empty;
+        tilemap.MapData[44][22].Type = Tile::TileType::Empty;
+        tilemap.MapData[45][22].Type = Tile::TileType::Empty;
+        tilemap.MapData[43][23].Type = Tile::TileType::Empty;
+        tilemap.MapData[44][23].Type = Tile::TileType::Empty;
+        tilemap.MapData[45][23].Type = Tile::TileType::Empty;
+        tilemap.MapData[43][24].Type = Tile::TileType::Empty;
+        tilemap.MapData[44][24].Type = Tile::TileType::Empty;
+        tilemap.MapData[45][24].Type = Tile::TileType::Empty;
+
+        coordinator->DestroyEntity(e);
+         
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }));
+    coordinator->AddComponent(blockingEntity2, BreakableComponent(3.0f));
+
+    auto blockingEntity3 = coordinator->CreateEntity(); 
+    coordinator->AddComponent(blockingEntity3, TransformComponent(glm::vec3(-464, 697, 0),
+       glm::vec3(0), glm::vec3(48, 48, 1)));
+    coordinator->AddComponent(blockingEntity3, SpriteRendererComponent(
+        SubTexture2D::CreateFromCoords(CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png"), glm::vec2(6.5f, 2), glm::vec2(32, 32)))); 
+    coordinator->AddComponent(blockingEntity3, BoxCollider2DComponent({0, 0}, {28, 28})); 
+    coordinator->AddComponent(blockingEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(blockingEntity3, PhysicsQuadtreeComponent());
+    coordinator->AddComponent(blockingEntity3, ReferenceComponent(tilemapEntity));
+    coordinator->AddComponent(blockingEntity3, HealthComponent(25, 20, [](Entity e)
+    {
+        auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
+
+        tilemap.MapData[47][34].Type = Tile::TileType::Empty;
+        tilemap.MapData[48][34].Type = Tile::TileType::Empty;
+        tilemap.MapData[49][34].Type = Tile::TileType::Empty;
+        tilemap.MapData[47][35].Type = Tile::TileType::Empty;
+        tilemap.MapData[48][35].Type = Tile::TileType::Empty;
+        tilemap.MapData[49][35].Type = Tile::TileType::Empty;
+        tilemap.MapData[47][36].Type = Tile::TileType::Empty;
+        tilemap.MapData[48][36].Type = Tile::TileType::Empty;
+        tilemap.MapData[49][36].Type = Tile::TileType::Empty;
+
+        coordinator->DestroyEntity(e);
+         
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+    },
+    [](Entity e)
+    {
+        auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+        sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+    }));
+    coordinator->AddComponent(blockingEntity3, BreakableComponent(3.0f));
 
     auto testPhysicsEntity = coordinator->CreateEntity();
     coordinator->AddComponent(testPhysicsEntity, TransformComponent(glm::vec3(-10, 0, 0),
@@ -603,12 +691,38 @@ MainLayer::MainLayer()
     coordinator->AddComponent(portalEntity, PortalComponent([](Entity e, PlayerEnterEvent& event)
     {
         auto& player_transform = coordinator->GetComponent<TransformComponent>(event.GetPlayerEntity());
-        player_transform.Position.x = -1000;
-        player_transform.Position.y = 480;
+        player_transform.Position.x = -960;
+        player_transform.Position.y = 460;
     }));
-    coordinator->AddComponent(portalEntity, BoxCollider2DComponent({}, {15, 15}));
+    coordinator->AddComponent(portalEntity, BoxCollider2DComponent({}, {8, 8}));
     coordinator->AddComponent(portalEntity, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(portalEntity, PhysicsQuadtreeComponent());
+
+    auto portalEntity2 = coordinator->CreateEntity();
+    coordinator->AddComponent(portalEntity2, TransformComponent(glm::vec3(-980, 460.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
+    coordinator->AddComponent(portalEntity2, SpriteRendererComponent(
+        CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
+    coordinator->AddComponent(portalEntity2, PortalComponent([](Entity e, PlayerEnterEvent& event)
+    {
+        auto& player_transform = coordinator->GetComponent<TransformComponent>(event.GetPlayerEntity());
+        player_transform.Position.x = 7;
+        player_transform.Position.y = 130;
+    }));
+    coordinator->AddComponent(portalEntity2, BoxCollider2DComponent({}, {8, 8}));
+    coordinator->AddComponent(portalEntity2, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(portalEntity2, PhysicsQuadtreeComponent());
+
+    auto portalEntity3 = coordinator->CreateEntity();
+    coordinator->AddComponent(portalEntity3, TransformComponent(glm::vec3(-268, 460.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
+    coordinator->AddComponent(portalEntity3, SpriteRendererComponent(
+        CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
+    coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
+    {
+        GameManager::Instance()->ChangeState(GameState::MenuLevel);
+    }));
+    coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
+    coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    coordinator->AddComponent(portalEntity3, PhysicsQuadtreeComponent());
 
     auto healthPotionBoxCave = coordinator->CreateEntity();
     coordinator->AddComponent(healthPotionBoxCave, TransformComponent(glm::vec3(-520, 202, 0),
@@ -744,13 +858,13 @@ MainLayer::MainLayer()
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
     }
 
-    for (int i = 0; i < 20; ++i)
+    for (int i = 0; i < 29; ++i)
     {
         auto spikeEntity = coordinator->CreateEntity();
         coordinator->AddComponent(spikeEntity, SpikeComponent(10.f));
         auto spikeRigidbody = RigidBody2DComponent();
         spikeRigidbody.BodyType = Physics::RigidBodyType::Static;
-        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-780 + i * 16, 442, -0.5f),
+        coordinator->AddComponent(spikeEntity, TransformComponent(glm::vec3(-784 + i * 16, 442, -0.5f),
             glm::vec3(0), glm::vec3(16, 16, 1)));
         coordinator->AddComponent(spikeEntity, SpriteRendererComponent(spike_texture));
         coordinator->AddComponent(spikeEntity, spikeRigidbody); 
@@ -763,19 +877,17 @@ MainLayer::MainLayer()
 #pragma endregion
 }
 
-auto MainLayer::OnAttach() -> void 
-{
-}
-
 auto MainLayer::OnDetach() -> void 
 {
-    Input::Destroy();
-    Coordinator::Destroy();
+    coordinator->Clear();
 }
 
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
     // cameraController_.OnUpdate(ts);
+    static GameManager* gameManager = GameManager::Instance();
+    timer_ += ts;
+    gameManager->UploadTime(timer_);
     physicsSystem_->tilemapSystem->Update(ts);
     weaponSystem_->Update(ts);
     damageableSystem_->Update(ts);
@@ -842,6 +954,18 @@ auto MainLayer::OnEvent(Event &e) -> void
 
 auto MainLayer::OnImGuiRender() -> void 
 {
+    auto io = ImGui::GetIO();
+
+    ImGui::SetNextWindowSize(ImVec2(110, 40));
+    ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - 20, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowBgAlpha(0.5f);
+    ImGui::Begin("Timer", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoSavedSettings);
+    ImGui::SetWindowFontScale(2.0f);
+    ImGui::Text("%.2fs", timer_);
+    ImGui::End();
+
     inventoryGUISystem_->OnImGuiRender();
     playerHealthGUISystem_->OnImGuiRender();
 }

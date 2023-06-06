@@ -26,6 +26,6 @@ public:
 	}
 private:
 	std::vector<Layer*> layers_;
-	std::vector<Layer*>::iterator layerIterator_;
+    uint32_t layerInsertIndex_;
 
 };
