@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include "EC/GameObject.h"
+
 //#define _CRTDBG_MAP_ALLOC
 //#include <stdlib.h>
 //#include <crtdbg.h>
@@ -220,7 +222,9 @@ Application::Application()
     mainLayer_ = new MainLayer();
     menuLayer_ = new MenuLayer();
 
-    PushLayer(menuLayer_);
+    // PushLayer(menuLayer_);
+    PushLayer(mainLayer_);
+    // Ref<GameObject> gameObject = CreateRef<GameObject>();
 
     imGuiLayer_ = new ImGuiLayer();
     PushOverlay(imGuiLayer_);

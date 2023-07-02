@@ -4,6 +4,8 @@ set(PROJECT_NAME Application)
 # Source groups
 ################################################################################
 set(Header_Files
+    "Source/EC/GameObject.h"
+    "Source/EC/Component.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -36,6 +38,8 @@ set(Header_Files
     "Source/Game/OrthographicCameraController.h"
     "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
+    "Source/Game/State.h"
+    "Source/Game/StateMachine.h"
 
     "Source/Scene/Scene.h"
     "Source/Scene/SceneManager.h"
@@ -68,6 +72,8 @@ set(Header_Files
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
+    "Source/EC/GameObject.cpp"
+
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"
     "Source/Core/LayerStack.cpp"
