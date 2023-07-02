@@ -1,6 +1,10 @@
 #pragma once
+
 #include <vector>
+#include <map>
+
 #include "ECS/Entity.h"
+#include "EC/GameObject.h"
 
 class Camera;
 
@@ -10,10 +14,15 @@ public:
 	Scene();
 	virtual ~Scene() {}
 
-    auto CreateEntity() -> Entity;
+    /// @brief This function is run before the first frame update.
+    virtual void Start();
+
+    virtual void Update(Timestep ts);
+    virtual void Render();
 
 protected:
-    std::vector<Entity> entities_;
+    std::vector<Ref<GameObject>> sceneObjects_;
 
+    std::multimap<int, Ref<Renderer>, std::greater<int>> rendererMap_;
 };
 

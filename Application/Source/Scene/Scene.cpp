@@ -4,15 +4,38 @@
 static Coordinator* s_Coordinator_ = Coordinator::Instance();
 
 Scene::Scene()
-    : entities_(MaxEntities)
 {
 
 }
 
-auto Scene::CreateEntity() -> Entity
+void Scene::Start()
 {
-    return s_Coordinator_->CreateEntity();
+    // 'Initialize' every gameobject
+    for (auto& gameObject : sceneObjects_)
+    {
+        gameObject->Start();
+    }
+
+    for (auto& gameObject : sceneObjects_)
+    {
+        auto& renderer = gameObject->GetRenderer();
+        if (!renderer) continue;
+        rendererMap_.insert(std::make_pair(renderer->sortingOrder, renderer));
+    }
 }
 
+void Scene::Update(Timestep ts)
+{
+    for (auto& gameObject : sceneObjects_)
+    {
+        gameObject->Update(ts);
+    }
+}
 
-
+void Scene::Render()
+{
+    for (auto& rendererPair : rendererMap_)
+    {
+        rendererPair.second->Render();
+    }
+}
