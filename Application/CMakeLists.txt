@@ -8,6 +8,7 @@ set(Header_Files
     "Source/EC/Component.h"
     "Source/EC/Components/Transform.h"
     "Source/EC/Components/Renderer.h"
+    "Source/EC/Components/SpriteRenderer.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -77,6 +78,7 @@ set(Source_Files
     "Source/EC/GameObject.cpp"
     "Source/EC/Components/Transform.cpp"
     "Source/EC/Components/Renderer.cpp"
+    "Source/EC/Components/SpriteRenderer.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"

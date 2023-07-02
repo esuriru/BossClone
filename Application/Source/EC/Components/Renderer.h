@@ -1,6 +1,9 @@
+#pragma once
 #include "EC/Component.h"
 
-class Renderer : public Component, std::enable_shared_from_this<Renderer>
+#include <memory>
+
+class Renderer : public Component, public std::enable_shared_from_this<Renderer>
 {
 public:
     Renderer(Ref<GameObject> gameObject);
@@ -14,5 +17,5 @@ public:
     virtual void Render() = 0;
 
 private:
-    int sortingOrder_ = 0;
+    int sortingOrder_;
 };

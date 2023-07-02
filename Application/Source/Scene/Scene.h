@@ -18,6 +18,8 @@ public:
     virtual void Start();
 
     virtual void Update(Timestep ts);
+    virtual void FixedUpdate(float fixedStep);
+
     virtual void Render();
 
 protected:

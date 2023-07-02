@@ -3,6 +3,7 @@
 
 Renderer::Renderer(Ref<GameObject> gameObject)
     : Component(gameObject)
+    , sortingOrder_(0)
 {
     gameObject->SetRenderer(shared_from_this());
 }

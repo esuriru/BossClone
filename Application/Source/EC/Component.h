@@ -1,4 +1,6 @@
+#pragma once
 #include "Core/Core.h"
+#include "Core/Timestep.h"
 
 class GameObject;
 class Component

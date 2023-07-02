@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Core/Core.h"
 #include "Component.h"
 #include <unordered_map>
@@ -8,9 +10,12 @@
 #include "Components/Transform.h"
 #include "Components/Renderer.h"
 
+#include <memory>
+
+class Component;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
-class GameObject
+class GameObject : std::enable_shared_from_this<GameObject>
 {
 private:
     template<typename T>
@@ -42,8 +47,10 @@ public:
     template<typename T, typename = is_component<T>> 
     Ref<T> AddComponent() 
     {
-        return static_cast<Ref<T>>(components_.insert(
-            std::make_pair(typeid(T), std::make_shared<T>()))->second);
+        // TODO - Should the components have a weak pointer instead ?
+        return std::static_pointer_cast<T>(components_.insert(
+            std::make_pair(std::type_index(typeid(T)), CreateRef<T>(
+            shared_from_this()))).first->second);
     }
 
     template<typename T, typename = is_component<T>>

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "EC/Component.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
@@ -28,5 +30,4 @@ private:
     glm::vec3 scale_;
 
     void CalculateWorldMatrix();
-
 };
