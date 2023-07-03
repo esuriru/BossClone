@@ -15,7 +15,7 @@
 class Component;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
-class GameObject : std::enable_shared_from_this<GameObject>
+class GameObject : public std::enable_shared_from_this<GameObject>
 {
 private:
     template<typename T>

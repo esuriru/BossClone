@@ -22,5 +22,5 @@ void SpriteRenderer::SetTexture(Ref<SubTexture2D> subtexture)
 
 void SpriteRenderer::SetTexture(Ref<Texture2D> texture)
 {
-    // TODO
+    subtexture_ = CreateRef<SubTexture2D>(texture, glm::vec2(), glm::vec2(1.0f));
 }

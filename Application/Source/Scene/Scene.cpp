@@ -1,11 +1,13 @@
 #include "Scene.h"
 #include "ECS/Coordinator.h"
+#include "SceneManager.h"
 
 static Coordinator* s_Coordinator_ = Coordinator::Instance();
 
-Scene::Scene()
+Scene::Scene(const std::string &name)
+    : name_(name)
 {
-
+    // SceneManager::Instance()->AddScene(name, shared_from_this());
 }
 
 void Scene::Start()
@@ -47,4 +49,11 @@ void Scene::Render()
     {
         rendererPair.second->Render();
     }
+}
+
+Ref<GameObject> Scene::CreateGameObject()
+{
+    Ref<GameObject> gameObject = CreateRef<GameObject>();
+    sceneObjects_.emplace_back(gameObject);
+    return gameObject;
 }

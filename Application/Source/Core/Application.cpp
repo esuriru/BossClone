@@ -221,9 +221,10 @@ Application::Application()
 
     mainLayer_ = new MainLayer();
     menuLayer_ = new MenuLayer();
+    sceneLayer_ = new SceneLayer();
 
     // PushLayer(menuLayer_);
-    PushLayer(mainLayer_);
+    PushLayer(sceneLayer_);
     // Ref<GameObject> gameObject = CreateRef<GameObject>();
 
     imGuiLayer_ = new ImGuiLayer();

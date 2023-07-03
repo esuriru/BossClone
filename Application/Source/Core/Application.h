@@ -20,6 +20,7 @@
 #include "Renderer/OrthographicCamera.h"
 
 #include "Game/MainLayer.h"
+#include "Game/SceneLayer.h"
 
 struct GLFWwindow;
 
@@ -97,6 +98,7 @@ private:
     ImGuiLayer* imGuiLayer_;
     Layer* mainLayer_;
     Layer* menuLayer_;
+    Layer* sceneLayer_;
 
     bool changingToPlay_ = false;
     bool changingToMenu_ = false;

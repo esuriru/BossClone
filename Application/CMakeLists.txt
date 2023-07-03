@@ -43,6 +43,8 @@ set(Header_Files
     "Source/Game/GameManager.h"
     "Source/Game/State.h"
     "Source/Game/StateMachine.h"
+    "Source/Game/SceneLayer.h"
+    "Source/Game/Scenes/PlayScene.h"
 
     "Source/Scene/Scene.h"
     "Source/Scene/SceneManager.h"
@@ -108,6 +110,8 @@ set(Source_Files
     "Source/Game/OrthographicCameraController.cpp"
     "Source/Game/Tilemap.cpp"
     "Source/Game/GameManager.cpp"
+    "Source/Game/SceneLayer.cpp"
+    "Source/Game/Scenes/PlayScene.cpp"
 
     "Source/ECS/Coordinator.cpp"
     "Source/ECS/Entity.cpp"
