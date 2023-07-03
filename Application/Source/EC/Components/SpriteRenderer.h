@@ -7,7 +7,7 @@
 class SpriteRenderer : public Renderer
 {
 public:
-    SpriteRenderer(Ref<GameObject> gameObject);
+    SpriteRenderer(GameObject& gameObject);
 
     void Render() override; 
 
@@ -18,7 +18,5 @@ public:
     float tilingFactor;
 
 private:
-    Ref<Transform> transform_;
-
     Ref<SubTexture2D> subtexture_;
 };

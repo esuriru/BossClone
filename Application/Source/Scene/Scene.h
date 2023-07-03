@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <functional>
 
 #include "EC/GameObject.h"
 
@@ -28,7 +29,7 @@ public:
 
 protected:
     std::vector<Ref<GameObject>> sceneObjects_;
-    std::multimap<int, Ref<Renderer>, std::greater<int>> rendererMap_;
+    std::multimap<int, Renderer*, std::greater<int>> rendererMap_;
     std::string name_;
 };
 

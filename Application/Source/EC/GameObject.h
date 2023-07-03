@@ -15,7 +15,7 @@
 class Component;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
-class GameObject : public std::enable_shared_from_this<GameObject>
+class GameObject 
 {
 private:
     template<typename T>
@@ -28,9 +28,9 @@ public:
     void Update(Timestep ts);
     void FixedUpdate(float fixedStep);
 
-    inline Ref<Transform>& GetTransform()
+    inline Transform& GetTransform()
     {
-        return transform_;
+        return *transform_;
     }
 
     template<typename T, typename = is_component<T>>
@@ -49,8 +49,8 @@ public:
     {
         // TODO - Should the components have a weak pointer instead ?
         return std::static_pointer_cast<T>(components_.insert(
-            std::make_pair(std::type_index(typeid(T)), CreateRef<T>(
-            shared_from_this()))).first->second);
+            std::make_pair(std::type_index(typeid(T)),
+            CreateRef<T>(*this))).first->second);
     }
 
     template<typename T, typename = is_component<T>>
@@ -74,21 +74,17 @@ public:
         renderer_->Render();
     }
 
-    inline void SetRenderer(Ref<Renderer> renderer)
-    {
-        renderer_ = renderer;
-    }
-
-    inline Ref<Renderer>& GetRenderer()
+    inline Renderer* GetRenderer()
     {
         return renderer_;
     }
 
 private:
     std::unordered_map<std::type_index, Ref<Component>> components_;
-    Ref<Transform> transform_;
-    Ref<Renderer> renderer_;
+    Transform* const transform_;
+    Renderer* renderer_;
 
     bool enabled_;
+    friend class Renderer;
      
 };

@@ -3,10 +3,10 @@
 
 #include <memory>
 
-class Renderer : public Component, public std::enable_shared_from_this<Renderer>
+class Renderer : public Component
 {
 public:
-    Renderer(Ref<GameObject> gameObject);
+    Renderer(GameObject& gameObject);
 
     void SetSortingOrder(int sortingOrder);
     inline int GetSortingOrder() const

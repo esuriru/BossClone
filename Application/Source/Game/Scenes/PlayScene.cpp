@@ -10,4 +10,5 @@ PlayScene::PlayScene()
     auto spriteRenderer = gameObject->AddComponent<SpriteRenderer>(); 
     spriteRenderer->SetTexture(nareLogoTexture_);
 
+    spriteRenderer->GetTransform().SetScale(glm::vec3(10.f));
 }

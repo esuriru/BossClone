@@ -23,6 +23,7 @@ void SceneLayer::OnDetach()
 
 void SceneLayer::OnUpdate(Timestep ts)
 {
+
     constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 
@@ -31,20 +32,25 @@ void SceneLayer::OnUpdate(Timestep ts)
     while (accumulator >= step)
     {
         activeScene_->FixedUpdate(step);
+        accumulator -= step;
     }
+
+    cameraController_.OnUpdate(ts);
 
     activeScene_->Update(ts);
     Renderer2D::BeginScene(cameraController_.GetCamera());
     constexpr glm::vec4 background_colour = glm::vec4(135.f, 206.f, 250.f, 1.0f);
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
+    RenderCommand::Clear();
 
     activeScene_->Render();
 
-    RenderCommand::Clear();
+    Renderer2D::EndScene();
 }
 
 void SceneLayer::OnEvent(Event &e)
 {
+    cameraController_.OnEvent(e);
 }
 
 void SceneLayer::OnImGuiRender()

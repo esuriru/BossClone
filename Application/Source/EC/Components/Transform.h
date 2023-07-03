@@ -7,7 +7,7 @@
 class Transform : public Component
 {
 public:
-    Transform(Ref<GameObject> gameObject);
+    Transform(GameObject& gameObject);
 
     const glm::vec3& GetPosition() const;
     const glm::quat& GetRotation() const;

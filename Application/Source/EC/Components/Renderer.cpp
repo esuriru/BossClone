@@ -1,11 +1,11 @@
 #include "Renderer.h"
 #include "EC/GameObject.h"
 
-Renderer::Renderer(Ref<GameObject> gameObject)
+Renderer::Renderer(GameObject& gameObject)
     : Component(gameObject)
     , sortingOrder_(0)
 {
-    gameObject->SetRenderer(shared_from_this());
+    gameObject.renderer_ = this;
 }
 
 void Renderer::SetSortingOrder(int sortingOrder)

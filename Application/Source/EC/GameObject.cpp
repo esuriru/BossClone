@@ -1,8 +1,11 @@
 #include "GameObject.h"
 
 GameObject::GameObject()
+    : transform_(AddComponent<Transform>().get())
+    , renderer_(nullptr)
+    , enabled_(true)
 {
-    transform_ = AddComponent<Transform>();
+    // transform_ = AddComponent<Transform>().get();
 }
 
 void GameObject::Start()

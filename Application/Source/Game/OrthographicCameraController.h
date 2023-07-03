@@ -23,7 +23,7 @@ private:
     auto OnWindowResized(WindowResizeEvent& e) -> bool;
 
     float aspectRatio_ = 0.f;
-    float zoomLevel_ = 150.0f;
+    float zoomLevel_ = 25.0f;
 
     bool rotationEnabled_ = false;
 

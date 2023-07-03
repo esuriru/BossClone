@@ -21,7 +21,7 @@ void Scene::Start()
     // Cache each renderer into a map.
     for (auto& gameObject : sceneObjects_)
     {
-        auto& renderer = gameObject->GetRenderer();
+        auto renderer = gameObject->GetRenderer();
         if (!renderer) continue;
         rendererMap_.insert(std::make_pair(renderer->GetSortingOrder(), renderer));
     }

@@ -78,6 +78,7 @@ source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
     "Source/EC/GameObject.cpp"
+    "Source/EC/Component.cpp"
     "Source/EC/Components/Transform.cpp"
     "Source/EC/Components/Renderer.cpp"
     "Source/EC/Components/SpriteRenderer.cpp"
