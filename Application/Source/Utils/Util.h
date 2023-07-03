@@ -4,10 +4,17 @@
 #include <algorithm>
 #include <vector>
 
-#include <examples/imgui_impl_opengl3.h>
+
+#include "Core/Core.h"
+#include "Renderer/Texture.h"
+#include "Renderer/SubTexture2D.h"
 
 namespace Utility
 {
+    void ImGuiImage(const Ref<Texture2D>& icon, float imageSizeMultiplier = 1.5f);
+    void ImGuiImage(const Ref<Texture2D>& icon, float width, float height);
+    void ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier = 1.5f);
+
     // TODO - Add custom UV coordinates
     using Vector2ui = std::pair<size_t, size_t>;
 

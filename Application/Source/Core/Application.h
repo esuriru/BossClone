@@ -19,7 +19,6 @@
 #include "Utils/Singleton.h"
 #include "Renderer/OrthographicCamera.h"
 
-#include "Game/MainLayer.h"
 #include "Game/SceneLayer.h"
 
 struct GLFWwindow;

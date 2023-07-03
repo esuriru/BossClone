@@ -15,7 +15,7 @@
 
 #include <glm/gtx/string_cast.hpp>
 
-struct Tile
+struct tilemaptile
 {
     enum TileType
     {
@@ -43,7 +43,7 @@ struct TilemapComponent
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> SubTextureMap {};
 
     // The map represented in a 2D array.
-    std::array<std::array<Tile, TilemapData::TILEMAP_MAX_X_LENGTH>, TilemapData::TILEMAP_MAX_Y_LENGTH> MapData{};
+    std::array<std::array<tilemaptile, TilemapData::TILEMAP_MAX_X_LENGTH>, TilemapData::TILEMAP_MAX_Y_LENGTH> MapData{};
 
     glm::vec4 Colour = glm::vec4(1.0f);
     glm::vec2 TileSize = glm::vec2(16.0f);

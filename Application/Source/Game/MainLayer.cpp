@@ -528,10 +528,10 @@ auto MainLayer::OnAttach() -> void
         auto positionOfDestroyedEntity = coordinator->GetComponent<TransformComponent>(e).Position;
         auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
 
-        tilemap.MapData[12][62].Type = Tile::TileType::Empty;
-        tilemap.MapData[12][63].Type = Tile::TileType::Empty;
-        tilemap.MapData[13][62].Type = Tile::TileType::Empty;
-        tilemap.MapData[13][63].Type = Tile::TileType::Empty;
+        tilemap.MapData[12][62].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[12][63].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[13][62].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[13][63].Type = tilemaptile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
          
@@ -561,15 +561,15 @@ auto MainLayer::OnAttach() -> void
     {
         auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
 
-        tilemap.MapData[43][22].Type = Tile::TileType::Empty;
-        tilemap.MapData[44][22].Type = Tile::TileType::Empty;
-        tilemap.MapData[45][22].Type = Tile::TileType::Empty;
-        tilemap.MapData[43][23].Type = Tile::TileType::Empty;
-        tilemap.MapData[44][23].Type = Tile::TileType::Empty;
-        tilemap.MapData[45][23].Type = Tile::TileType::Empty;
-        tilemap.MapData[43][24].Type = Tile::TileType::Empty;
-        tilemap.MapData[44][24].Type = Tile::TileType::Empty;
-        tilemap.MapData[45][24].Type = Tile::TileType::Empty;
+        tilemap.MapData[43][22].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[44][22].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[45][22].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[43][23].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[44][23].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[45][23].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[43][24].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[44][24].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[45][24].Type = tilemaptile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
          
@@ -599,15 +599,15 @@ auto MainLayer::OnAttach() -> void
     {
         auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
 
-        tilemap.MapData[47][34].Type = Tile::TileType::Empty;
-        tilemap.MapData[48][34].Type = Tile::TileType::Empty;
-        tilemap.MapData[49][34].Type = Tile::TileType::Empty;
-        tilemap.MapData[47][35].Type = Tile::TileType::Empty;
-        tilemap.MapData[48][35].Type = Tile::TileType::Empty;
-        tilemap.MapData[49][35].Type = Tile::TileType::Empty;
-        tilemap.MapData[47][36].Type = Tile::TileType::Empty;
-        tilemap.MapData[48][36].Type = Tile::TileType::Empty;
-        tilemap.MapData[49][36].Type = Tile::TileType::Empty;
+        tilemap.MapData[47][34].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[48][34].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[49][34].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[47][35].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[48][35].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[49][35].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[47][36].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[48][36].Type = tilemaptile::TileType::Empty;
+        tilemap.MapData[49][36].Type = tilemaptile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
          

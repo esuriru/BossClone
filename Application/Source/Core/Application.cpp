@@ -219,7 +219,6 @@ Application::Application()
     RenderCommand::Init();
     Renderer2D::Init();
 
-    mainLayer_ = new MainLayer();
     menuLayer_ = new MenuLayer();
     sceneLayer_ = new SceneLayer();
 

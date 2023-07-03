@@ -379,7 +379,7 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
                 }
             }
 
-            Tile::TileType tileType;
+            tilemaptile::TileType tileType;
             if (index_y >= TilemapData::TILEMAP_MAX_Y_LENGTH)
             {
                 tileType = tilemap.MapData[index_y - TilemapData::TILEMAP_MAX_Y_LENGTH][index_x].Type;
@@ -391,12 +391,12 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition,
                 groundLevel = static_cast<float>(index_y) * newTilemap.TileSize.y + newTilemap.TileSize.y * 0.5f + newTilemapPosition.y;
             }
 
-            if (tileType == Tile::TileType::Solid)
+            if (tileType == tilemaptile::TileType::Solid)
             {
                 onPlatform = false;
                 return true;
             }
-            else if (tileType == Tile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
+            else if (tileType == tilemaptile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
             {
                 onPlatform = true;  
             }
@@ -452,12 +452,12 @@ auto PhysicsSystem::CheckTilemapCollisionGround(const glm::vec2 &oldPosition, co
 
             auto& tileType = tilemap.MapData[index_y][index_x].Type;
             groundLevel = static_cast<float>(index_y) * tilemap.TileSize.y + tilemap.TileSize.y * 0.5f + tilemapPosition.y;
-            if (tileType == Tile::TileType::Solid)
+            if (tileType == tilemaptile::TileType::Solid)
             {
                 onPlatform = false;
                 return true;
             }
-            else if (tileType == Tile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
+            else if (tileType == tilemaptile::TileType::OneWay && fabs(checkedTile.y - groundLevel) <= Physics::PlatformCollisionDetectionThreshold + oldPosition.y - newPosition.y)
             {
                 onPlatform = true;  
             }
@@ -510,7 +510,7 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
             }
 
             auto& tileType = tilemap.MapData[index_y][index_x].Type;
-            if (tileType == Tile::TileType::Solid)
+            if (tileType == tilemaptile::TileType::Solid)
             {
                 ceilingLevel = static_cast<float>(index_y) * tilemap.TileSize.y - tilemap.TileSize.y * 0.5f + tilemapPosition.y;
                 return true;
@@ -573,11 +573,11 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
             }
             // Check if it is in bounds.
 
-            Tile::TileType tileType;
+            tilemaptile::TileType tileType;
             if (index_y < 0)
             {
                 tileType = tilemap.MapData[index_y + TilemapData::TILEMAP_MAX_Y_LENGTH][index_x].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     ceilingLevel = static_cast<float>(index_y + TilemapData::TILEMAP_MAX_Y_LENGTH) * tilemap.TileSize.y - tilemap.TileSize.y * 0.5f + tilemapPosition.y;
                     return true;
@@ -586,7 +586,7 @@ auto PhysicsSystem::CheckTilemapCollisionCeiling(const glm::vec2 &oldPosition, c
             else
             {
                 tileType = newTilemap.MapData[index_y][index_x].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     ceilingLevel = static_cast<float>(index_y) * tilemap.TileSize.y - tilemap.TileSize.y * 0.5f + tilemapPosition.y;
                     return true;
@@ -639,7 +639,7 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
             }
 
             auto& tileType = tilemap.MapData[index_y][index_x].Type;
-            if (tileType == Tile::TileType::Solid)
+            if (tileType == tilemaptile::TileType::Solid)
             {
                 wallX = static_cast<float>(index_x) * tilemap.TileSize.x + tilemap.TileSize.x * 0.5f + tilemapPosition.x;
                 return true;
@@ -698,11 +698,11 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
                 break;
             }
 
-            Tile::TileType tileType;
+            tilemaptile::TileType tileType;
             if (index_x >= TilemapData::TILEMAP_MAX_X_LENGTH)
             {
                 tileType = tilemap.MapData[index_y][index_x - TilemapData::TILEMAP_MAX_X_LENGTH].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     wallX = static_cast<float>(index_x - TilemapData::TILEMAP_MAX_X_LENGTH) * tilemap.TileSize.x + tilemap.TileSize.x * 0.5f + tilemapPosition.x;
                     return true;
@@ -711,7 +711,7 @@ auto PhysicsSystem::CheckTilemapCollisionLeft(const glm::vec2 &oldPosition, cons
             else
             {
                 tileType = newTilemap.MapData[index_y][index_x].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     wallX = static_cast<float>(index_x) * newTilemap.TileSize.x + newTilemap.TileSize.x * 0.5f + newTilemapPosition.x;
                     return true;
@@ -765,7 +765,7 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
             }
 
             auto& tileType = tilemap.MapData[index_y][index_x].Type;
-            if (tileType == Tile::TileType::Solid)
+            if (tileType == tilemaptile::TileType::Solid)
             {
                 wallX = static_cast<float>(index_x) * tilemap.TileSize.x - tilemap.TileSize.x * 0.5f + tilemapPosition.x;
                 return true;
@@ -829,11 +829,11 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
 
 
             // Check if it is in bounds.
-            Tile::TileType tileType;
+            tilemaptile::TileType tileType;
             if (index_x < 0)
             {
                 tileType = tilemap.MapData[index_y][index_x + TilemapData::TILEMAP_MAX_X_LENGTH].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     wallX = static_cast<float>(index_x + TilemapData::TILEMAP_MAX_X_LENGTH) * tilemap.TileSize.x - tilemap.TileSize.x * 0.5f + tilemapPosition.x;
                     return true;
@@ -842,7 +842,7 @@ auto PhysicsSystem::CheckTilemapCollisionRight(const glm::vec2 &oldPosition, con
             else
             {
                 tileType = newTilemap.MapData[index_y][index_x].Type;
-                if (tileType == Tile::TileType::Solid)
+                if (tileType == tilemaptile::TileType::Solid)
                 {
                     wallX = static_cast<float>(index_x) * newTilemap.TileSize.x - newTilemap.TileSize.x * 0.5f + newTilemapPosition.x;
                     return true;
@@ -919,7 +919,7 @@ auto PhysicsSystem::GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, 
     return (column_row * tileSize) + glm::vec2(tilemapWorldPosition);
 }
 
-auto PhysicsSystem::GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent &tilemap, const glm::vec2 &worldPosition) const -> Tile &
+auto PhysicsSystem::GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent &tilemap, const glm::vec2 &worldPosition) const -> tilemaptile &
 {
     return tilemap.MapData[GetTileIndexYAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.y)][GetTileIndexXAtWorldPoint(tilemapWorldPosition, tilemap.TileSize, worldPosition.x)];
 }

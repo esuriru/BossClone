@@ -38,20 +38,20 @@ auto TilemapComponent::ImportTilemapCSV(const std::string &map_csv, bool make_ti
             const size_t index_x = (TilemapData::TILEMAP_MAX_Y_LENGTH - 1) - i;
             MapData[index_x][j].TextureIndex = static_cast<uint8_t>(row[j]);
             if (make_tiles_solid && row[j] > 0)
-                MapData[index_x][j].Type = Tile::TileType::Solid;
+                MapData[index_x][j].Type = tilemaptile::TileType::Solid;
         }
     }
 }
 
-auto CharToTileType(char csv_input) -> Tile::TileType
+auto CharToTileType(char csv_input) -> tilemaptile::TileType
 {
     switch (csv_input)
     {
-        case 'S': return Tile::TileType::Solid;
-        case 'P': return Tile::TileType::OneWay;
+        case 'S': return tilemaptile::TileType::Solid;
+        case 'P': return tilemaptile::TileType::OneWay;
         default: break;
     }
-    return Tile::TileType::Empty;
+    return tilemaptile::TileType::Empty;
 }
 
 auto TilemapComponent::ImportTilemapCSV(const std::string &map_csv, const std::string &tile_type_csv) -> void

@@ -120,7 +120,7 @@ private:
     auto GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, size_t index_x, size_t index_y) const -> glm::vec2;
     auto GetTileWorldPosition(const glm::vec3& tilemapWorldPosition, const glm::vec2& tileSize, glm::vec2 column_row) const -> glm::vec2;
 
-    auto GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent& tilemap, const glm::vec2& worldPosition) const -> Tile&;
+    auto GetTileAtWorldPoint(const glm::vec3& tilemapWorldPosition, TilemapComponent& tilemap, const glm::vec2& worldPosition) const -> tilemaptile&;
 
 
     // Quadtree

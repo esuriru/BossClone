@@ -9,6 +9,7 @@ set(Header_Files
     "Source/EC/Components/Transform.h"
     "Source/EC/Components/Renderer.h"
     "Source/EC/Components/SpriteRenderer.h"
+    "Source/EC/Components/Tilemap.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -36,10 +37,10 @@ set(Header_Files
     "Source/Renderer/SubTexture2D.h"
     "Source/Renderer/OrthographicCamera.h"
 
-    "Source/Game/MainLayer.h"
+    # "Source/Game/MainLayer.h"
     "Source/Game/MenuLayer.h"
     "Source/Game/OrthographicCameraController.h"
-    "Source/Game/Tilemap.h"
+    # "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
     "Source/Game/State.h"
     "Source/Game/StateMachine.h"
@@ -57,19 +58,19 @@ set(Header_Files
     "Source/ECS/ComponentArray.h"
     "Source/ECS/IComponentArray.h"
 
-    "Source/ECS/Systems/RenderSystem.h"
-    "Source/ECS/Systems/PlayerSystem.h"
-    "Source/ECS/Systems/GameSystem.h"
-    "Source/ECS/Systems/GUISystem.h"
+    # "Source/ECS/Systems/RenderSystem.h"
+    # "Source/ECS/Systems/PlayerSystem.h"
+    # "Source/ECS/Systems/GameSystem.h"
+    # "Source/ECS/Systems/GUISystem.h"
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
     "Source/Utils/Singleton.h"
 
-    "Source/Physics/PhysicsSystem.h"
-    "Source/Physics/PhysicsComponent.h"
-    "Source/Physics/Quadtree.h"
-    "Source/Physics/Collision2D.h"
+    # "Source/Physics/PhysicsSystem.h"
+    # "Source/Physics/PhysicsComponent.h"
+    # "Source/Physics/Quadtree.h"
+    # "Source/Physics/Collision2D.h"
 
     "Source/ImGui/ImGuiLayer.h"
 
@@ -82,6 +83,7 @@ set(Source_Files
     "Source/EC/Components/Transform.cpp"
     "Source/EC/Components/Renderer.cpp"
     "Source/EC/Components/SpriteRenderer.cpp"
+    "Source/EC/Components/Tilemap.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"
@@ -107,7 +109,7 @@ set(Source_Files
     "Source/Scene/Scene.cpp"
 
     "Source/Game/MenuLayer.cpp"
-    "Source/Game/MainLayer.cpp"
+    # "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
     "Source/Game/Tilemap.cpp"
     "Source/Game/GameManager.cpp"
@@ -118,16 +120,17 @@ set(Source_Files
     "Source/ECS/Entity.cpp"
 
 
-    "Source/ECS/Systems/RenderSystem.cpp"
-    "Source/ECS/Systems/PlayerSystem.cpp"
-    "Source/ECS/Systems/GameSystem.cpp"
-    "Source/ECS/Systems/GUISystem.cpp"
+    # "Source/ECS/Systems/RenderSystem.cpp"
+    # "Source/ECS/Systems/PlayerSystem.cpp"
+    # "Source/ECS/Systems/GameSystem.cpp"
+    # "Source/ECS/Systems/GUISystem.cpp"
 
     "Source/Utils/Input.cpp"
+    "Source/Utils/Util.cpp"
 
-    "Source/Physics/PhysicsSystem.cpp"
-    "Source/Physics/PhysicsComponent.cpp"
-    "Source/Physics/Quadtree.cpp"
+    # "Source/Physics/PhysicsSystem.cpp"
+    # "Source/Physics/PhysicsComponent.cpp"
+    # "Source/Physics/Quadtree.cpp"
 
     "Source/ImGui/ImGuiLayer.cpp"
 )
