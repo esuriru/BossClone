@@ -27,6 +27,7 @@ public:
 
 public:
     Tilemap(GameObject& gameObject);
+    Tilemap(GameObject& gameObject, const std::string& textureCsvFilePath, const std::string& typeCsvFilePath);
 
     glm::vec4 colour;
     glm::vec2 tileSize;

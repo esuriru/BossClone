@@ -8,6 +8,8 @@ class Transform : public Component
 {
 public:
     Transform(GameObject& gameObject);
+    Transform(GameObject& gameObject, const glm::vec3& position);
+    Transform(GameObject& gameObject, const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
 
     const glm::vec3& GetPosition() const;
     const glm::quat& GetRotation() const;

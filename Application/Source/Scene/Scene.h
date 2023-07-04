@@ -25,6 +25,15 @@ public:
     virtual void Render();
 
     virtual Ref<GameObject> CreateGameObject();
+
+    template<typename... Args>
+    Ref<GameObject> CreateGameObject(Args&&... args)
+    {
+        Ref<GameObject> gameObject = CreateRef<GameObject>(std::forward<Args>(args)...);
+        sceneObjects_.emplace_back(gameObject);
+        return gameObject;
+    }
+
     virtual std::string GetName() = 0;
 
 protected:

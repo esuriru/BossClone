@@ -7,7 +7,22 @@ Transform::Transform(GameObject& gameObject)
     , rotation_(glm::identity<glm::quat>())
     , scale_(1.0f)
 {
+}
 
+Transform::Transform(GameObject &gameObject, const glm::vec3 &position)
+    : Component(gameObject)
+    , position_(position)
+    , rotation_(glm::identity<glm::quat>())
+    , scale_(1.0f)
+{
+}
+
+Transform::Transform(GameObject &gameObject, const glm::vec3 &position, const glm::quat &rotation, const glm::vec3 &scale)
+    : Component(gameObject)
+    , position_(position)
+    , rotation_(rotation)
+    , scale_(scale)
+{
 }
 
 const glm::vec3 &Transform::GetPosition() const

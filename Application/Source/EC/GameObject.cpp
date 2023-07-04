@@ -8,6 +8,21 @@ GameObject::GameObject()
     // transform_ = AddComponent<Transform>().get();
 }
 
+GameObject::GameObject(const glm::vec3 &position)
+    : transform_(AddComponent<Transform>(position).get())
+    , renderer_(nullptr)
+    , enabled_(true)
+{
+
+}
+
+GameObject::GameObject(const glm::vec3 &position, const glm::quat &rotation, const glm::vec3 &scale)
+    : transform_(AddComponent<Transform>(position, rotation, scale).get())
+    , renderer_(nullptr)
+    , enabled_(true)
+{
+}
+
 void GameObject::Start()
 {
     for (auto& component : components_)

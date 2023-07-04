@@ -8,6 +8,8 @@ class SpriteRenderer : public Renderer
 {
 public:
     SpriteRenderer(GameObject& gameObject);
+    SpriteRenderer(GameObject& gameObject, Ref<SubTexture2D> subtexture);
+    SpriteRenderer(GameObject& gameObject, Ref<Texture2D> subtexture);
 
     void Render() override; 
 

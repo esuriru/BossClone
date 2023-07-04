@@ -7,15 +7,19 @@
 
 #include "Core/Timestep.h"
 
+#include <glm/glm.hpp>
+
 #include "Components/Transform.h"
 #include "Components/Renderer.h"
 
 #include <memory>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 class Component;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
-class GameObject 
+class GameObject : public std::enable_shared_from_this<GameObject>
 {
 private:
     template<typename T>
@@ -23,6 +27,8 @@ private:
 
 public:
     GameObject();
+    GameObject(const glm::vec3& position);
+    GameObject(const glm::vec3& position, const glm::quat& rotation, const glm::vec3& scale);
 
     void Start();
     void Update(Timestep ts);
@@ -52,6 +58,26 @@ public:
             std::make_pair(std::type_index(typeid(T)),
             CreateRef<T>(*this))).first->second);
     }
+
+    template<typename T, typename = is_component<T>, typename... Args> 
+    Ref<T> AddComponent(Args&&... args) 
+    {
+        // TODO - Should the components have a weak pointer instead ?
+        return std::static_pointer_cast<T>(components_.insert(
+            std::make_pair(std::type_index(typeid(T)),
+            CreateRef<T>(*this, std::forward<Args>(args)...))).first->second);
+    }
+
+    template<typename T, typename = is_component<T>, typename... Args> 
+    Ref<GameObject> SetComponent(Args&&... args) 
+    {
+        // TODO - Should the components have a weak pointer instead ?
+        components_.insert(
+            std::make_pair(std::type_index(typeid(T)),
+            CreateRef<T>(*this, std::forward<Args>(args)...)));
+        return shared_from_this();
+    }
+
 
     template<typename T, typename = is_component<T>>
     void RemoveComponent()

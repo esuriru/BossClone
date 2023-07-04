@@ -10,6 +10,25 @@ SpriteRenderer::SpriteRenderer(GameObject& gameObject)
     
 }
 
+SpriteRenderer::SpriteRenderer(GameObject& gameObject, Ref<SubTexture2D> subtexture)
+    : Renderer(gameObject)
+    , colour(1.0f)
+    , tilingFactor(1.0f)
+    , subtexture_(subtexture)
+{
+    
+}
+
+SpriteRenderer::SpriteRenderer(GameObject& gameObject, Ref<Texture2D> texture)
+    : Renderer(gameObject)
+    , colour(1.0f)
+    , tilingFactor(1.0f)
+    , subtexture_(CreateRef<SubTexture2D>(texture, glm::vec2(), glm::vec2(1.0f))
+)
+{
+    
+}
+
 void SpriteRenderer::Render()
 {
     if (subtexture_)
