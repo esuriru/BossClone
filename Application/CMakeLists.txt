@@ -10,6 +10,7 @@ set(Header_Files
     "Source/EC/Components/Renderer.h"
     "Source/EC/Components/SpriteRenderer.h"
     "Source/EC/Components/Tilemap.h"
+    "Source/EC/Components/TilemapRenderer.cpp"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -84,6 +85,7 @@ set(Source_Files
     "Source/EC/Components/Renderer.cpp"
     "Source/EC/Components/SpriteRenderer.cpp"
     "Source/EC/Components/Tilemap.cpp"
+    "Source/EC/Components/TilemapRenderer.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"

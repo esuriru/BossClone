@@ -28,9 +28,13 @@ public:
 public:
     Tilemap(GameObject& gameObject);
 
+    glm::vec4 colour;
     glm::vec2 tileSize;
     float tilingFactor;
     void LoadCSV(const std::string& textureCsvFilePath, const std::string& typeCsvFilePath);
+
+    Tile& GetTile(uint32_t x, uint32_t y); 
+    Ref<SubTexture2D>& GetTexture(uint32_t index);
 
 private:
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_{};

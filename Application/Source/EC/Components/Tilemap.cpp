@@ -1,12 +1,15 @@
 #include "Tilemap.h"
+#include "TilemapRenderer.h"
 #include "rapidcsv.h"
+#include "EC/GameObject.h"
 
 Tilemap::Tilemap(GameObject& gameObject)
     : Component(gameObject)
     , tileSize(16.0f)
     , tilingFactor(1.0f)
 {
-
+    Ref<TilemapRenderer> tilemapRenderer = gameObject.AddComponent<TilemapRenderer>();
+    tilemapRenderer->SetTilemapComponent(this);
 }
 
 auto CharToTileType(char csv_input) -> decltype(Tile::Empty) 
@@ -50,4 +53,14 @@ void Tilemap::LoadCSV(const std::string& textureCsvFilePath, const std::string& 
         }
     }
     
+}
+
+Tile &Tilemap::GetTile(uint32_t x, uint32_t y)
+{
+    return tileData_[x][y];
+}
+
+Ref<SubTexture2D> &Tilemap::GetTexture(uint32_t index)
+{
+    return subTextureMap_[index];
 }
