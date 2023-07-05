@@ -113,7 +113,7 @@ set(Source_Files
     "Source/Game/MenuLayer.cpp"
     # "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
-    "Source/Game/Tilemap.cpp"
+    # "Source/Game/Tilemap.cpp"
     "Source/Game/GameManager.cpp"
     "Source/Game/SceneLayer.cpp"
     "Source/Game/Scenes/PlayScene.cpp"

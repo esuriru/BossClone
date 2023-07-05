@@ -7,10 +7,44 @@ Tilemap::Tilemap(GameObject& gameObject)
     : Component(gameObject)
     , tileSize(16.0f)
     , tilingFactor(1.0f)
+    , colour(1.f)
+    , nextTextureIndex_(1)
 {
     Ref<TilemapRenderer> tilemapRenderer = gameObject.AddComponent<TilemapRenderer>();
     tilemapRenderer->SetTilemapComponent(this);
 }
+
+Tilemap::Tilemap(GameObject &gameObject, const std::string &textureCsvFilePath, const std::string &typeCsvFilePath)
+    : Component(gameObject)
+    , tileSize(16.0f)
+    , tilingFactor(1.0f)
+    , colour(1.f)
+    , textureCsvFilePath_(textureCsvFilePath)
+    , typeCsvFilePath_(typeCsvFilePath)
+    , nextTextureIndex_(1)
+{
+    Ref<TilemapRenderer> tilemapRenderer = gameObject.AddComponent<TilemapRenderer>();
+    tilemapRenderer->SetTilemapComponent(this);
+    LoadCSV(textureCsvFilePath, typeCsvFilePath);
+}
+
+Ref<Tilemap> Tilemap::SetTexture(uint32_t index, Ref<SubTexture2D> subtexture)
+{
+    subTextureMap_[index] = subtexture; 
+    return shared_from_this();
+}
+
+Ref<Tilemap> Tilemap::PushTexture(Ref<SubTexture2D> subtexture)
+{
+    if (!isPushed_)
+    {
+        isPushed_ = true;
+    }
+    subTextureMap_[nextTextureIndex_++] = subtexture;
+    return shared_from_this();
+}
+
+
 
 auto CharToTileType(char csv_input) -> decltype(Tile::Empty) 
 {
@@ -53,6 +87,8 @@ void Tilemap::LoadCSV(const std::string& textureCsvFilePath, const std::string& 
         }
     }
     
+    textureCsvFilePath_ = textureCsvFilePath;
+    typeCsvFilePath_ = typeCsvFilePath;
 }
 
 Tile &Tilemap::GetTile(uint32_t x, uint32_t y)

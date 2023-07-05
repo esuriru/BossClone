@@ -45,7 +45,7 @@ public:
         auto iterator = components_.find(typeid(T));
         if (iterator != components_.end())
         {
-            return static_cast<Ref<T>>(iterator->second);
+            return std::static_pointer_cast<T>(iterator->second);
         }
         return nullptr;
     }

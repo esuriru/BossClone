@@ -15,5 +15,6 @@ public:
 
 private:
     Ref<Texture2D> nareLogoTexture_;
+    Ref<Texture2D> terrainSpritesheet_;
 
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EC/Component.h" 
+#include "Core/Core.h"
 
 #include <array>
 #include <limits>
@@ -19,7 +20,7 @@ struct Tile
     uint8_t textureIndex = 0;
 };
 
-class Tilemap : public Component
+class Tilemap : public Component, public std::enable_shared_from_this<Tilemap>
 {
 public:
     constexpr static uint32_t MaxHorizontalLength = 128;
@@ -36,9 +37,15 @@ public:
 
     Tile& GetTile(uint32_t x, uint32_t y); 
     Ref<SubTexture2D>& GetTexture(uint32_t index);
+    Ref<Tilemap> SetTexture(uint32_t index, Ref<SubTexture2D> subtexture);
+    Ref<Tilemap> PushTexture(Ref<SubTexture2D> subtexture);
 
 private:
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_{};
     std::array<std::array<Tile, MaxHorizontalLength>, MaxVerticalLength> tileData_{};
+
+    std::string textureCsvFilePath_, typeCsvFilePath_;
+    uint32_t nextTextureIndex_;
+    bool isPushed_;
 
 };

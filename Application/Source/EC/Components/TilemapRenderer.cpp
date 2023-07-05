@@ -25,9 +25,11 @@ void TilemapRenderer::Render()
                     i * tilemapComponent_->tileSize.y,
                 0)) * glm::scale(glm::mat4(1.0f), glm::vec3(tilemapComponent_->tileSize, 0));
 
+            auto& texture = tilemapComponent_->GetTexture(tilemapComponent_->GetTile(i, j).textureIndex);
+            if (!texture) continue;
             Renderer2D::DrawQuad(
                 model,
-                tilemapComponent_->GetTexture(tilemapComponent_->GetTile(i, j).textureIndex),
+                texture,
                 tilemapComponent_->tilingFactor,
                 tilemapComponent_->colour);
         }
