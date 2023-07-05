@@ -10,7 +10,8 @@ set(Header_Files
     "Source/EC/Components/Renderer.h"
     "Source/EC/Components/SpriteRenderer.h"
     "Source/EC/Components/Tilemap.h"
-    "Source/EC/Components/TilemapRenderer.cpp"
+    "Source/EC/Components/TilemapRenderer.h"
+    "Source/EC/Components/Collider2D.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -68,6 +69,7 @@ set(Header_Files
     "Source/Utils/Util.h"
     "Source/Utils/Singleton.h"
 
+    "Source/Physics/PhysicsWorld.h"
     # "Source/Physics/PhysicsSystem.h"
     # "Source/Physics/PhysicsComponent.h"
     # "Source/Physics/Quadtree.h"
@@ -86,6 +88,7 @@ set(Source_Files
     "Source/EC/Components/SpriteRenderer.cpp"
     "Source/EC/Components/Tilemap.cpp"
     "Source/EC/Components/TilemapRenderer.cpp"
+    "Source/EC/Components/Collider2D.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"
@@ -130,6 +133,7 @@ set(Source_Files
     "Source/Utils/Input.cpp"
     "Source/Utils/Util.cpp"
 
+    "Source/Physics/PhysicsWorld.cpp"
     # "Source/Physics/PhysicsSystem.cpp"
     # "Source/Physics/PhysicsComponent.cpp"
     # "Source/Physics/Quadtree.cpp"
