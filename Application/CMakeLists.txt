@@ -12,6 +12,7 @@ set(Header_Files
     "Source/EC/Components/Tilemap.h"
     "Source/EC/Components/TilemapRenderer.h"
     "Source/EC/Components/Collider2D.h"
+    "Source/EC/Components/Rigidbody2D.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -89,6 +90,7 @@ set(Source_Files
     "Source/EC/Components/Tilemap.cpp"
     "Source/EC/Components/TilemapRenderer.cpp"
     "Source/EC/Components/Collider2D.cpp"
+    "Source/EC/Components/Rigidbody2D.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"
