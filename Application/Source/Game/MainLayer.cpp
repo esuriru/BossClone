@@ -1,6 +1,8 @@
 #include "MainLayer.h"
 #include "Renderer/RenderCommand.h"
 #include "Renderer/Renderer2D.h"
+#include "Utils/SoundController.h"
+#include "Utils/MusicPlayer.h"
 
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
@@ -24,6 +26,11 @@ MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
+    ISoundSource* source;
+    MusicPlayer::Instance()->AddMusic("Assets/Sounds/level1bgm_01.ogg", 1, source, true);
+    source->setDefaultVolume(0.0f);
+
+
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
@@ -31,6 +38,18 @@ MainLayer::MainLayer()
     blueBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Blue.png");
     brownBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
     spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
+
+#pragma region SOUND 
+    auto soundController = SoundController::Instance();
+    for (int i = 0; i < 9; ++i)
+        soundController->MasterVolumeDecrease();
+    
+
+    // soundController->LoadSound("Assets/Sounds/01.-The-Tale-of-a-Cruel-World.ogg", 1, true);
+    // MusicPlayer::Instance()->AddMusic("Assets/Sounds/calamitybgm.mp3", 1, true);
+    // MusicPlayer::Instance()->AddMusic("Assets/Sounds/01.-The-Tale-of-a-Cruel-World.ogg", 1, true);
+
+#pragma endregion 
 
     coordinator->Init();
     coordinator->SetEventCallback(CC_BIND_EVENT_FUNC(MainLayer::OnEvent));
@@ -225,6 +244,9 @@ MainLayer::MainLayer()
     coordinator->SetSystemSignature<ProjectileSystem>(projectileSystemSignature);
 
 #pragma endregion
+
+    // soundController->PlaySoundByID(1);
+    // MusicPlayer::Instance()->PlayMusicByID(1);
 }
 
 auto MainLayer::OnAttach() -> void 
@@ -885,7 +907,10 @@ auto MainLayer::OnDetach() -> void
 auto MainLayer::OnUpdate(Timestep ts) -> void 
 {
     // cameraController_.OnUpdate(ts);
+    static MusicPlayer* musicPlayer = MusicPlayer::Instance();
     static GameManager* gameManager = GameManager::Instance();
+
+    // musicPlayer->PlayMusic();
     timer_ += ts;
     gameManager->UploadTime(timer_);
     physicsSystem_->tilemapSystem->Update(ts);

@@ -4,7 +4,6 @@ set(PROJECT_NAME Application)
 # Source groups
 ################################################################################
 set(Header_Files
-
     "Source/Core/Application.h"
     "Source/Core/Core.h"
     "Source/Core/Layer.h"
@@ -40,6 +39,8 @@ set(Header_Files
     "Source/Scene/Scene.h"
     "Source/Scene/SceneManager.h"
 
+    "Source/Audio/Transition.h"
+
     "Source/ECS/System.h"
     "Source/ECS/SystemManager.h"
     "Source/ECS/Coordinator.h"
@@ -63,6 +64,11 @@ set(Header_Files
     "Source/Physics/Collision2D.h"
 
     "Source/ImGui/ImGuiLayer.h"
+
+    "Source/Utils/MusicPlayer.h"
+    "Source/Utils/SoundController.h"
+    "Source/Utils/SoundInfo.h"
+    "Source/Utils/filesystem.h"
 
 )
 source_group("Header Files" FILES ${Header_Files})
@@ -100,6 +106,7 @@ set(Source_Files
     "Source/ECS/Coordinator.cpp"
     "Source/ECS/Entity.cpp"
 
+    "Source/Audio/Transition.cpp"
 
     "Source/ECS/Systems/RenderSystem.cpp"
     "Source/ECS/Systems/PlayerSystem.cpp"
@@ -113,6 +120,10 @@ set(Source_Files
     "Source/Physics/Quadtree.cpp"
 
     "Source/ImGui/ImGuiLayer.cpp"
+
+    "Source/Utils/MusicPlayer.cpp"
+    "Source/Utils/SoundController.cpp"
+    "Source/Utils/SoundInfo.cpp"
 )
 
 source_group("Source Files" FILES ${Source_Files})
@@ -172,6 +183,7 @@ elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
         "${CMAKE_SOURCE_DIR}/vendor/assimp/include;"
         "${CMAKE_SOURCE_DIR}/vendor/glfw/include;"
         "${CMAKE_SOURCE_DIR}/vendor/imgui/imgui;"
+        "${CMAKE_SOURCE_DIR}/vendor/irrKlang;"
         "${CMAKE_SOURCE_DIR}/Common/Source"
     )
 endif()
@@ -281,6 +293,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
         "opengl32;"
         "winmm;"
         "Common;"
+        "irrKlang;"
     )
 endif()
 
@@ -289,7 +302,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE "${ADDITIONAL_LIBRARY_DEPENDENCIES
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     target_link_directories(${PROJECT_NAME} PRIVATE
         "${CMAKE_SOURCE_DIR}/vendor/assimp/lib;"
-        # "${CMAKE_SOURCE_DIR}/vendor/imgui;"
+        "${CMAKE_SOURCE_DIR}/vendor/irrKlang/lib;"
         "${CMAKE_SOURCE_DIR}/vendor/glfw/lib-vc2019;"
         "${CMAKE_SOURCE_DIR}/$<CONFIG>"
     )

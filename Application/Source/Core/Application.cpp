@@ -20,6 +20,9 @@
 
 #include "ImGui/ImGuiLayer.h"
 
+#include "Utils/SoundController.h"
+#include "Utils/MusicPlayer.h"
+
 #include <glad/glad.h>
 #include <glfw/glfw3.h>
 
@@ -59,6 +62,9 @@ auto Application::PerformRunCycle() -> void
 	{
 		const Timestep deltaTime = Timestep(static_cast<float>(timer_.getElapsedTime()));
 
+        static MusicPlayer* musicPlayer = MusicPlayer::Instance();
+        musicPlayer->UpdateTransition(deltaTime);
+
 		for (const auto& layer : layerStack_)
         {
 			layer->OnUpdate(deltaTime);
@@ -71,18 +77,21 @@ auto Application::PerformRunCycle() -> void
         }
         imGuiLayer_->End(); 
 	}
+    
     if (changingToPlay_)
     {
         changingToPlay_ = false;
         layerStack_.PopLayer(menuLayer_);
         PushLayer(mainLayer_);
     }
+
     if (changingToMenu_)
     {
         changingToMenu_ = false;
         layerStack_.PopLayer(mainLayer_);
         PushLayer(menuLayer_);
     }
+
 	input->PostUpdateKeys();
 	window_->OnUpdate();
 }
@@ -213,6 +222,11 @@ Application::Application()
 	window_->SetEventCallback(CC_BIND_EVENT_FUNC(Application::OnEvent));
 	window_->SetVSyncEnabled(false);
     window_->SetCursorEnabled(true);
+
+    SoundController::Instance()->Init();
+    MusicPlayer::Instance()->Init();
+    for (int i = 0; i < 9; ++i)
+        MusicPlayer::Instance()->MasterVolumeDecrease();
 
     RenderCommand::Init();
     Renderer2D::Init();

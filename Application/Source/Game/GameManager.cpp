@@ -1,6 +1,9 @@
 #include "GameManager.h"
 #include "Events/ApplicationEvent.h"
 #include <limits>
+#include "Utils/MusicPlayer.h"
+#include "Core/Core.h"
+#include <includes/ik_ISoundEffectControl.h>
 
 GameManager::GameManager()
     : state_(GameState::MenuLevel)
@@ -15,12 +18,26 @@ auto GameManager::ChangeState(GameState state) -> void
     eventCallback_(event);
     state_ = state;
 
-    if (state_ == GameState::MenuLevel)
+    switch (state_)
     {
-        if (timer_ < bestTime_)         
-        {
-            bestTime_ = timer_;
-        }
+        case GameState::MenuLevel:
+            if (timer_ < bestTime_)         
+            {
+                bestTime_ = timer_;
+            }
+            break;
+        case GameState::PlayingLevel:
+            {
+                auto musicPlayer = MusicPlayer::Instance();
+                musicPlayer->SetPlayMode(MusicPlayer::PLAYMODE::SINGLE_LOOP);
+                auto music = musicPlayer->PlayMusic();
+                // music->GetSound()->
+                musicPlayer->AddTransition(CreateScope<FadeInTransition>(musicPlayer->GetCurrentSound(), 4.0f));
+                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 20.f));
+            }
+            break;
+        default:
+            break;
     }
 }
 
