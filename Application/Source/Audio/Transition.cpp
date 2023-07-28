@@ -59,7 +59,7 @@ void FadeInTransition::OnTransit(float dt)
     Transition::OnTransit(dt);
     float value = inverseLength_ * timer_ * defaultVolume_;
 
-    CC_TRACE(value);
+    // CC_TRACE(value);
 
     sound_->setVolume(value);
     if (timer_ >= length_)
@@ -86,8 +86,6 @@ void FadeOutTransition::OnTransit(float dt)
 {
     timer_ -= dt;
     float value = inverseLength_ * timer_ * defaultVolume_;
-
-    CC_TRACE(value);
 
     sound_->setVolume(value);
     if (timer_ <= 0)

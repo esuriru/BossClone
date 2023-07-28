@@ -4,6 +4,10 @@
 #include "ECS/Component.h"
 #include "Core/KeyCodes.h"
 
+#include "ECS/Systems/GUISystem.h" 
+
+#include "Utils/SoundController.h"
+
 #include "Physics/Collision2D.h"
 
 #include "ECS/Coordinator.h"
@@ -284,6 +288,10 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 proposedPositionY = groundLevel + box_collider.Extents.y - box_collider.Offset.y;
                 rigidbody.LinearVelocity.y = 0.f;
                 resolved = true;
+                if (!onGroundBitset.test(e) && (*helperSystem->entities.begin()) == e)
+                {
+                    SoundController::Instance()->PlaySoundByID(4);
+                }
                 onGroundBitset.set(e, true);
                 if (onPlatform)
                 {

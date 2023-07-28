@@ -241,6 +241,84 @@ Application::Application()
         source->SetVolume(0.0f);
     }
 
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/FreeSFX/GameSFX/Events/Retro Event UI 01.wav", 1, true);
+        source->SetVolume(0.5f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/03_Step_grass_03.wav", 2, true, false);
+        source->SetVolume(0.5f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/30_Jump_03.wav", 3, true, false);
+        source->SetVolume(0.9f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/45_Landing_01.wav", 4, true, false);
+        source->SetVolume(0.9f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/22_Slash_04.wav", 5, true, false);
+        source->SetVolume(0.8f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/04_Fire_explosion_04_medium.wav", 6, true, false);
+        source->SetVolume(0.8f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodhit.ogg", 7, true, false);
+        source->SetVolume(0.8f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodbreak.ogg", 8, true, false);
+        source->SetVolume(0.8f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/013_Confirm_03.wav", 9, true, false);
+        source->SetVolume(0.95f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/39_Block_03.wav", 10, true, false);
+        source->SetVolume(0.95f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/08_Bite_04.wav", 11, true, false);
+        source->SetVolume(0.85f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/02_Heal_02.wav", 12, true, false);
+        source->SetVolume(0.85f);
+    }
+
+    {
+        SoundInfo* source;
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/88_Teleport_02.wav", 13, true, false);
+        source->SetVolume(0.85f);
+    }
+
     RenderCommand::Init();
     Renderer2D::Init();
 

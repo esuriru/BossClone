@@ -5,6 +5,7 @@
 #include "Audio/Transition.h"
 #include "Utils/MusicPlayer.h"
 #include "Core/Core.h"
+#include "Utils/SoundController.h"
 
 MenuLayer::MenuLayer()
     : Layer("MenuLayer")
@@ -55,6 +56,18 @@ auto MenuLayer::OnImGuiRender() -> void
     if (ImGui::Button("Play")) 
     {
         GameManager::Instance()->ChangeState(GameState::PlayingLevel);
+    }
+    if (ImGui::IsItemHovered())
+    {
+        if (!buttonHovered_)
+        {
+            buttonHovered_ = true;
+            SoundController::Instance()->PlaySoundByID(1, true);
+        }
+    }
+    else
+    {
+        buttonHovered_ = false;
     }
 
     ImGui::SetCursorPosX(88);

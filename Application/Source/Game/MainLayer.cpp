@@ -123,6 +123,8 @@ MainLayer::MainLayer()
     projectileSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
+    physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
+
 #pragma endregion
 #pragma region SYSTEM_SIGNATURES
     Signature spriteRenderSystemSignature;
@@ -519,11 +521,13 @@ auto MainLayer::OnAttach() -> void
         health.Health = health.MaxHealth;
         auto& transform = coordinator->GetComponent<TransformComponent>(e);
         transform.Position = glm::vec3(48, -3, 0);
+        SoundController::Instance()->PlaySoundByID(11, false);
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour.a = 0.5f;
+        SoundController::Instance()->PlaySoundByID(11, true);
     },
     [](Entity e)
     {
@@ -553,12 +557,14 @@ auto MainLayer::OnAttach() -> void
         tilemap.MapData[13][63].Type = Tile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
+        SoundController::Instance()->PlaySoundByID(10, true);
          
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        SoundController::Instance()->PlaySoundByID(10, true);
     },
     [](Entity e)
     {
@@ -591,12 +597,14 @@ auto MainLayer::OnAttach() -> void
         tilemap.MapData[45][24].Type = Tile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
+        SoundController::Instance()->PlaySoundByID(10, true);
          
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        SoundController::Instance()->PlaySoundByID(10, true);
     },
     [](Entity e)
     {
@@ -629,12 +637,14 @@ auto MainLayer::OnAttach() -> void
         tilemap.MapData[49][36].Type = Tile::TileType::Empty;
 
         coordinator->DestroyEntity(e);
+        SoundController::Instance()->PlaySoundByID(10, true);
          
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        SoundController::Instance()->PlaySoundByID(10, true);
     },
     [](Entity e)
     {
@@ -690,11 +700,13 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(starterWandEntity, rigidbody); 
         coordinator->AddComponent(starterWandEntity, PickupComponent()); 
         coordinator->AddComponent(starterWandEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
+        SoundController::Instance()->PlaySoundByID(8, true);
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        SoundController::Instance()->PlaySoundByID(7, true);
     },
     [](Entity e)
     {
@@ -778,11 +790,13 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(healthPot, physics_quadtree_component); 
         coordinator->AddComponent(healthPot, PickupComponent()); 
         coordinator->AddComponent(healthPot, HealthPotionComponent(50.f)); 
+        SoundController::Instance()->PlaySoundByID(8, true);
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        SoundController::Instance()->PlaySoundByID(7, true);
     },
     [](Entity e)
     {

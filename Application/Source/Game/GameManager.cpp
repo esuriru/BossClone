@@ -29,6 +29,10 @@ auto GameManager::ChangeState(GameState state) -> void
     switch (state_)
     {
         case GameState::MenuLevel:
+            {
+                auto musicPlayer = MusicPlayer::Instance();
+                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 0.5f));
+            }
             if (timer_ < bestTime_)         
             {
                 bestTime_ = timer_;
@@ -41,7 +45,7 @@ auto GameManager::ChangeState(GameState state) -> void
                 musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 0.5f));
                 auto music = musicPlayer->PlayMusicByID(1);
                 musicPlayer->AddTransition(CreateScope<FadeInTransition>(musicPlayer->GetCurrentSound(), 4.0f));
-                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 10.f));
+                // musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 10.f));
             }
             break;
         default:

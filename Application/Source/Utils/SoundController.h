@@ -38,8 +38,15 @@ public:
 					SoundInfo::SOUNDTYPE eSoundType = SoundInfo::SOUNDTYPE::_2D,
 					vec3df vec3dfSoundPos = vec3df(0.0f, 0.0f, 0.0f));
 
+	bool LoadSound(	SoundInfo*& sound, string filename, 
+					const int ID,
+					const bool bPreload = true,
+					const bool bIsLooped = false,
+					SoundInfo::SOUNDTYPE eSoundType = SoundInfo::SOUNDTYPE::_2D,
+					vec3df vec3dfSoundPos = vec3df(0.0f, 0.0f, 0.0f));
+
 	// Play a sound by its ID
-	void PlaySoundByID(const int ID);
+	irrklang::ISound* PlaySoundByID(const int ID, bool forcePlay = false);
 
 	// Increase Master volume
 	bool MasterVolumeIncrease(void);

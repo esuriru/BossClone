@@ -18,4 +18,5 @@ public:
 private:
     Ref<Texture2D> mapPreview_; 
     bool firstTime_;
+    bool buttonHovered_;
 };

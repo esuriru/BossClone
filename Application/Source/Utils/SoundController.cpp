@@ -113,36 +113,80 @@ bool SoundController::LoadSound(	string filename,
 	return true;
 }
 
+bool SoundController::LoadSound(	SoundInfo*& sound, string filename,
+									const int ID,
+									const bool bPreload,
+									const bool bIsLooped,
+									SoundInfo::SOUNDTYPE eSoundType,
+									vec3df vec3dfSoundPos)
+{
+	// Load the sound from the file
+	ISoundSource* pSoundSource = cSoundEngine->addSoundSourceFromFile(filename.c_str(),
+																	E_STREAM_MODE::ESM_NO_STREAMING, 
+																	bPreload);
+
+
+	// Trivial Rejection : Invalid pointer provided
+	if (pSoundSource == nullptr)
+	{
+		cout << "Unable to load sound " << filename.c_str() << endl;
+		return false;
+	}
+
+	// Force the sound source not to have any streaming
+	pSoundSource->setForcedStreamingThreshold(-1);
+
+	// Clean up first if there is an existing Entity with the same name
+	RemoveSound(ID);
+
+	// Add the entity now
+	SoundInfo* cSoundInfo = new SoundInfo();
+	if (eSoundType == SoundInfo::SOUNDTYPE::_2D)
+		cSoundInfo->Init(ID, pSoundSource, bIsLooped);
+	else
+		cSoundInfo->Init(ID, pSoundSource, bIsLooped, eSoundType, vec3dfSoundPos);
+
+    sound = cSoundInfo;
+
+	// Set to soundMap
+	soundMap[ID] = cSoundInfo;
+
+	return true;
+}
+
 /**
  @brief Play a sound by its ID
  @param ID A const int variable which will be the ID of the iSoundSource in the map
  */
-void SoundController::PlaySoundByID(const int ID)
+irrklang::ISound* SoundController::PlaySoundByID(const int ID, bool forcePlay)
 {
 	SoundInfo* pSoundInfo = GetSound(ID);
 	if (!pSoundInfo)
 	{
 		cout << "Sound #" << ID << " is not playable." << endl;
-		return;
+		return nullptr;
 	}
-	else if (cSoundEngine->isCurrentlyPlaying(pSoundInfo->GetSound()))
+
+	else if (!forcePlay && cSoundEngine->isCurrentlyPlaying(pSoundInfo->GetSound()))
 	{
 		cout << "Sound #" << ID << " is currently being played." << endl;
-		return;
+		return nullptr;
 	}
 
 	if (pSoundInfo->GetSoundType() == SoundInfo::SOUNDTYPE::_2D)
 	{
-		cSoundEngine->play2D(	pSoundInfo->GetSound(), 
-								pSoundInfo->GetLoopStatus());
+		return cSoundEngine->play2D(	pSoundInfo->GetSound(), 
+								pSoundInfo->GetLoopStatus(), false, false, true);
 	}
 	else if (pSoundInfo->GetSoundType() == SoundInfo::SOUNDTYPE::_3D)
 	{
 		cSoundEngine->setListenerPosition(vec3dfListenerPos, vec3dfListenerDir);
-		cSoundEngine->play3D(	pSoundInfo->GetSound(), 
+		return cSoundEngine->play3D(	pSoundInfo->GetSound(), 
 								pSoundInfo->GetPosition(), 
 								pSoundInfo->GetLoopStatus());
 	}
+
+    return nullptr;
 }
 
 /**

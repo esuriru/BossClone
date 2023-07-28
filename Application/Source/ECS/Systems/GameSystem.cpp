@@ -5,6 +5,8 @@
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
+#include "Utils/SoundController.h"
+
 #include "Core/Core.h"
 
 #include "Events/EventDispatcher.h"
@@ -28,8 +30,9 @@ auto WeaponSystem::Update(Timestep ts) -> void
             if (weapon.Active)
             {
                 weapon.ActiveBehaviour(e);
-
             }
+            if (weapon.CooldownFrames > 0)
+                weapon.CooldownFrames--;
         } 
         accumulator -= step;
     }
@@ -63,8 +66,10 @@ auto WeaponSystem::MageBehaviour(Entity e, WeaponUseEvent &event) -> void
 {
     auto& weapon = coordinator->GetComponent<WeaponComponent>(e);
     weapon.Active = event.IsMouseDown();
-    if (!event.IsMouseDown())
-        weapon.CooldownFrames = 0;
+    if (weapon.CooldownFrames > 0)
+        --weapon.CooldownFrames;
+    // if (!event.IsMouseDown())
+    //     weapon.CooldownFrames = 0;
 }
 
 auto WeaponSystem::MeleeActiveBehaviour(Entity e) -> void
@@ -91,10 +96,10 @@ auto WeaponSystem::MageActiveBehaviour(Entity e) -> void
     auto& owner_centre = coordinator->GetComponent<TransformComponent>(owned_by.Owner).Position;
     bool ownerIsFacingRight = coordinator->GetComponent<PlayerController2DComponent>(owned_by.Owner).IsFacingRight;
 
-    if (weapon.CooldownFrames > 0)
-        --weapon.CooldownFrames;
+    // if (weapon.CooldownFrames > 0)
+    //     --weapon.CooldownFrames;
 
-    if (weapon.CooldownFrames == 0)
+    if (weapon.CooldownFrames <= 0)
     {
         // NOTE - This will throw if spark is invalid.
         auto& reference_component = coordinator->GetComponent<ReferenceComponent>(e);
@@ -104,6 +109,7 @@ auto WeaponSystem::MageActiveBehaviour(Entity e) -> void
         auto& projectile_physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(spark_entity);
         auto& projectile_sprite = coordinator->GetComponent<SpriteRendererComponent>(spark_entity);
 
+        SoundController::Instance()->PlaySoundByID(6, true);
         projectile.Active = true; 
         projectile.LifetimeFrames = 60; 
         projectile_physics_quadtree.Active = true;
@@ -265,6 +271,12 @@ auto WeaponAffectedByAnimationSystem::DefaultMeleeAnimationBehaviour(Entity e, A
 {
     bool indexIsActive = activeIndices.find(ascEvent.GetSpriteIndex()) != activeIndices.end();
     coordinator->GetComponent<PhysicsQuadtreeComponent>(e).Active = indexIsActive;
+
+    // NOTE - Hardcoded
+    if (ascEvent.GetSpriteIndex() == 3) 
+    {
+        SoundController::Instance()->PlaySoundByID(5, true);
+    }
 }
 
 auto WeaponAffectedByAnimationSystem::OnItemAffectByAnimationEvent(ItemAffectByAnimationEvent &e) -> bool
@@ -343,6 +355,7 @@ auto PickupItemSystem::OnPickupEvent(PickupEvent &e) -> bool
     coordinator->RemoveComponent<SpriteRendererComponent>(e.GetTargetEntity());
     auto& physics_obj = coordinator->GetComponent<PhysicsQuadtreeComponent>(e.GetTargetEntity());
     physics_obj.Active = false;
+    SoundController::Instance()->PlaySoundByID(9);
 
     return false;
 }
@@ -464,6 +477,8 @@ auto HealingPotionSystem::OnWeaponUseEvent(WeaponUseEvent &e) -> bool
     HealingEvent healingEvent(e.GetWeapon(), healing_potion, e.GetOwner());
     eventCallback(healingEvent);
 
+    SoundController::Instance()->PlaySoundByID(12, true);
+
     // NOTE - IT'S ONE USE FOR NOW
     // Remove the potion. 
     for (int i = 0; i < player_inventory.Items.size(); ++i)
@@ -495,6 +510,7 @@ auto PortalSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
     if (entities.find(e.GetTargetEntity()) == entities.end()) return false;
     auto& portal = coordinator->GetComponent<PortalComponent>(e.GetTargetEntity());
     portal.Behaviour(e.GetTargetEntity(), e);
+    SoundController::Instance()->PlaySoundByID(13, true);
     return true;
 }
 

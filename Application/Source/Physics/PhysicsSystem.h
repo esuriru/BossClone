@@ -14,6 +14,8 @@
 
 #include "Core/Window.h"
 
+class InventoryGUIHelperSystem;
+
 namespace Physics
 {
     constexpr float GravityAccelerationScalar = -25.8f;
@@ -50,6 +52,7 @@ public:
     // TODO - Find out why this exists
     Entity tilemapEntity;
     Ref<ActiveTilemapSystem> tilemapSystem;
+    Ref<InventoryGUIHelperSystem> helperSystem;
     EventCallback eventCallback;
 
     static auto AddForce(RigidBody2DComponent& rigidbody, const glm::vec2& force, float deltaTime, Physics::ForceMode mode = Physics::ForceMode::Force) -> void;

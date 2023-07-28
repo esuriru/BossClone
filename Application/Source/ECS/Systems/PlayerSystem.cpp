@@ -8,6 +8,9 @@
 #include "Physics/PhysicsSystem.h"
 #include "Utils/Input.h"
 
+#include "Utils/SoundController.h"
+#include <includes/ik_ISoundEffectControl.h>
+
 #include "Events/ApplicationEvent.h"
 #include "Events/EventDispatcher.h"
 
@@ -38,12 +41,16 @@ auto PlayerSystem::Update(Timestep ts) -> void
         wantsToDash = true;
     if (input->IsKeyPressed(Key::Space))
         wantsToJump = true;
+    mouseDown_ = input->GetMouseButtonDown(0);
+    static bool eventSent = false;
 
 
     while (accumulator >= step) 
     {
         for (auto& e : entities)
         {
+            static int audioWalkCooldown = 0; 
+            static SoundController* soundController = SoundController::Instance(); 
             auto& transform = coordinator->GetComponent<TransformComponent>(e);
             auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
             auto& player_controller = coordinator->GetComponent<PlayerController2DComponent>(e);
@@ -71,6 +78,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
                     eventCallback(event);
                     runningBitset_.set(e, true);
+                    // audioWalkCooldown = 0;
                 }
                 transform.Scale.x = -fabs(transform.Scale.x);
                 player_controller.IsFacingRight = false;
@@ -91,6 +99,7 @@ auto PlayerSystem::Update(Timestep ts) -> void
                     AnimationEvent event(Animation::AnimationType::Running, e, true);
                     eventCallback(event);
                     runningBitset_.set(e, true);
+                    // audioWalkCooldown = 0;
                 }
                 transform.Scale.x = fabs(transform.Scale.x);
                 player_controller.IsFacingRight = true;
@@ -120,12 +129,14 @@ auto PlayerSystem::Update(Timestep ts) -> void
             if (wantsToJump && input->IsKeyDown(Key::Space) && (physicsSystem->onGroundBitset.test(e) || physicsSystem->onPlatformBitset.test(e)) && rigidbody.LinearVelocity.y <= 0.0f)
             {
                 wantsToJump = false;
+                soundController->PlaySoundByID(3, true);
                 PhysicsSystem::AddForce(rigidbody, glm::vec2(0, player_controller.JumpForce), step, Physics::ForceMode::Impulse);
                 hasJumped = true;
             }
             if (wantsToDash && input->IsKeyDown(Key::F))
             {
                 wantsToDash = false;
+                soundController->PlaySoundByID(3, true)->setPlaybackSpeed(0.75f);
                 currentDashCooldown_ += dashCooldownFrames_; 
                 // rigidbody.LinearVelocity.x = !hasJumped && (physicsSystem->onGroundBitset.test(e) || physicsSystem->onPlatformBitset.test(e)) ? 
                 //     (-1 + 2 * static_cast<int>(player_controller.IsFacingRight)) * player_controller.DashForce : 
@@ -149,25 +160,44 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
             // Using the item that the player currently holds.
             auto& inventory = coordinator->GetComponent<InventoryComponent>(e);    
-            if (input->GetMouseButtonDown(0))
+            if (!mouseDown_)
             {
-                if (!mouseDown_)
+                if (!eventSent)
                 {
-                    WeaponUseEvent event(e, inventory.CurrentlyHolding, true, player_controller.IsFacingRight); 
-                    lastKnownHolding_ = inventory.CurrentlyHolding;
-                    eventCallback(event);
-                    mouseDown_ = true;
-                }
-            }
-            else
-            {
-                if (mouseDown_)
-                {
-                    mouseDown_ = false;
+                    eventSent = true;
                     WeaponUseEvent event(e, lastKnownHolding_, false, player_controller.IsFacingRight); 
                     eventCallback(event);
                 }
             }
+            else
+            {
+                if (eventSent)
+                {
+                    eventSent = false;
+                // eventSent = false;
+                    WeaponUseEvent event(e, inventory.CurrentlyHolding, true, player_controller.IsFacingRight); 
+                    lastKnownHolding_ = inventory.CurrentlyHolding;
+                    eventCallback(event);
+                }
+            }
+
+
+            if (runningBitset_.test(e) && physicsSystem->onGroundBitset.test(e))
+            {
+                // CC_TRACE(audioWalkCooldown);
+                if (audioWalkCooldown > 0)
+                {
+                    audioWalkCooldown--; 
+                }
+                else if (audioWalkCooldown <= 0)
+                {
+                    // CC_TRACE("Sound log.");
+                    soundController->PlaySoundByID(2, true);
+                    audioWalkCooldown += 16;
+                }
+
+            }
+
 
         }
         accumulator -= step;
