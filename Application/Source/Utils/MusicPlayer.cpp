@@ -194,7 +194,7 @@ bool MusicPlayer::AddMusic(	string filename,
 	return true;
 }
 
-bool MusicPlayer::AddMusic(string filename, const int ID, ISoundSource*& source, const bool bPreload)
+bool MusicPlayer::AddMusic(string filename, const int ID, SoundInfo*& source, const bool bPreload, const bool loop)
 {
 	if (FileSystem::DoesFileExists(filename) == false)
 	{
@@ -215,7 +215,6 @@ bool MusicPlayer::AddMusic(string filename, const int ID, ISoundSource*& source,
 		return false;
 	}
 
-    source = pSoundSource; 
 
 	// Force the sound source not to have any streaming
 	pSoundSource->setForcedStreamingThreshold(-1);
@@ -225,7 +224,9 @@ bool MusicPlayer::AddMusic(string filename, const int ID, ISoundSource*& source,
 
 	// Add the entity now
 	SoundInfo* cSoundInfo = new SoundInfo();
-	cSoundInfo->Init(ID, pSoundSource);
+	cSoundInfo->Init(ID, pSoundSource, loop);
+
+    source = cSoundInfo; 
 
 	// Set to musicMap
 	musicMap[ID] = cSoundInfo;
@@ -274,7 +275,7 @@ void MusicPlayer::SetMusicPlaybackFinished(const bool bMusicPlaybackFinished)
  @brief Play a sound by its ID
  @param ID A const int variable which will be the ID of the iSoundSource in the map
  */
-void MusicPlayer::PlayMusicByID(const int ID)
+SoundInfo* MusicPlayer::PlayMusicByID(const int ID)
 {
 	// Set the play mode
 	ePlayMode = PLAYMODE::SINGLE;
@@ -283,15 +284,18 @@ void MusicPlayer::PlayMusicByID(const int ID)
 	if (!pSoundInfo)
 	{
 		cout << "Sound #" << ID << " is not playable." << endl;
-		return;
+		return nullptr;
 	}
 	else if (cSoundEngine->isCurrentlyPlaying(pSoundInfo->GetSound()))
 	{
 		cout << "Sound #" << ID << " is currently being played." << endl;
-		return;
+		return nullptr;
 	}
 
-	cSoundEngine->play2D(pSoundInfo->GetSound(), pSoundInfo->GetLoopStatus());
+	currentISound = cSoundEngine->play2D(pSoundInfo->GetSound(), pSoundInfo->GetLoopStatus(), false, false, true);
+    currentISound->setSoundStopEventReceiver(cSoundStopReceiver, 0);
+
+    return pSoundInfo;
 }
 
 /**

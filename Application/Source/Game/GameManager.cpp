@@ -29,11 +29,12 @@ auto GameManager::ChangeState(GameState state) -> void
         case GameState::PlayingLevel:
             {
                 auto musicPlayer = MusicPlayer::Instance();
-                musicPlayer->SetPlayMode(MusicPlayer::PLAYMODE::SINGLE_LOOP);
-                auto music = musicPlayer->PlayMusic();
+                // musicPlayer->SetPlayMode(MusicPlayer::PLAYMODE::SINGLE_LOOP);
+                // auto music = musicPlayer->PlayMusic();
+                auto music = musicPlayer->PlayMusicByID(1);
                 // music->GetSound()->
                 musicPlayer->AddTransition(CreateScope<FadeInTransition>(musicPlayer->GetCurrentSound(), 4.0f));
-                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 20.f));
+                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 10.f));
             }
             break;
         default:

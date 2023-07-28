@@ -67,8 +67,9 @@ public:
 
 	bool AddMusic(	string filename, 
 					const int ID,
-                    ISoundSource*& source, 
-					const bool bPreload = true);
+                    SoundInfo*& source, 
+					const bool bPreload = true,
+                    const bool loop = false);
 	// Remove a music files  from this map
 	bool RemoveMusic(const int ID);
 	// Get the number of music files in this map
@@ -78,7 +79,7 @@ public:
 	void SetMusicPlaybackFinished(const bool bMusicPlaybackFinished);
 
 	// Play a music by its ID
-	void PlayMusicByID(const int ID);
+	SoundInfo* PlayMusicByID(const int ID);
 	// Play a music according to the current mode
 	SoundInfo* PlayMusic(void);
     SoundInfo* PlayMusic(Scope<Transition> transition);

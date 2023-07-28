@@ -26,9 +26,9 @@ MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
-    ISoundSource* source;
-    MusicPlayer::Instance()->AddMusic("Assets/Sounds/level1bgm_01.ogg", 1, source, true);
-    source->setDefaultVolume(0.0f);
+    SoundInfo* source;
+    MusicPlayer::Instance()->AddMusic("Assets/Sounds/level1bgm_01.ogg", 1, source, true, true);
+    source->SetVolume(0.0f);
 
 
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
