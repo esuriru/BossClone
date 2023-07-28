@@ -16,6 +16,7 @@
 
 // Include filesystem
 #include "filesystem.h"
+#include "Audio/Transition.h"
 
 #include <iostream>
 using namespace std;
@@ -429,6 +430,15 @@ void MusicPlayer::Reset(void)
 		// Reset to start of playlist
 		iCurrentMusicVector = 0;
 	}
+}
+
+void MusicPlayer::ForceEndTransitions()
+{
+    for (auto& t : transitions_)
+    {
+        t->ForceEnd();
+    }
+    transitions_.clear();
 }
 
 /**

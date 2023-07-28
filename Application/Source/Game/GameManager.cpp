@@ -4,11 +4,19 @@
 #include "Utils/MusicPlayer.h"
 #include "Core/Core.h"
 #include <includes/ik_ISoundEffectControl.h>
+#include "Audio/Transition.h"
 
 GameManager::GameManager()
     : state_(GameState::MenuLevel)
     , bestTime_(std::numeric_limits<float>::max())
 {
+}
+
+void GameManager::Init()
+{
+    auto musicPlayer = MusicPlayer::Instance();
+    auto music = musicPlayer->PlayMusicByID(2);
+    musicPlayer->AddTransition(CreateScope<FadeInTransition>(musicPlayer->GetCurrentSound(), 1.0f));
 }
 
 auto GameManager::ChangeState(GameState state) -> void
@@ -30,9 +38,8 @@ auto GameManager::ChangeState(GameState state) -> void
             {
                 auto musicPlayer = MusicPlayer::Instance();
                 // musicPlayer->SetPlayMode(MusicPlayer::PLAYMODE::SINGLE_LOOP);
-                // auto music = musicPlayer->PlayMusic();
+                musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 0.5f));
                 auto music = musicPlayer->PlayMusicByID(1);
-                // music->GetSound()->
                 musicPlayer->AddTransition(CreateScope<FadeInTransition>(musicPlayer->GetCurrentSound(), 4.0f));
                 musicPlayer->AddTransition(CreateScope<FadeOutTransition>(musicPlayer->GetCurrentSound(), 4.0f, 10.f));
             }

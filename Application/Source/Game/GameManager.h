@@ -13,6 +13,7 @@ class GameManager : public Utility::Singleton<GameManager>
 {
 public:
     GameManager();
+    void Init();
     inline auto GetState() -> GameState { return state_; }
     auto ChangeState(GameState state) -> void;
     auto SetEventCallback(EventCallback eventCallback) -> void { eventCallback_ = eventCallback; }

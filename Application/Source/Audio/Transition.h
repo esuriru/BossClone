@@ -38,6 +38,11 @@ protected:
         done_ = true;
     }
 
+public:
+    virtual void ForceEnd() {}
+
+protected:
+
     TransitionState currentState_;
     float length_, timer_;
     bool done_;
@@ -55,6 +60,10 @@ private:
     float inverseLength_;
 
     void OnTransit(float dt) override;
+    inline void ForceEnd() override
+    {
+        sound_->setVolume(defaultVolume_);
+    }
 
 };
 
@@ -71,5 +80,10 @@ private:
 
     void OnEnter(float dt) override;
     void OnTransit(float dt) override;
+    void OnExit(float dt) override;
+    inline void ForceEnd() override
+    {
+        sound_->setVolume(0.0f);
+    }
 
 };

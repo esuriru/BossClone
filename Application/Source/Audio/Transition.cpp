@@ -1,5 +1,6 @@
 #include "Transition.h"
 #include "Core/Core.h"
+#include "Utils/MusicPlayer.h"
 
 Transition::Transition(ISound* sound)
     : timer_(0.0f)
@@ -65,6 +66,12 @@ void FadeInTransition::OnTransit(float dt)
     {
         currentState_ = Exit;
     }
+}
+
+void FadeOutTransition::OnExit(float dt)
+{
+    Transition::OnExit(dt);
+    sound_->stop();
 }
 
 FadeOutTransition::FadeOutTransition(ISound *sound, float lengthSeconds, float offset)

@@ -14,7 +14,6 @@
 using namespace irrklang;
 #pragma comment(lib, "irrKlang.lib") // link with irrKlang.dll
 
-#include "Audio/Transition.h" 
 #include "Core/Core.h"
 
 // Include string
@@ -27,6 +26,8 @@ using namespace std;
 
 // Include SoundInfo class; it stores the sound and other information
 #include "SoundInfo.h"
+
+class Transition;
 
 class MusicPlayer : public Utility::Singleton<MusicPlayer>
 {
@@ -87,6 +88,7 @@ public:
 	void StopPlayMusic(void);
 	// Reset the music player
 	void Reset(void);
+    void ForceEndTransitions();
 
     inline ISound* GetCurrentSound()
     {

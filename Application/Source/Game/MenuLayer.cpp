@@ -2,6 +2,9 @@
 #include <examples/imgui_impl_opengl3.h> 
 #include "ECS/Systems/GUISystem.h"
 #include "GameManager.h"
+#include "Audio/Transition.h"
+#include "Utils/MusicPlayer.h"
+#include "Core/Core.h"
 
 MenuLayer::MenuLayer()
     : Layer("MenuLayer")
@@ -12,6 +15,7 @@ MenuLayer::MenuLayer()
 
 auto MenuLayer::OnAttach() -> void 
 {
+    GameManager::Instance()->Init();
 }
 
 auto MenuLayer::OnDetach() -> void 

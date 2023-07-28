@@ -223,10 +223,23 @@ Application::Application()
 	window_->SetVSyncEnabled(false);
     window_->SetCursorEnabled(true);
 
+
     SoundController::Instance()->Init();
     MusicPlayer::Instance()->Init();
     for (int i = 0; i < 9; ++i)
         MusicPlayer::Instance()->MasterVolumeDecrease();
+
+    {
+        SoundInfo* source;
+        MusicPlayer::Instance()->AddMusic("Assets/Sounds/level1bgm_01.ogg", 1, source, true, true);
+        source->SetVolume(0.0f);
+    }
+
+    {
+        SoundInfo* source;
+        MusicPlayer::Instance()->AddMusic("Assets/Sounds/menu_01.ogg", 2, source, true, true);
+        source->SetVolume(0.0f);
+    }
 
     RenderCommand::Init();
     Renderer2D::Init();
