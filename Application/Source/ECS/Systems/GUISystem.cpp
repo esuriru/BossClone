@@ -112,6 +112,8 @@ auto PlayerHealthGUISystem::OnImGuiRender() -> void
     ImGui::End();
 }
 
+
+
 auto Utility::ImGuiImage(const Ref<Texture2D> &icon, float width, float height) -> void
 {
     ImGui::Image(reinterpret_cast<ImTextureID>(
@@ -134,4 +136,14 @@ auto Utility::ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplie
         ImVec2(icon->GetTexCoordsArray()[0].x, icon->GetTexCoordsArray()[0].y),
         ImVec2(icon->GetTexCoordsArray()[2].x, icon->GetTexCoordsArray()[2].y)
     );
+}
+
+ImTextureID Utility::ImGuiImageTexture(const Ref<Texture2D> &icon)
+{
+    return reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetRendererID()));
+}
+
+ImTextureID Utility::ImGuiImageTexture(const Ref<SubTexture2D> &icon)
+{
+    return reinterpret_cast<ImTextureID>(static_cast<intptr_t>(icon->GetTexture()->GetRendererID()));
 }

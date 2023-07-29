@@ -5,11 +5,14 @@
 #include "Renderer/SubTexture2D.h"
 #include "Renderer/Texture.h"
 
+typedef void* ImTextureID;
 namespace Utility
 {
     auto ImGuiImage(const Ref<Texture2D>& icon, float imageSizeMultiplier = 1.5f) -> void;
     auto ImGuiImage(const Ref<Texture2D>& icon, float width, float height) -> void;
     auto ImGuiImage(const Ref<SubTexture2D> &icon, float imageSizeMultiplier = 1.5f) -> void;
+    ImTextureID ImGuiImageTexture(const Ref<Texture2D>& icon);
+    ImTextureID ImGuiImageTexture(const Ref<SubTexture2D>& icon);
 }
 
 

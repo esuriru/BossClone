@@ -28,8 +28,14 @@ public:
 
 private:
     float timer_ = 0.f;
+    float musicTimer_ = 0.f;
+    bool isPlayingMusic_ = true;
 
     OrthographicCameraController cameraController_;
+
+    Ref<Texture2D> buttons_;
+    Ref<SubTexture2D> playButton_;
+    Ref<SubTexture2D> pauseButton_;
 
     Ref<Texture2D> nareLogoTexture_;
     Ref<Scene> activeScene_;

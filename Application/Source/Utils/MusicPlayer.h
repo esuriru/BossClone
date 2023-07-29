@@ -20,6 +20,7 @@ using namespace irrklang;
 #include <string>
 // Include map storage
 #include <map>
+#include <unordered_map>
 // Include vector storage
 #include <vector>
 using namespace std;
@@ -57,6 +58,7 @@ public:
     void AddTransition(Scope<Transition> newTransition);
 
     void UpdateTransition(float dt);
+    void SetPause(bool pause);
 
 	// Initialise this class instance
 	bool Init(void);
@@ -78,9 +80,10 @@ public:
 
 	// Set the music playback status
 	void SetMusicPlaybackFinished(const bool bMusicPlaybackFinished);
+    void SetIDToName(int ID, std::string name);
 
 	// Play a music by its ID
-	SoundInfo* PlayMusicByID(const int ID);
+	SoundInfo* PlayMusicByID(const int ID, bool paused = false);
 	// Play a music according to the current mode
 	SoundInfo* PlayMusic(void);
     SoundInfo* PlayMusic(Scope<Transition> transition);
@@ -114,17 +117,24 @@ public:
 	bool MasterVolumeIncrease(void);
 	// Decrease Master volume
 	bool MasterVolumeDecrease(void);
+    void SetMasterVolume(float volume);
+    float GetVolume();
+
 
 	// Increase volume of a ISoundSource
 	bool VolumeIncrease(const int ID);
 	// Decrease volume of a ISoundSource
 	bool VolumeDecrease(const int ID);
+    int GetID(string name);
 
 protected:
 	// Constructor
 	MusicPlayer(void);
 
     std::vector<Scope<Transition>> transitions_;
+    std::unordered_map<std::string, int> musicMap_;
+
+    
 
 	// Destructor
 	virtual ~MusicPlayer(void);

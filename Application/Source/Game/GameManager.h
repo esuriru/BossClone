@@ -6,6 +6,7 @@
 enum GameState
 {
     PlayingLevel,
+    Paused,
     MenuLevel,
 };
 

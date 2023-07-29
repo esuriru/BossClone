@@ -290,7 +290,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
                 resolved = true;
                 if (!onGroundBitset.test(e) && (*helperSystem->entities.begin()) == e)
                 {
-                    SoundController::Instance()->PlaySoundByID(4);
+                    SoundController::Instance()->PlaySoundByID(4, true);
                 }
                 onGroundBitset.set(e, true);
                 if (onPlatform)

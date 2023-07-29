@@ -101,10 +101,12 @@ auto Application::OnGameStateChange(GameStateChangeEvent &e) -> bool
     switch (e.GetNewState())
     {
     case GameState::PlayingLevel: 
-        changingToPlay_ = true;
+        if (e.GetOldState() == GameState::MenuLevel)
+            changingToPlay_ = true;
         break;
     case GameState::MenuLevel:
-        changingToMenu_ = true;
+        if (e.GetOldState() == GameState::PlayingLevel)
+            changingToMenu_ = true;
         break;
     default:
         break;
@@ -232,12 +234,20 @@ Application::Application()
     {
         SoundInfo* source;
         MusicPlayer::Instance()->AddMusic("Assets/Sounds/level1bgm_01.ogg", 1, source, true, true);
+        MusicPlayer::Instance()->SetIDToName(1, "My Castle Town");
         source->SetVolume(0.0f);
     }
 
     {
         SoundInfo* source;
         MusicPlayer::Instance()->AddMusic("Assets/Sounds/menu_01.ogg", 2, source, true, true);
+        source->SetVolume(0.0f);
+    }
+
+    {
+        SoundInfo* source;
+        MusicPlayer::Instance()->AddMusic("Assets/Sounds/01.-The-Tale-of-a-Cruel-World.ogg", 3, source, true, true);
+        MusicPlayer::Instance()->SetIDToName(3, "The Tale of a Cruel World");
         source->SetVolume(0.0f);
     }
 
@@ -268,7 +278,7 @@ Application::Application()
     {
         SoundInfo* source;
         SoundController::Instance()->LoadSound(source, "Assets/Sounds/22_Slash_04.wav", 5, true, false);
-        source->SetVolume(0.8f);
+        source->SetVolume(0.2f);
     }
 
     {
@@ -279,14 +289,14 @@ Application::Application()
 
     {
         SoundInfo* source;
-        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodhit.ogg", 7, true, false);
-        source->SetVolume(0.8f);
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodhit.ogg", 7, true, false, SoundInfo::SOUNDTYPE::_3D);
+        source->SetVolume(0.95f);
     }
 
     {
         SoundInfo* source;
-        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodbreak.ogg", 8, true, false);
-        source->SetVolume(0.8f);
+        SoundController::Instance()->LoadSound(source, "Assets/Sounds/woodbreak.ogg", 8, true, false, SoundInfo::SOUNDTYPE::_3D);
+        source->SetVolume(0.95f);
     }
 
     {

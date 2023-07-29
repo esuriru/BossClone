@@ -11,6 +11,7 @@ MenuLayer::MenuLayer()
     : Layer("MenuLayer")
 {
     mapPreview_ = CreateRef<Texture2D>("Assets/Images/Preview.png", false);
+    gear_ = CreateRef<Texture2D>("Assets/Images/gear.png", false);
     firstTime_ = true;
 }
 
@@ -22,6 +23,7 @@ auto MenuLayer::OnAttach() -> void
 auto MenuLayer::OnDetach() -> void 
 {
     firstTime_ = false;
+    settingsOn_ = false;
 }
 
 auto MenuLayer::OnUpdate(Timestep ts) -> void 
@@ -41,6 +43,66 @@ auto MenuLayer::OnImGuiRender() -> void
     ImGui::Begin("Menu", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
+    
+    ImGui::SetCursorPosX(io.DisplaySize.x - 100);
+
+    static SoundController* soundController = SoundController::Instance();
+    static bool gearHovered = false;
+
+    if (!settingsOn_)
+    {
+        if (ImGui::ImageButton(Utility::ImGuiImageTexture(gear_), ImVec2(80, 80)))
+        {
+            settingsOn_ = true;
+        }
+        if (ImGui::IsItemHovered())
+        {
+            if (!gearHovered)
+            {
+                gearHovered = true;
+                soundController->PlaySoundByID(1, true);
+            }
+        }
+        else
+        {
+            gearHovered = false;
+        }
+    }
+    else
+    {
+        if (ImGui::ImageButton(Utility::ImGuiImageTexture(gear_), ImVec2(80, 80)))
+        {
+            settingsOn_ = false;
+        }
+        if (ImGui::IsItemHovered())
+        {
+            if (!gearHovered)
+            {
+                gearHovered = true;
+                soundController->PlaySoundByID(1, true);
+            }
+        }
+        else
+        {
+            gearHovered = false;
+        }
+        ImGui::SetNextWindowSize(ImVec2(400, 300));
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 450, 120));
+        static MusicPlayer* player = MusicPlayer::Instance();
+        ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoSavedSettings);
+        float bgmMasterVolume_ = player->GetVolume();
+        ImGui::SliderFloat("BGM Master volume", &bgmMasterVolume_, 0.0f, 1.0f);
+        player->SetMasterVolume(bgmMasterVolume_);
+        static SoundController* sc = SoundController::Instance();
+        float soundVolume = sc->GetVolume();
+        ImGui::SliderFloat("SFX Master volume", &soundVolume, 0.0f, 1.0f);
+        sc->SetMasterVolume(soundVolume);
+        ImGui::End();
+
+    }
+
     ImGui::SetCursorPosX(100);
     ImGui::SetCursorPosY(100);
     Utility::ImGuiImage(mapPreview_, 0.5f);
@@ -62,7 +124,7 @@ auto MenuLayer::OnImGuiRender() -> void
         if (!buttonHovered_)
         {
             buttonHovered_ = true;
-            SoundController::Instance()->PlaySoundByID(1, true);
+            soundController->PlaySoundByID(1, true);
         }
     }
     else

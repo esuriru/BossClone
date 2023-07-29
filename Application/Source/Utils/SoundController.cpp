@@ -55,7 +55,7 @@ SoundController::~SoundController(void)
 bool SoundController::Init(void)
 {
 	// Initialise the sound engine with default parameters
-	cSoundEngine = createIrrKlangDevice(ESOD_WIN_MM, ESEO_MULTI_THREADED);
+	cSoundEngine = createIrrKlangDevice(/*ESOD_WIN_MM, ESEO_MULTI_THREADED*/);
 	if (cSoundEngine == NULL)
 	{
 		cout << "Unable to initialise the IrrKlang sound engine" << endl;
@@ -183,7 +183,7 @@ irrklang::ISound* SoundController::PlaySoundByID(const int ID, bool forcePlay)
 		cSoundEngine->setListenerPosition(vec3dfListenerPos, vec3dfListenerDir);
 		return cSoundEngine->play3D(	pSoundInfo->GetSound(), 
 								pSoundInfo->GetPosition(), 
-								pSoundInfo->GetLoopStatus());
+								pSoundInfo->GetLoopStatus(), false, false, true);
 	}
 
     return nullptr;
@@ -232,6 +232,11 @@ bool SoundController::MasterVolumeDecrease(void)
 void SoundController::SetMasterVolume(float volume)
 {
     cSoundEngine->setSoundVolume(glm::clamp(volume, 0.f, 1.0f));
+}
+
+float SoundController::GetVolume()
+{
+    return cSoundEngine->getSoundVolume();
 }
 
 /**

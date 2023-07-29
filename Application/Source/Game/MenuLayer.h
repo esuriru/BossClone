@@ -16,7 +16,12 @@ public:
     auto OnImGuiRender() -> void override;
 
 private:
+    float masterVolume_ = 0.1f;
+
     Ref<Texture2D> mapPreview_; 
+    Ref<Texture2D> gear_; 
+
     bool firstTime_;
     bool buttonHovered_;
+    bool settingsOn_;
 };

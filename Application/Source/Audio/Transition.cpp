@@ -54,6 +54,15 @@ FadeInTransition::FadeInTransition(ISound* sound, float lengthSeconds, float def
 
 }
 
+FadeOutTransition::FadeOutTransition(ISound *sound, float lengthSeconds, float offset, OnExitCallback callback)
+    : Transition(sound, lengthSeconds)
+    , inverseLength_(1.0f / lengthSeconds)
+    , defaultVolume_(sound->getVolume())
+    , callback_(callback)
+{
+    timer_ = 0.0f;
+}
+
 void FadeInTransition::OnTransit(float dt)
 {
     Transition::OnTransit(dt);
@@ -71,15 +80,7 @@ void FadeInTransition::OnTransit(float dt)
 void FadeOutTransition::OnExit(float dt)
 {
     Transition::OnExit(dt);
-    sound_->stop();
-}
-
-FadeOutTransition::FadeOutTransition(ISound *sound, float lengthSeconds, float offset)
-    : Transition(sound, lengthSeconds)
-    , inverseLength_(1.0f / lengthSeconds)
-    , offset_(offset)
-{
-    timer_ = 0.0f;
+    callback_(sound_);
 }
 
 void FadeOutTransition::OnTransit(float dt)

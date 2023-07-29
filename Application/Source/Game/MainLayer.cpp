@@ -4,6 +4,10 @@
 #include "Utils/SoundController.h"
 #include "Utils/MusicPlayer.h"
 
+#include "Audio/Transition.h"
+
+#include "Core/KeyCodes.h"
+
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
 
@@ -35,6 +39,10 @@ MainLayer::MainLayer()
     blueBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Blue.png");
     brownBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
     spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
+    buttons_ = CreateRef<Texture2D>("Assets/Images/buttons_4x.png");
+
+    playButton_ = SubTexture2D::CreateFromCoords(buttons_, { 13, 1 }, {32, 32});
+    pauseButton_ = SubTexture2D::CreateFromCoords(buttons_, { 12, 1 }, {32, 32});
 
 #pragma region SOUND 
     auto soundController = SoundController::Instance();
@@ -251,6 +259,7 @@ MainLayer::MainLayer()
 auto MainLayer::OnAttach() -> void 
 {
     timer_ = 0;
+    musicTimer_ = 0;
 #pragma region TILEMAP_SETUP
     // TODO - Fix tilemap bleeding
     // TODO - Fix animation update
@@ -700,12 +709,16 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(starterWandEntity, rigidbody); 
         coordinator->AddComponent(starterWandEntity, PickupComponent()); 
         coordinator->AddComponent(starterWandEntity, WeaponAffectedByPickupComponent(WeaponAffectedByPickupSystem::DefaultMeleePickupBehaviour));
+
+        SoundController::Instance()->GetSound(8)->SetPosition(positionOfDestroyedEntity.x, positionOfDestroyedEntity.y, 0);
         SoundController::Instance()->PlaySoundByID(8, true);
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        auto position = coordinator->GetComponent<TransformComponent>(e).Position;
+        SoundController::Instance()->GetSound(7)->SetPosition(position.x, position.y, 0);
         SoundController::Instance()->PlaySoundByID(7, true);
     },
     [](Entity e)
@@ -790,12 +803,16 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(healthPot, physics_quadtree_component); 
         coordinator->AddComponent(healthPot, PickupComponent()); 
         coordinator->AddComponent(healthPot, HealthPotionComponent(50.f)); 
+
+        SoundController::Instance()->GetSound(8)->SetPosition(positionOfDestroyedEntity.x, positionOfDestroyedEntity.y, 0);
         SoundController::Instance()->PlaySoundByID(8, true);
     },
     [](Entity e)
     {
         auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
         sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        auto position = coordinator->GetComponent<TransformComponent>(e).Position;
+        SoundController::Instance()->GetSound(7)->SetPosition(position.x, position.y, 0);
         SoundController::Instance()->PlaySoundByID(7, true);
     },
     [](Entity e)
@@ -921,18 +938,31 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     static MusicPlayer* musicPlayer = MusicPlayer::Instance();
     static GameManager* gameManager = GameManager::Instance();
 
-    // musicPlayer->PlayMusic();
-    timer_ += ts;
-    gameManager->UploadTime(timer_);
-    physicsSystem_->tilemapSystem->Update(ts);
-    weaponSystem_->Update(ts);
-    damageableSystem_->Update(ts);
-    physicsSystem_->Update(ts);
-    playerSystem_->Update(ts);
-    portalSystem_->Update(ts);
-    projectileSystem_->Update(ts);
-    cameraController_.GetCamera().SetPosition(
-        smoothCameraFollowSystem_->GetCalculatedPosition(ts));
+    if (Input::Instance()->IsKeyPressed(Key::Backslash))
+    {
+        if (gameManager->GetState() == GameState::PlayingLevel)
+            gameManager->ChangeState(GameState::Paused);
+        else
+            gameManager->ChangeState(GameState::PlayingLevel);
+    }
+
+    if (!musicPlayer->GetCurrentSound()->getIsPaused())
+        musicTimer_ += ts;
+
+    if (gameManager->GetState() != GameState::Paused)
+    {
+        timer_ += ts;
+        gameManager->UploadTime(timer_);
+        physicsSystem_->tilemapSystem->Update(ts);
+        weaponSystem_->Update(ts);
+        damageableSystem_->Update(ts);
+        physicsSystem_->Update(ts);
+        playerSystem_->Update(ts);
+        portalSystem_->Update(ts);
+        projectileSystem_->Update(ts);
+        cameraController_.GetCamera().SetPosition(
+            smoothCameraFollowSystem_->GetCalculatedPosition(ts));
+    }
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
 
@@ -943,8 +973,11 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
     RenderCommand::Clear();
 
-    runningAnimationSystem_->Update(ts);
-    swingingAnimationSystem_->Update(ts);
+    if (gameManager->GetState() != GameState::Paused)
+    {
+        runningAnimationSystem_->Update(ts);
+        swingingAnimationSystem_->Update(ts);
+    } 
 
     tilemapRenderSystem_->Update(ts);
     spriteRenderSystem_->Update(ts);
@@ -980,11 +1013,15 @@ auto MainLayer::OnEvent(Event &e) -> void
     };
 #undef OEB 
 
-    for (auto& func : on_events)
+    static GameManager* gameManager = GameManager::Instance();
+    if (gameManager->GetState() != GameState::Paused)
     {
-        if (e.Handled)
-            return;
-        func(e);
+        for (auto& func : on_events)
+        {
+            if (e.Handled)
+                return;
+            func(e);
+        }
     }
 }
 
@@ -1001,6 +1038,145 @@ auto MainLayer::OnImGuiRender() -> void
     ImGui::SetWindowFontScale(2.0f);
     ImGui::Text("%.2fs", timer_);
     ImGui::End();
+
+    static GameManager* gm = GameManager::Instance();
+
+    if (gm->GetState() == GameState::Paused)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300));
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - 200, io.DisplaySize.y * 0.5f - 150));
+        ImGui::SetNextWindowBgAlpha(0.2f);
+        static MusicPlayer* player = MusicPlayer::Instance();
+        ImGui::Begin("Settings", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoSavedSettings);
+        float bgmVolume = player->GetVolume();
+        ImGui::SliderFloat("BGM Master volume", &bgmVolume, 0.0f, 1.0f);
+        player->SetMasterVolume(bgmVolume);
+        static SoundController* sc = SoundController::Instance();
+        float soundVolume = sc->GetVolume();
+        ImGui::SliderFloat("SFX Master volume", &soundVolume, 0.0f, 1.0f);
+        sc->SetMasterVolume(soundVolume);
+
+        static float crossfadeDuration = 0.5f;
+        
+        static const char* items[] = { "My Castle Town", "The Tale of a Cruel World" };
+        static const char* current_item = "My Castle Town";
+        static const char* item_before;
+
+        static bool reverb_enabled = false;
+
+        if (ImGui::BeginCombo("Background Music", current_item)) // The second parameter is the label previewed before opening the combo.
+        {
+            item_before = current_item;
+            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+            {
+                bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(items[n], is_selected))
+                {
+                    current_item = items[n];
+                    if (item_before != current_item)
+                    {
+                        player->AddTransition(CreateScope<FadeOutTransition>(player->GetCurrentSound(), crossfadeDuration));
+                        player->PlayMusicByID(player->GetID(std::string(current_item)), !isPlayingMusic_);
+                        musicTimer_ = 0.f;
+                        player->AddTransition(CreateScope<FadeInTransition>(player->GetCurrentSound(), crossfadeDuration));
+                    }
+
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+            ImGui::EndCombo();
+        }
+
+        ISoundEffectControl* sfxCtrl = player->GetCurrentSound()->getSoundEffectControl();
+        // if (player->GetCurrentSound())
+        // {
+        //     sfxCtrl = player->GetCurrentSound()->getSoundEffectControl();
+        // }
+        // else
+        // {
+        //     sfxCtrl = nullptr;
+        // }
+
+        ImGui::Checkbox("Enable reverb for music", &reverb_enabled);
+        if (sfxCtrl)
+        {
+            if (reverb_enabled)
+            {
+                if (!sfxCtrl->isI3DL2ReverbSoundEffectEnabled())
+                {
+                    sfxCtrl->enableI3DL2ReverbSoundEffect();
+                }
+            }
+            else
+            {
+                if (sfxCtrl->isI3DL2ReverbSoundEffectEnabled())
+                {
+                    sfxCtrl->disableI3DL2ReverbSoundEffect();
+                }
+            }
+        }
+        else
+        {
+            CC_TRACE("Null");
+        }
+
+        ImGui::SliderFloat("Crossfade length", &crossfadeDuration, 0.0f, 10.f);
+
+        ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 50.f);
+        ImGui::SetCursorPosX(200 - 16);
+        ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 8.0f);
+            if (isPlayingMusic_)
+            {
+                if (ImGui::ImageButton(Utility::ImGuiImageTexture(pauseButton_), {32, 32}, 
+                    ImVec2(pauseButton_->GetTexCoordsArray()[0].x, pauseButton_->GetTexCoordsArray()[0].y),
+                    ImVec2(pauseButton_->GetTexCoordsArray()[2].x, pauseButton_->GetTexCoordsArray()[2].y)
+                ))
+                {
+                    player->AddTransition(CreateScope<FadeOutTransition>(player->GetCurrentSound(), 0.25f, 0.0f, [](ISound* sound){
+                        sound->setIsPaused(true);
+                    }));
+                    isPlayingMusic_ = false;
+                }
+            }
+            else
+            {
+                if (ImGui::ImageButton(Utility::ImGuiImageTexture(playButton_), {32, 32}, 
+                    ImVec2(playButton_->GetTexCoordsArray()[0].x, playButton_->GetTexCoordsArray()[0].y),
+                    ImVec2(playButton_->GetTexCoordsArray()[2].x, playButton_->GetTexCoordsArray()[2].y)
+                ))
+                {
+                    player->AddTransition(CreateScope<FadeInTransition>(player->GetCurrentSound(), 0.25f));
+                    player->SetPause(false);
+                    isPlayingMusic_ = true;
+                }
+            }
+        ImGui::PopStyleVar();
+
+        float time = musicTimer_ * 1000.f;
+        if (time > static_cast<float>(player->GetCurrentSound()->getPlayLength()))
+        {
+            musicTimer_ = 0.f;
+        }
+
+        float value = time / static_cast<float>(player->GetCurrentSound()->getPlayLength());
+        ImGui::SetNextItemWidth(250.f);
+        ImGui::SetCursorPosX(200.f - 125.f);
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(0, 0, 0, 0));
+            ImGui::SliderFloat(" ", &value, 0.f, 1.0f, "%.2f", ImGuiSliderFlags_NoInput);
+        ImGui::PopStyleColor();
+
+        auto windowWidth = ImGui::GetWindowSize().x;
+        auto textWidth   = ImGui::CalcTextSize(current_item).x;
+
+        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+        ImGui::Text(current_item);
+
+
+        ImGui::End();
+    }
 
     inventoryGUISystem_->OnImGuiRender();
     playerHealthGUISystem_->OnImGuiRender();

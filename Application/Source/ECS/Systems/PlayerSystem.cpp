@@ -198,7 +198,11 @@ auto PlayerSystem::Update(Timestep ts) -> void
 
             }
 
-
+            auto position = transform.Position;
+            float multiplier = 1.0f;
+            soundController->SetListenerPosition(position.x * multiplier, position.y * multiplier, position.z * multiplier);
+            // soundController->SetListenerDirection(player_controller.IsFacingRight ? 1.0f : -1.0f, 0, 0);
+            soundController->SetListenerDirection(0, 0, 1);
         }
         accumulator -= step;
     }

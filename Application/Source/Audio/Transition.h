@@ -69,11 +69,19 @@ private:
 
 class FadeOutTransition : public Transition
 {
+public:
+    using OnExitCallback = void(*)(ISound*);
+
 public: 
     FadeOutTransition() = default;
-    FadeOutTransition(ISound* sound, float lengthSeconds = 1.0f, float offset = 0.0f);
+    FadeOutTransition(ISound* sound, float lengthSeconds = 1.0f, float offset = 0.0f,
+        OnExitCallback callback = [](ISound* sound)
+    {
+        sound->stop();
+    });
 
 private:
+    OnExitCallback callback_;
     float defaultVolume_;
     float inverseLength_;
     float offset_;

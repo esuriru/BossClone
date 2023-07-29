@@ -5,6 +5,7 @@
  Date: May 2023
  */
 #include "MusicPlayer.h"
+#include <glm/glm.hpp>
 
 #include <algorithm>    // std::shuffle
 
@@ -77,6 +78,14 @@ MusicPlayer::MusicPlayer(void)
 /**
  @brief Destructor
  */
+int MusicPlayer::GetID(string name)
+{
+    auto it = musicMap_.find(name);
+    if (it != musicMap_.end())
+        return it->second;
+    return -1;
+}
+
 MusicPlayer::~MusicPlayer(void)
 {
 	// Clear the musicVector without deleting, since it will be deleted in musicMap
@@ -134,10 +143,15 @@ void MusicPlayer::UpdateTransition(float dt)
     }
 }
 
+void MusicPlayer::SetPause(bool pause)
+{
+    currentISound->setIsPaused(pause);
+}
+
 bool MusicPlayer::Init(void)
 {
 	// Initialise the sound engine with default parameters
-	cSoundEngine = createIrrKlangDevice(ESOD_WIN_MM, ESEO_MULTI_THREADED);
+	cSoundEngine = createIrrKlangDevice(/*ESOD_WIN_MM, ESEO_MULTI_THREADED*/);
 	if (cSoundEngine == NULL)
 	{
 		cout << "Unable to initialise the IrrKlang sound engine" << endl;
@@ -272,11 +286,16 @@ void MusicPlayer::SetMusicPlaybackFinished(const bool bMusicPlaybackFinished)
 	this->bMusicPlaybackFinished = bMusicPlaybackFinished;
 }
 
+void MusicPlayer::SetIDToName(int ID, std::string name)
+{
+    musicMap_[name] = ID;
+}
+
 /**
  @brief Play a sound by its ID
  @param ID A const int variable which will be the ID of the iSoundSource in the map
  */
-SoundInfo* MusicPlayer::PlayMusicByID(const int ID)
+SoundInfo* MusicPlayer::PlayMusicByID(const int ID, bool paused)
 {
 	// Set the play mode
 	ePlayMode = PLAYMODE::SINGLE;
@@ -293,7 +312,7 @@ SoundInfo* MusicPlayer::PlayMusicByID(const int ID)
 		return nullptr;
 	}
 
-	currentISound = cSoundEngine->play2D(pSoundInfo->GetSound(), pSoundInfo->GetLoopStatus(), false, false, true);
+	currentISound = cSoundEngine->play2D(pSoundInfo->GetSound(), pSoundInfo->GetLoopStatus(), paused, true, true);
     currentISound->setSoundStopEventReceiver(cSoundStopReceiver, 0);
 
     return pSoundInfo;
@@ -633,6 +652,16 @@ bool MusicPlayer::MasterVolumeDecrease(void)
 	cout << "MasterVolumeDecrease: fCurrentVolume = " << fCurrentVolume << endl;
 
 	return true;
+}
+
+void MusicPlayer::SetMasterVolume(float volume)
+{
+    cSoundEngine->setSoundVolume(glm::clamp(volume, 0.f, 1.0f));
+}
+
+float MusicPlayer::GetVolume()
+{
+    return cSoundEngine->getSoundVolume();
 }
 
 

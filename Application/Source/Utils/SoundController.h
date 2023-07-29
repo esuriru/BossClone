@@ -54,6 +54,7 @@ public:
 	bool MasterVolumeDecrease(void);
 
     void SetMasterVolume(float volume);
+    float GetVolume();
 
 	// Increase volume of a ISoundSource
 	bool VolumeIncrease(const int ID);
@@ -66,6 +67,8 @@ public:
 	// Set Listener direction
 	void SetListenerDirection(const float x, const float y, const float z);
 
+	SoundInfo* GetSound(const int ID);
+
 protected:
 	// Constructor
 	SoundController(void);
@@ -74,7 +77,6 @@ protected:
 	virtual ~SoundController(void);
 
 	// Get an sound from this map
-	SoundInfo* GetSound(const int ID);
 	// Remove an sound from this map
 	bool RemoveSound(const int ID);
 	// Get the number of sounds in this map
