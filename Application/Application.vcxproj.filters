@@ -1,249 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Source\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\AABB.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\AABB2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Ahri.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoundingCircle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoundingSphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoundingVolume.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoundingVolume2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoxCollider2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\CameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\CircleCollider2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Collider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Collider2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\CoveringRock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Droppable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Interactable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\InteractButton.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\MeshFilter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\MeshRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\OBB2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\PanningCameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\PlayerCameraController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\PlayerController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\PlayerMovement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\PolygonCollider2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Ray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\RayVolume.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\RigidBody.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\RigidBody2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\SphereCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\SpotlightController.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Talkable.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Terrain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\TerrainCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\TerrainVolume.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Text.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\ThrowableRock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\UIRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Application.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Physics\ColliderManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Physics\Collision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Physics\Collision2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Physics\Contact.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\MeshBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\SceneRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\ShaderLibrary.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Renderer\UniformBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\GameObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\JungleScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\LoadOBJ.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\LoadTGA.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Log.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Layer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\LayerStack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Core\Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\SceneLayer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\MainScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\DebugScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\ModelRenderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\BoxCollider.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\BumperCarScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\ForceDebug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\DebugMovement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\CarouselMovement.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Components\FinishPoint.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Scene\LoadingScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Utils\TextureManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\Utils\Input.cpp" />
@@ -284,59 +41,25 @@
     <ClCompile Include="..\vendor\imgui\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\vendor\imgui\imgui\imgui_widgets.cpp" />
     <ClCompile Include="..\vendor\imgui\imgui\examples\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Source\Core\Application.cpp" />
+    <ClCompile Include="Source\Core\Layer.cpp" />
+    <ClCompile Include="Source\Core\LayerStack.cpp" />
+    <ClCompile Include="Source\Core\Log.cpp" />
+    <ClCompile Include="Source\Core\Window.cpp" />
+    <ClCompile Include="Source\glad.c" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Renderer\Shader.cpp" />
+    <ClCompile Include="Source\Renderer\ShaderLibrary.cpp" />
+    <ClCompile Include="Source\Renderer\Texture.cpp" />
+    <ClCompile Include="Source\Scene\SceneManager.cpp" />
+    <ClCompile Include="Source\Utils\Input.cpp" />
+    <ClCompile Include="Source\Audio\Transition.cpp" />
+    <ClCompile Include="Source\Utils\SoundController.cpp" />
+    <ClCompile Include="Source\Utils\SoundInfo.cpp" />
+    <ClCompile Include="Source\Utils\MusicPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Scene\LoadingScene.h" />
     <ClInclude Include="Source\Scene\SceneManager.h" />
-    <ClInclude Include="Source\Components\CarouselMovement.h" />
-    <ClInclude Include="Source\Components\DebugMovement.h" />
-    <ClInclude Include="Source\Components\FinishPoint.h" />
-    <ClInclude Include="Source\Components\ForceDebug.h" />
-    <ClInclude Include="Source\Components\ModelRenderer.h" />
-    <ClInclude Include="Source\Components\BoxCollider.h" />
-    <ClInclude Include="Source\Components\AABB.h" />
-    <ClInclude Include="Source\Components\AABB2D.h" />
-    <ClInclude Include="Source\Components\Ahri.h" />
-    <ClInclude Include="Source\Components\BoundingCircle.h" />
-    <ClInclude Include="Source\Components\BoundingSphere.h" />
-    <ClInclude Include="Source\Components\BoundingVolume.h" />
-    <ClInclude Include="Source\Components\BoundingVolume2D.h" />
-    <ClInclude Include="Source\Components\BoxCollider2D.h" />
-    <ClInclude Include="Source\Components\Camera.h" />
-    <ClInclude Include="Source\Components\CameraController.h" />
-    <ClInclude Include="Source\Components\CircleCollider2D.h" />
-    <ClInclude Include="Source\Components\Collider.h" />
-    <ClInclude Include="Source\Components\Collider2D.h" />
-    <ClInclude Include="Source\Components\Component.h" />
-    <ClInclude Include="Source\Components\CoveringRock.h" />
-    <ClInclude Include="Source\Components\Droppable.h" />
-    <ClInclude Include="Source\Components\Interactable.h" />
-    <ClInclude Include="Source\Components\InteractButton.h" />
-    <ClInclude Include="Source\Components\Light.h" />
-    <ClInclude Include="Source\Components\MeshFilter.h" />
-    <ClInclude Include="Source\Components\MeshRenderer.h" />
-    <ClInclude Include="Source\Components\OBB2D.h" />
-    <ClInclude Include="Source\Components\PanningCameraController.h" />
-    <ClInclude Include="Source\Components\PlayerCameraController.h" />
-    <ClInclude Include="Source\Components\PlayerController.h" />
-    <ClInclude Include="Source\Components\PlayerMovement.h" />
-    <ClInclude Include="Source\Components\PolygonCollider2D.h" />
-    <ClInclude Include="Source\Components\Ray.h" />
-    <ClInclude Include="Source\Components\RayVolume.h" />
-    <ClInclude Include="Source\Components\Renderer.h" />
-    <ClInclude Include="Source\Components\RigidBody.h" />
-    <ClInclude Include="Source\Components\RigidBody2D.h" />
-    <ClInclude Include="Source\Components\Skybox.h" />
-    <ClInclude Include="Source\Components\SphereCollider.h" />
-    <ClInclude Include="Source\Components\SpotlightController.h" />
-    <ClInclude Include="Source\Components\Talkable.h" />
-    <ClInclude Include="Source\Components\Terrain.h" />
-    <ClInclude Include="Source\Components\TerrainCollider.h" />
-    <ClInclude Include="Source\Components\TerrainVolume.h" />
-    <ClInclude Include="Source\Components\Text.h" />
-    <ClInclude Include="Source\Components\ThrowableRock.h" />
-    <ClInclude Include="Source\Components\Transform.h" />
-    <ClInclude Include="Source\Components\UIRenderer.h" />
     <ClInclude Include="Source\Core\Application.h" />
     <ClInclude Include="Source\Core\Core.h" />
     <ClInclude Include="Source\Core\Layer.h" />
@@ -349,33 +72,13 @@
     <ClInclude Include="Source\Events\EventDispatcher.h" />
     <ClInclude Include="Source\Events\KeyEvent.h" />
     <ClInclude Include="Source\Events\MouseEvent.h" />
-    <ClInclude Include="Source\Physics\ColliderManager.h" />
-    <ClInclude Include="Source\Physics\Collision.h" />
     <ClInclude Include="Source\Physics\Collision2D.h" />
-    <ClInclude Include="Source\Physics\Contact.h" />
-    <ClInclude Include="Source\Renderer\Material.h" />
-    <ClInclude Include="Source\Renderer\Mesh.h" />
-    <ClInclude Include="Source\Renderer\MeshBuilder.h" />
-    <ClInclude Include="Source\Renderer\SceneRenderer.h" />
     <ClInclude Include="Source\Renderer\Shader.h" />
-    <ClInclude Include="Source\Renderer\shader.hpp" />
     <ClInclude Include="Source\Renderer\ShaderLibrary.h" />
     <ClInclude Include="Source\Renderer\Texture.h" />
-    <ClInclude Include="Source\Renderer\UniformBuffer.h" />
-    <ClInclude Include="Source\Scene\BumperCarScene.h" />
-    <ClInclude Include="Source\Scene\DebugScene.h" />
-    <ClInclude Include="Source\Scene\GameObject.h" />
-    <ClInclude Include="Source\Scene\JungleScene.h" />
-    <ClInclude Include="Source\Scene\MainScene.h" />
     <ClInclude Include="Source\Scene\Scene.h" />
-    <ClInclude Include="Source\Scene\SceneLayer.h" />
-    <ClInclude Include="Source\Utils\Font.h" />
     <ClInclude Include="Source\Utils\Input.h" />
-    <ClInclude Include="Source\Utils\LoadOBJ.h" />
-    <ClInclude Include="Source\Utils\LoadTGA.h" />
-    <ClInclude Include="Source\Utils\TextureManager.h" />
     <ClInclude Include="Source\Utils\Util.h" />
-    <ClInclude Include="Source\Utils\Vertex.h" />
     <ClInclude Include="Source\Utils\Input.h" />
     <ClInclude Include="Source\Utils\Singleton.h" />
     <ClInclude Include="Source\Utils\Util.h" />
@@ -431,5 +134,10 @@
     <ClInclude Include="..\vendor\imgui\imgui\imgui_internal.h" />
     <ClInclude Include="..\vendor\imgui\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\vendor\imgui\imgui\imstb_textedit.h" />
+    <ClInclude Include="Source\Audio\Transition.h" />
+    <ClInclude Include="Source\Utils\SoundController.h" />
+    <ClInclude Include="Source\Utils\SoundInfo.h" />
+    <ClInclude Include="Source\Utils\MusicPlayer.h" />
+    <ClInclude Include="Source\Utils\filesystem.h" />
   </ItemGroup>
 </Project>

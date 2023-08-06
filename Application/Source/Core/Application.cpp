@@ -320,7 +320,7 @@ Application::Application()
     {
         SoundInfo* source;
         SoundController::Instance()->LoadSound(source, "Assets/Sounds/02_Heal_02.wav", 12, true, false);
-        source->SetVolume(0.85f);
+        source->SetVolume(0.65f);
     }
 
     {
