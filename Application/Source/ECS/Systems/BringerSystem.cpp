@@ -1,12 +1,13 @@
-#include "NightborneSystem.h"
+#include "BringerSystem.h"
 #include <glm/gtx/norm.hpp>
 #include "Events/ApplicationEvent.h"
+#include <glm/gtx/string_cast.hpp>
 
 static Coordinator* coordinator = Coordinator::Instance();
 
-NightborneSystem::NightborneSystem()
+BringerSystem::BringerSystem()
     : hasJumped_(false)
-    , chaseRange_(7300.0f)
+    , chaseRange_(13300.0f)
     , currentState_(IDLE)
     , hasAttacked_(false)
     , timer_(0.0f)
@@ -15,7 +16,7 @@ NightborneSystem::NightborneSystem()
 
 }
 
-void NightborneSystem::Update(Timestep ts)
+void BringerSystem::Update(Timestep ts)
 {
     if (toStopAnimation_)
     {
@@ -29,58 +30,68 @@ void NightborneSystem::Update(Timestep ts)
     }
 }
 
-bool NightborneSystem::OnAnimationSpriteChangeEvent(AnimationSpriteChangeEvent &event)
+bool BringerSystem::OnAnimationSpriteChangeEvent(AnimationSpriteChangeEvent &event)
 {
     if (entities.find(event.GetEntityAffected()) == entities.end())
         return false;
     
+    constexpr glm::vec3 size = { 140, 93, 1 };
     if (event.GetAnimationType() != Animation::AnimationType::Swinging) return false;
     auto& animation = coordinator->GetComponent<SwingingAnimationComponent>(event.GetEntityAffected()).Animation;
+    static glm::vec3 ppos;
+    if (event.GetSpriteIndex() == animation.AnimationIndices[animation.AnimationIndices.size() - 2])
+    {
+        Entity player = *(playerSystem->entities.begin());
+        ppos = coordinator->GetComponent<TransformComponent>(player).Position;
+    }
     if (event.GetSpriteIndex() == animation.AnimationIndices.back())
     {
         hasJumped_ = false;
         affected_ = event.GetEntityAffected();
         toStopAnimation_ = true;
+
         Entity player = *(playerSystem->entities.begin());
         auto& transform = coordinator->GetComponent<TransformComponent>(event.GetEntityAffected());
         auto& pos = transform.Position;
         auto& playerPos = coordinator->GetComponent<TransformComponent>(player).Position;
+
+        Entity m = coordinator->GetComponent<ReferenceComponent>(event.GetEntityAffected()).RefEntity;
+        auto& col = coordinator->GetComponent<BoxCollider2DComponent>(m);
+        auto& physics = coordinator->GetComponent<PhysicsQuadtreeComponent>(m);
+        physics.Active = true;
+        auto& t = coordinator->GetComponent<TransformComponent>(m);
+        t.Scale = size;
+        constexpr glm::vec3 offset = { 0, 20, 0 };
+        t.Position = ppos + offset;
+
+        // coordinator->GetComponent<TransformComponent>(m).Scale
         currentState_ = (glm::distance2(pos, playerPos) < chaseRange_) ? CHASE : IDLE;
         timer_ = 0.0f;
         hasAttacked_ = false;
 
         return true;
     }
-    else if (event.GetSpriteIndex() == 8)
-    {
-        constexpr glm::vec2 offset = { 31, 0 };
-        auto& transform = coordinator->GetComponent<TransformComponent>(event.GetEntityAffected());
-        Entity m = coordinator->GetComponent<ReferenceComponent>(event.GetEntityAffected()).RefEntity;
-        auto& col = coordinator->GetComponent<BoxCollider2DComponent>(m);
-        // col.Offset = offset; 
-        auto& physics = coordinator->GetComponent<PhysicsQuadtreeComponent>(m);
-        physics.Active = true;
-        auto& t = coordinator->GetComponent<TransformComponent>(m);
-        t.Position = coordinator->GetComponent<TransformComponent>(event.GetEntityAffected()).Position + glm::vec3(glm::sign(transform.Scale.x) * offset.x, offset.y, 0);
-    }
-    else if (event.GetSpriteIndex() == 9)
+    else if (event.GetSpriteIndex() == animation.AnimationIndices[1])
     {
         Entity m = coordinator->GetComponent<ReferenceComponent>(event.GetEntityAffected()).RefEntity;
         auto& physics = coordinator->GetComponent<PhysicsQuadtreeComponent>(m);
         physics.Active = false;
+        auto& t = coordinator->GetComponent<TransformComponent>(m);
+        t.Scale = {0, 0, 0};
+        return true;
     }
     return false;
 }
 
-void NightborneSystem::StateUpdate(Entity e, Timestep ts)
+void BringerSystem::StateUpdate(Entity e, Timestep ts)
 {
     Entity player = *(playerSystem->entities.begin());
-    auto& nightborne = coordinator->GetComponent<NightborneComponent>(e);
+    auto& nightborne = coordinator->GetComponent<BringerComponent>(e);
     auto& transform = coordinator->GetComponent<TransformComponent>(e);
     auto& pos = transform.Position;
     auto& playerPos = coordinator->GetComponent<TransformComponent>(player).Position;
     auto& rigidbody = coordinator->GetComponent<RigidBody2DComponent>(e);
-    static const float attackRange = 2300.0f;
+    static const float attackRange = 2900.0f;
     static const float jumpForce = 8.0f;
     static const float attackTimer = 1.5f;
 
@@ -97,11 +108,12 @@ void NightborneSystem::StateUpdate(Entity e, Timestep ts)
         case CHASE:
             if (glm::distance2(pos, playerPos) < chaseRange_)
             {
-                glm::vec2 direction = playerPos - pos; 
+                glm::vec2 direction = glm::distance2(pos, playerPos) < attackRange ? pos - playerPos : playerPos - pos; 
                 rigidbody.LinearVelocity.x = glm::sign(direction.x) * nightborne.Speed;
+                // rigidbody.LinearVelocity.x = -40; 
                 timer_ += ts;
-                // CC_TRACE(timer_);
-                if (timer_ >= attackTimer && glm::distance2(pos, playerPos) < attackRange)
+                CC_TRACE(glm::to_string(rigidbody.LinearVelocity));
+                if (timer_ >= attackTimer)
                 {
                     timer_ = 0.0f;
                     currentState_ = ATTACK;
@@ -126,10 +138,10 @@ void NightborneSystem::StateUpdate(Entity e, Timestep ts)
                 AnimationEvent animationEvent(Animation::AnimationType::Swinging, e, true);
                 eventCallback(animationEvent);
                 hasAttacked_ = true;
+                CC_TRACE("attack");
             }
             timer_ = 0.0f;
             break;
     }
 
-    transform.Scale.x = rigidbody.LinearVelocity.x > 0 ? fabs(transform.Scale.x) : -fabs(transform.Scale.x);
 }

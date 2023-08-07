@@ -8,6 +8,7 @@
 #include "ECS/Systems/GameSystem.h"
 #include "ECS/Systems/GUISystem.h"
 #include "ECS/Systems/NightborneSystem.h"
+#include "ECS/Systems/BringerSystem.h"
 
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
@@ -74,6 +75,7 @@ private:
     Ref<PhysicsSystem> physicsSystem_;
 
     // Game Logic systems
+    Ref<BringerSystem> bringerSystem_;
     Ref<BatSystem> batSystem_;
     Ref<PlayerSystem> playerSystem_;
     Ref<DamageableSystem> damageableSystem_;

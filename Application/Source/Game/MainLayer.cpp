@@ -3,6 +3,7 @@
 #include "Renderer/Renderer2D.h"
 #include "Utils/SoundController.h"
 #include "Utils/MusicPlayer.h"
+#include <string>
 
 #include "Audio/Transition.h"
 
@@ -94,6 +95,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<EntityQueueComponent>();
     coordinator->RegisterComponent<BatComponent>();
     coordinator->RegisterComponent<NightborneComponent>();
+    coordinator->RegisterComponent<BringerComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -126,6 +128,7 @@ MainLayer::MainLayer()
     batFlyingAnimationSystem_         = coordinator->RegisterSystem<BatFlyingAnimationSystem>();
     batSystem_                        = coordinator->RegisterSystem<BatSystem>();
     nightborneSystem_                 = coordinator->RegisterSystem<NightborneSystem>(); 
+    bringerSystem_                    = coordinator->RegisterSystem<BringerSystem>(); 
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -141,11 +144,13 @@ MainLayer::MainLayer()
     batFlyingAnimationSystem_->eventCallback =
     batSystem_->eventCallback =
     nightborneSystem_->eventCallback = 
+    bringerSystem_->eventCallback = 
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
     batSystem_->playerSystem = playerSystem_;
     nightborneSystem_->playerSystem = playerSystem_;
+    bringerSystem_->playerSystem = playerSystem_;
 
 #pragma endregion
 #pragma region SYSTEM_SIGNATURES
@@ -277,6 +282,10 @@ MainLayer::MainLayer()
     nightborneSystemSignature.set(coordinator->GetComponentType<NightborneComponent>());
     coordinator->SetSystemSignature<NightborneSystem>(nightborneSystemSignature);
 
+    Signature bringerSystemSignature;
+    bringerSystemSignature.set(coordinator->GetComponentType<BringerComponent>());
+    coordinator->SetSystemSignature<BringerSystem>(bringerSystemSignature);
+
 #pragma endregion
 
     // soundController->PlaySoundByID(1);
@@ -369,7 +378,8 @@ auto MainLayer::OnAttach() -> void
     auto playerEntity = coordinator->CreateEntity();
 
     coordinator->AddComponent(playerEntity, TransformComponent{
-        glm::vec3(48, -3, 0), 
+        glm::vec3(-100, 500, 0), 
+        // glm::vec3(48, -3, 0), 
         glm::vec3(), 
         glm::vec3(32, 32, 1), 
     });
@@ -793,18 +803,7 @@ auto MainLayer::OnAttach() -> void
     coordinator->AddComponent(portalEntity2, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(portalEntity2, PhysicsQuadtreeComponent());
 
-    // auto portalEntity3 = coordinator->CreateEntity();
-    // coordinator->AddComponent(portalEntity3, TransformComponent(glm::vec3(-268, 460.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
-    // coordinator->AddComponent(portalEntity3, SpriteRendererComponent(
-    //     CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
-    // coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
-    // {
-    //     GameManager::Instance()->ChangeState(GameState::MenuLevel);
-    // }));
-    // coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
-    // coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
-    // coordinator->AddComponent(portalEntity3, PhysicsQuadtreeComponent());
-
+    
     auto healthPotionBoxCave = coordinator->CreateEntity();
     coordinator->AddComponent(healthPotionBoxCave, TransformComponent(glm::vec3(-520, 202, 0),
        glm::vec3(0), glm::vec3(28, 24, 1)));
@@ -1095,6 +1094,93 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(nightborneEntity, ReferenceComponent(melee));
     }
 
+    {
+        // constexpr glm::vec2 size = { 80, 93 };
+        auto y = coordinator->CreateEntity();
+        auto firstFrame = CreateRef<SubTexture2D>((CreateRef<Texture2D>("Assets/Images/Bringer-of-Death_Idle_1.png")), glm::vec2(), glm::vec2(1));
+        swingingAnimationSystem_->SetOriginalTexture(firstFrame, y);
+        // firstFrame->Inset(0.01f);
+
+        coordinator->AddComponent(y, TransformComponent(glm::vec3(-90, 470, 0), glm::vec3(), glm::vec3(140, 93, 0)));
+        SpriteRendererComponent src(firstFrame);
+        src.Offset.x = -30; 
+        coordinator->AddComponent(y, src);
+        coordinator->AddComponent(y, BoxCollider2DComponent({0, -5.f}, {20.0f, 40.0f}));
+
+        auto rigidbody = RigidBody2DComponent();
+        rigidbody.BodyType = Physics::RigidBodyType::Dynamic;
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+
+        coordinator->AddComponent(y, physics_quadtree_component); 
+        coordinator->AddComponent(y, rigidbody);
+
+        BringerComponent bringer;
+        bringer.Speed = 40.f;
+        coordinator->AddComponent(y, bringer);
+
+        SwingingAnimationComponent sac;
+
+        auto& saca = sac.Animation;
+        for (int i = 1; i < 9; ++i)
+        {
+            auto texture = 
+                CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Spritesheets/Cast/Bringer-of-Death_Cast_" + std::to_string(i) + ".png"), glm::vec2(), glm::vec2(1));
+
+            if (texture) 
+                texture->Inset(0.001f);
+            // texture inset 
+
+            saca.SpriteTextures.emplace_back(texture);
+        }
+
+        for (size_t i = 0; i < saca.SpriteTextures.size(); ++i)
+        {
+            saca.AnimationIndices.emplace_back(i);
+        }
+
+        saca.FramesBetweenTransition = 8;
+        coordinator->AddComponent(y, sac);
+        coordinator->AddComponent(y, HealthComponent(5, 30, [](Entity e)
+        {
+            coordinator->DestroyEntity(e);
+            auto portalEntity3 = coordinator->CreateEntity();
+            coordinator->AddComponent(portalEntity3, TransformComponent(glm::vec3(-90, 470.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
+            coordinator->AddComponent(portalEntity3, SpriteRendererComponent(
+                CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
+            coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
+            {
+                GameManager::Instance()->ChangeState(GameState::MenuLevel);
+            }));
+            coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
+            coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
+            coordinator->AddComponent(portalEntity3, PhysicsQuadtreeComponent());
+
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }));
+
+        coordinator->AddComponent(y, BreakableComponent(5));
+
+        auto melee = coordinator->CreateEntity();
+        coordinator->AddComponent(melee, SpriteRendererComponent(CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Spritesheets/Bringer-of-Death_Spell_8.png"), glm::vec2(), glm::vec2(1))));
+        coordinator->AddComponent(melee, RigidBody2DComponent(Physics::RigidBodyType::Static));
+        coordinator->AddComponent(melee, BoxCollider2DComponent({}, {15, 30}));
+        PhysicsQuadtreeComponent pqc;
+        pqc.Active = false;
+        coordinator->AddComponent(melee, pqc);
+        coordinator->AddComponent(melee, TransformComponent({}, {}, glm::vec3(0, 0, 0 )));
+        coordinator->AddComponent(melee, SpikeComponent(bringer.Damage));
+
+        coordinator->AddComponent(y, ReferenceComponent(melee));
+    }
 #pragma endregion
 }
 
@@ -1132,11 +1218,13 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
         playerSystem_->Update(ts);
         batSystem_->Update(ts);
         nightborneSystem_->Update(ts);
+        bringerSystem_->Update(ts);
 
         portalSystem_->Update(ts);
         projectileSystem_->Update(ts);
         cameraController_.GetCamera().SetPosition(
             smoothCameraFollowSystem_->GetCalculatedPosition(ts));
+
     }
 
     Renderer2D::BeginScene(cameraController_.GetCamera());
@@ -1165,7 +1253,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x) std::bind(&std::remove_reference<decltype(*(x))>::type::OnEvent, x, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 19> on_events {
+    static const std::array<std::function<void(Event&)>, 20> on_events {
         OEB(physicsSystem_),
         OEB(projectileSystem_),
         OEB(weaponSystem_),
@@ -1188,6 +1276,7 @@ auto MainLayer::OnEvent(Event &e) -> void
         OEB(swingingAnimationSystem_),
         OEB(batFlyingAnimationSystem_),
         OEB(nightborneSystem_),
+        OEB(bringerSystem_),
         OEB(playerAffectedByAnimationSystem_),
         OEB(weaponAffectedByAnimationSystem_)
     };

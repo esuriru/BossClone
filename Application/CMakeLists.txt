@@ -57,6 +57,7 @@ set(Header_Files
     "Source/ECS/Systems/GUISystem.h"
     "Source/ECS/Systems/BatSystem.h"
     "Source/ECS/Systems/NightborneSystem.h"
+    "Source/ECS/Systems/BringerSystem.h"
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
@@ -118,6 +119,7 @@ set(Source_Files
     "Source/ECS/Systems/GUISystem.cpp"
     "Source/ECS/Systems/BatSystem.cpp"
     "Source/ECS/Systems/NightborneSystem.cpp"
+    "Source/ECS/Systems/BringerSystem.cpp"
     "Source/Utils/Input.cpp"
 
     "Source/Physics/PhysicsSystem.cpp"

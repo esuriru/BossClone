@@ -334,5 +334,12 @@ struct NightborneComponent
     float Speed = 8.0f;
     float Damage = 15.0f;
 
+};
+
+struct BringerComponent
+{
+    float Speed = 8.0f;
+    float Damage = 15.0f;
 
 };
+
