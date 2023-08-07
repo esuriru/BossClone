@@ -35,9 +35,9 @@ public:
     auto CheckCollisions() -> void;
 
     EventCallback eventCallback;
-
 private:
     auto HasCollisionData(const PhysicsQuadtreeComponent& pqc, Entity e) -> bool;
+
 
 };
 

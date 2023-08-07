@@ -30,6 +30,7 @@ public:
     template<typename T>
     inline void AddComponent(Entity entity, T component)
     {
+        CC_TRACE(sizeof(component));
         componentManager_->AddComponent<T>(entity, component);
 
         auto signature = entityManager_->GetSignature(entity);

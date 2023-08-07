@@ -71,6 +71,7 @@ public:
 private:
 	// Packed array of components set to MaxEntities
 	std::array<T, MaxEntities> componentArray_;
+	// std::array<T, 30> componentArray_;
 
 	// Map from an entity ID to array index
 	std::unordered_map<Entity, size_t> entityToIndexMap_;

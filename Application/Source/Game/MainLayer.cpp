@@ -140,6 +140,7 @@ MainLayer::MainLayer()
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
+    batSystem_->playerSystem = playerSystem_;
 
 #pragma endregion
 #pragma region SYSTEM_SIGNATURES
@@ -328,6 +329,7 @@ auto MainLayer::OnAttach() -> void
 
     coordinator->AddComponent(tilemapEntity, TransformComponent {
         glm::vec3(TilemapData::TILEMAP_MAX_X_LENGTH * -0.5f * tilemapComponent.TileSize.x, -70, 0),
+        // glm::vec3(0, 0, 0),
     });
 
     coordinator->AddComponent(tilemapEntity, tilemapComponent);

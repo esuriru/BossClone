@@ -3,6 +3,8 @@
 #include "Core/Window.h"
 #include "Game/StateMachine.h"
 
+class PlayerSystem;
+
 class BatSystem : public System
 {
 public:
@@ -10,7 +12,10 @@ public:
     void Update(Timestep ts);
 
     EventCallback eventCallback;
-    StateMachine<BatSystem> stateMachine_;
+    Ref<PlayerSystem> playerSystem;
+
 private:
     bool hasEnabledAnimation_ = false;
+    StateMachine<BatSystem> stateMachine_;
+
 };

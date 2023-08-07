@@ -323,4 +323,6 @@ struct ProjectileComponent
 struct BatComponent
 {
     float FlightSpeed = 5.0f;
+    glm::vec3 Destination;
+    glm::vec3 Direction;
 };
