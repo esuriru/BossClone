@@ -7,6 +7,7 @@
 #include "ECS/Systems/BatSystem.h"
 #include "ECS/Systems/GameSystem.h"
 #include "ECS/Systems/GUISystem.h"
+#include "ECS/Systems/NightborneSystem.h"
 
 #include "OrthographicCameraController.h"
 #include "Renderer/Texture.h"
@@ -33,6 +34,8 @@ private:
     bool isPlayingMusic_ = true;
 
     OrthographicCameraController cameraController_;
+
+    Ref<Texture2D> nightborneSpritesheet_;
 
     Ref<Texture2D> buttons_;
     Ref<SubTexture2D> playButton_;
@@ -84,6 +87,7 @@ private:
     Ref<HealingPotionSystem> healingPotionSystem_;
     Ref<PortalSystem> portalSystem_;
     Ref<ProjectileSystem> projectileSystem_;
+    Ref<NightborneSystem> nightborneSystem_;
 
     // GUI Systems
     Ref<InventoryGUISystem> inventoryGUISystem_;

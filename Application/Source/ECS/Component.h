@@ -328,3 +328,11 @@ struct BatComponent
     glm::vec2 Destination;
     glm::vec2 Direction;
 };
+
+struct NightborneComponent 
+{
+    float Speed = 8.0f;
+    float Damage = 15.0f;
+
+
+};

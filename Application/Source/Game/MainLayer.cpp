@@ -39,6 +39,7 @@ MainLayer::MainLayer()
     spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
     buttons_ = CreateRef<Texture2D>("Assets/Images/buttons_4x.png");
     batSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/Bat_Sprite_Sheet.png");
+    nightborneSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/NightBorne.png");
 
     playButton_ = SubTexture2D::CreateFromCoords(buttons_, { 13, 1 }, {32, 32});
     pauseButton_ = SubTexture2D::CreateFromCoords(buttons_, { 12, 1 }, {32, 32});
@@ -92,6 +93,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<ProjectileComponent>();
     coordinator->RegisterComponent<EntityQueueComponent>();
     coordinator->RegisterComponent<BatComponent>();
+    coordinator->RegisterComponent<NightborneComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -123,6 +125,7 @@ MainLayer::MainLayer()
     projectileSystem_                 = coordinator->RegisterSystem<ProjectileSystem>();
     batFlyingAnimationSystem_         = coordinator->RegisterSystem<BatFlyingAnimationSystem>();
     batSystem_                        = coordinator->RegisterSystem<BatSystem>();
+    nightborneSystem_                 = coordinator->RegisterSystem<NightborneSystem>(); 
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -137,10 +140,12 @@ MainLayer::MainLayer()
     projectileSystem_->eventCallback =
     batFlyingAnimationSystem_->eventCallback =
     batSystem_->eventCallback =
+    nightborneSystem_->eventCallback = 
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
     batSystem_->playerSystem = playerSystem_;
+    nightborneSystem_->playerSystem = playerSystem_;
 
 #pragma endregion
 #pragma region SYSTEM_SIGNATURES
@@ -267,6 +272,10 @@ MainLayer::MainLayer()
     Signature batSystemSignature;
     batSystemSignature.set(coordinator->GetComponentType<BatComponent>());
     coordinator->SetSystemSignature<BatSystem>(batSystemSignature);
+
+    Signature nightborneSystemSignature;
+    nightborneSystemSignature.set(coordinator->GetComponentType<NightborneComponent>());
+    coordinator->SetSystemSignature<NightborneSystem>(nightborneSystemSignature);
 
 #pragma endregion
 
@@ -996,6 +1005,94 @@ auto MainLayer::OnAttach() -> void
 
         faca.FramesBetweenTransition = 8;
         coordinator->AddComponent(batEntity, fac);
+        coordinator->AddComponent(batEntity, HealthComponent(40, 20, [](Entity e)
+        {
+            coordinator->DestroyEntity(e);
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }));
+        coordinator->AddComponent(batEntity, BreakableComponent(5));
+    }
+
+    {
+        constexpr glm::vec2 size = { 80, 80 };
+        auto nightborneEntity = coordinator->CreateEntity();
+        auto firstFrame = SubTexture2D::CreateFromCoords(nightborneSpritesheet_, glm::vec2(0, 4), size);
+        swingingAnimationSystem_->SetOriginalTexture(firstFrame, nightborneEntity);
+        // firstFrame->Inset(0.01f);
+
+        coordinator->AddComponent(nightborneEntity, TransformComponent(glm::vec3(-520, 300, 0), glm::vec3(), glm::vec3(size, 0)));
+        SpriteRendererComponent src(firstFrame);
+        coordinator->AddComponent(nightborneEntity, src);
+        coordinator->AddComponent(nightborneEntity, BoxCollider2DComponent({0, -13.5f}, {10.0f, 10.0f}));
+
+        auto rigidbody = RigidBody2DComponent();
+        rigidbody.BodyType = Physics::RigidBodyType::Dynamic;
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+
+        coordinator->AddComponent(nightborneEntity, physics_quadtree_component); 
+        coordinator->AddComponent(nightborneEntity, rigidbody);
+
+        NightborneComponent nightborne;
+        nightborne.Speed = 40.f;
+        coordinator->AddComponent(nightborneEntity, nightborne);
+
+        SwingingAnimationComponent sac;
+
+        auto& saca = sac.Animation;
+        for (int i = 0; i < 12; ++i)
+        {
+            auto texture = 
+                SubTexture2D::CreateFromCoords(nightborneSpritesheet_, glm::vec2(i , 2), size);
+            // texture inset 
+            texture->Inset(0.001f);
+
+            saca.SpriteTextures.emplace_back(texture);
+        }
+
+        for (size_t i = 0; i < saca.SpriteTextures.size(); ++i)
+        {
+            saca.AnimationIndices.emplace_back(i);
+        }
+
+        saca.FramesBetweenTransition = 8;
+        coordinator->AddComponent(nightborneEntity, sac);
+        coordinator->AddComponent(nightborneEntity, HealthComponent(100, 30, [](Entity e)
+        {
+            coordinator->DestroyEntity(e);
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 0.9f, 0.5f, 0.5f, 1.0f };
+        },
+        [](Entity e)
+        {
+            auto& sprite_renderer = coordinator->GetComponent<SpriteRendererComponent>(e);
+            sprite_renderer.Colour = { 1.0f, 1.0f, 1.0f, 1.0f };
+        }));
+
+        coordinator->AddComponent(nightborneEntity, BreakableComponent(5));
+
+        auto melee = coordinator->CreateEntity();
+        // coordinator->AddComponent(melee, SpriteRendererComponent());
+        coordinator->AddComponent(melee, RigidBody2DComponent(Physics::RigidBodyType::Static));
+        coordinator->AddComponent(melee, BoxCollider2DComponent({}, {8, 15}));
+        PhysicsQuadtreeComponent pqc;
+        pqc.Active = false;
+        coordinator->AddComponent(melee, pqc);
+        coordinator->AddComponent(melee, TransformComponent({}, {}, glm::vec3(8, 15, 1)));
+        coordinator->AddComponent(melee, SpikeComponent(nightborne.Damage));
+
+        coordinator->AddComponent(nightborneEntity, ReferenceComponent(melee));
     }
 
 #pragma endregion
@@ -1031,8 +1128,11 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
         weaponSystem_->Update(ts);
         damageableSystem_->Update(ts);
         physicsSystem_->Update(ts);
+
         playerSystem_->Update(ts);
         batSystem_->Update(ts);
+        nightborneSystem_->Update(ts);
+
         portalSystem_->Update(ts);
         projectileSystem_->Update(ts);
         cameraController_.GetCamera().SetPosition(
@@ -1065,7 +1165,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x) std::bind(&std::remove_reference<decltype(*(x))>::type::OnEvent, x, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 18> on_events {
+    static const std::array<std::function<void(Event&)>, 19> on_events {
         OEB(physicsSystem_),
         OEB(projectileSystem_),
         OEB(weaponSystem_),
@@ -1078,6 +1178,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 
         OEB(playerSystem_),
         OEB(batSystem_),
+
         OEB(pickupSystem_),
         OEB(spikeSystem_),
         OEB(portalSystem_),
@@ -1086,6 +1187,7 @@ auto MainLayer::OnEvent(Event &e) -> void
         OEB(runningAnimationSystem_),
         OEB(swingingAnimationSystem_),
         OEB(batFlyingAnimationSystem_),
+        OEB(nightborneSystem_),
         OEB(playerAffectedByAnimationSystem_),
         OEB(weaponAffectedByAnimationSystem_)
     };

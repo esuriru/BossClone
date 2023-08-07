@@ -26,7 +26,7 @@ public:
 private:
     auto OnPlayerEnterEvent(PlayerEnterEvent& e) -> bool;
 
-    void StateUpdate(Timestep ts);
+    void StateUpdate(Entity e, Timestep ts);
     enum BatState
     {
         IDLE,

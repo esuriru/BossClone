@@ -19,16 +19,18 @@ BatSystem::BatSystem()
 
 void BatSystem::Update(Timestep ts)
 {
-    Entity e = *(entities.begin());
-
-    if (!hasEnabledAnimation_)
+    if (entities.size() == 0) return;
+    for (auto& e : entities)
     {
-        hasEnabledAnimation_ = true;
-        AnimationEvent event(Animation::AnimationType::Flying, e, true);
-        eventCallback(event);
-    }
+        if (!hasEnabledAnimation_)
+        {
+            hasEnabledAnimation_ = true;
+            AnimationEvent event(Animation::AnimationType::Flying, e, true);
+            eventCallback(event);
+        }
 
-    StateUpdate(ts);
+        StateUpdate(e, ts);
+    }
 }
 
 auto BatSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
@@ -58,9 +60,8 @@ auto BatSystem::OnPlayerEnterEvent(PlayerEnterEvent &e) -> bool
     return false;
 }
 
-void BatSystem::StateUpdate(Timestep ts)
+void BatSystem::StateUpdate(Entity e, Timestep ts)
 {
-    Entity e = *(entities.begin());
     static float timer = 0.0f;
     static const float patrolTime = 1.0f;
     static const float idleTime = 1.0f;
