@@ -100,7 +100,6 @@ auto MenuLayer::OnImGuiRender() -> void
         ImGui::SliderFloat("SFX Master volume", &soundVolume, 0.0f, 1.0f);
         sc->SetMasterVolume(soundVolume);
         ImGui::End();
-
     }
 
     ImGui::SetCursorPosX(100);

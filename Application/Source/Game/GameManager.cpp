@@ -40,7 +40,7 @@ auto GameManager::ChangeState(GameState state) -> void
             break;
         case GameState::PlayingLevel:
             {
-                if (event.GetOldState() == GameState::Paused)
+                if (event.GetOldState() == GameState::Paused || event.GetOldState() == GameState::About)
                     return;
                 auto musicPlayer = MusicPlayer::Instance();
                 // musicPlayer->SetPlayMode(MusicPlayer::PLAYMODE::SINGLE_LOOP);

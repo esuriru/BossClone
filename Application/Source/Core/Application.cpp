@@ -101,11 +101,11 @@ auto Application::OnGameStateChange(GameStateChangeEvent &e) -> bool
     switch (e.GetNewState())
     {
     case GameState::PlayingLevel: 
-        if (e.GetOldState() == GameState::MenuLevel)
+        if (e.GetOldState() == GameState::MenuLevel )
             changingToPlay_ = true;
         break;
     case GameState::MenuLevel:
-        if (e.GetOldState() == GameState::PlayingLevel)
+        if (e.GetOldState() == GameState::PlayingLevel || e.GetOldState() == GameState::Win)
             changingToMenu_ = true;
         break;
     default:

@@ -100,8 +100,18 @@ void BringerSystem::StateUpdate(Entity e, Timestep ts)
         case IDLE:
             if (glm::distance2(pos, playerPos) < chaseRange_)
             {
+
                 hasAttacked_ = false;
                 currentState_ = CHASE;
+            }
+            else
+            {
+                Entity m = coordinator->GetComponent<ReferenceComponent>(e).RefEntity;
+                auto& physics = coordinator->GetComponent<PhysicsQuadtreeComponent>(m);
+                physics.Active = false;
+                auto& t = coordinator->GetComponent<TransformComponent>(m);
+                t.Scale = {0, 0, 0};
+
             }
             break;
 

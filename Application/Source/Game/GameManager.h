@@ -7,7 +7,10 @@ enum GameState
 {
     PlayingLevel,
     Paused,
+    Win,
     MenuLevel,
+    Start,
+    About,
 };
 
 class GameManager : public Utility::Singleton<GameManager>

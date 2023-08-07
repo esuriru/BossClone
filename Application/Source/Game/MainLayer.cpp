@@ -378,8 +378,8 @@ auto MainLayer::OnAttach() -> void
     auto playerEntity = coordinator->CreateEntity();
 
     coordinator->AddComponent(playerEntity, TransformComponent{
-        glm::vec3(-100, 500, 0), 
-        // glm::vec3(48, -3, 0), 
+        // glm::vec3(-100, 500, 0), 
+        glm::vec3(48, -3, 0), 
         glm::vec3(), 
         glm::vec3(32, 32, 1), 
     });
@@ -629,7 +629,7 @@ auto MainLayer::OnAttach() -> void
     coordinator->AddComponent(blockingEntity2, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(blockingEntity2, PhysicsQuadtreeComponent());
     coordinator->AddComponent(blockingEntity2, ReferenceComponent(tilemapEntity));
-    coordinator->AddComponent(blockingEntity2, HealthComponent(25, 20, [](Entity e)
+    coordinator->AddComponent(blockingEntity2, HealthComponent(10, 20, [](Entity e)
     {
         auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
 
@@ -668,7 +668,7 @@ auto MainLayer::OnAttach() -> void
     coordinator->AddComponent(blockingEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(blockingEntity3, PhysicsQuadtreeComponent());
     coordinator->AddComponent(blockingEntity3, ReferenceComponent(tilemapEntity));
-    coordinator->AddComponent(blockingEntity3, HealthComponent(25, 20, [](Entity e)
+    coordinator->AddComponent(blockingEntity3, HealthComponent(10, 20, [](Entity e)
     {
         auto& tilemap = coordinator->GetComponent<TilemapComponent>(coordinator->GetComponent<ReferenceComponent>(e).RefEntity);
 
@@ -1140,7 +1140,7 @@ auto MainLayer::OnAttach() -> void
 
         saca.FramesBetweenTransition = 8;
         coordinator->AddComponent(y, sac);
-        coordinator->AddComponent(y, HealthComponent(5, 30, [](Entity e)
+        coordinator->AddComponent(y, HealthComponent(100, 30, [](Entity e)
         {
             coordinator->DestroyEntity(e);
             auto portalEntity3 = coordinator->CreateEntity();
@@ -1149,7 +1149,7 @@ auto MainLayer::OnAttach() -> void
                 CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
             coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
             {
-                GameManager::Instance()->ChangeState(GameState::MenuLevel);
+                GameManager::Instance()->ChangeState(GameState::Win);
             }));
             coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
             coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
@@ -1203,10 +1203,16 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
             gameManager->ChangeState(GameState::PlayingLevel);
     }
 
+    if (Input::Instance()->IsKeyPressed(Key::Slash))
+    {
+        if (gameManager->GetState() == GameState::PlayingLevel)
+            gameManager->ChangeState(GameState::About);
+    }
+
     if (!musicPlayer->GetCurrentSound()->getIsPaused())
         musicTimer_ += ts;
 
-    if (gameManager->GetState() != GameState::Paused)
+    if (gameManager->GetState() == GameState::PlayingLevel)
     {
         timer_ += ts;
         gameManager->UploadTime(timer_);
@@ -1236,7 +1242,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     RenderCommand::SetClearColour(Utility::Colour32BitConvert(background_colour));
     RenderCommand::Clear();
 
-    if (gameManager->GetState() != GameState::Paused)
+    if (gameManager->GetState() == GameState::PlayingLevel)
     {
         runningAnimationSystem_->Update(ts);
         swingingAnimationSystem_->Update(ts);
@@ -1292,6 +1298,16 @@ auto MainLayer::OnEvent(Event &e) -> void
             func(e);
         }
     }
+}
+
+void CentreText(const char* text)
+{
+    auto windowWidth = ImGui::GetWindowSize().x;
+    auto textWidth   = ImGui::CalcTextSize(text).x;
+
+    ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+    ImGui::Text(text);
+
 }
 
 auto MainLayer::OnImGuiRender() -> void 
@@ -1443,6 +1459,50 @@ auto MainLayer::OnImGuiRender() -> void
         ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
         ImGui::Text(current_item);
 
+
+        ImGui::End();
+    }
+    else if (gm->GetState() == GameState::Win)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300));
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - 200, io.DisplaySize.y * 0.5f - 150));
+        ImGui::SetNextWindowBgAlpha(0.2f);
+        ImGui::Begin("Win", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoSavedSettings);
+        auto windowWidth = ImGui::GetWindowSize().x;
+        auto textWidth   = ImGui::CalcTextSize("You win!").x;
+
+        ImGui::SetCursorPosX((windowWidth - textWidth) * 0.5f);
+        ImGui::Text("You win!");
+        ImGui::SetCursorPosX(200.f - 75.f);
+        if (ImGui::Button("Menu", ImVec2(150.f, 100.f)))
+        {
+            GameManager::Instance()->ChangeState(GameState::MenuLevel);
+        }
+        ImGui::End();
+    }
+    else if (gm->GetState() == GameState::About)
+    {
+        ImGui::SetNextWindowSize(ImVec2(400, 300));
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f - 200, io.DisplaySize.y * 0.5f - 150));
+        ImGui::SetNextWindowBgAlpha(0.2f);
+        ImGui::Begin("About", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+            ImGuiWindowFlags_NoSavedSettings);
+
+        CentreText("About this game.");
+        CentreText("A and D to move left and right respectively.");
+        CentreText("S to drop down from platforms.");
+        CentreText("Space to jump.");
+        CentreText("F to dash.");
+        CentreText("Backslash to open up settings menu.");
+
+        ImGui::SetCursorPosX(200.f - 75.f);
+        if (ImGui::Button("Close", ImVec2(150.f, 100.f)))
+        {
+            GameManager::Instance()->ChangeState(GameState::PlayingLevel);
+        }
 
         ImGui::End();
     }
