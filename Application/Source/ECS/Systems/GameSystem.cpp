@@ -102,8 +102,13 @@ auto WeaponSystem::MageActiveBehaviour(Entity e) -> void
     if (weapon.CooldownFrames <= 0)
     {
         // NOTE - This will throw if spark is invalid.
-        auto& reference_component = coordinator->GetComponent<ReferenceComponent>(e);
-        auto spark_entity = reference_component.RefEntity;
+        // auto& reference_component = coordinator->GetComponent<ReferenceComponent>(e);
+        auto& reference_component = coordinator->GetComponent<EntityQueueComponent>(e);
+        auto& queue = reference_component.EntityQueue;
+        if (queue.empty()) return;
+        auto spark_entity = queue.front();
+        queue.pop();
+
         auto& projectile = coordinator->GetComponent<ProjectileComponent>(spark_entity);
         auto& projectile_transform = coordinator->GetComponent<TransformComponent>(spark_entity);
         auto& projectile_physics_quadtree = coordinator->GetComponent<PhysicsQuadtreeComponent>(spark_entity);
@@ -538,6 +543,9 @@ auto ProjectileSystem::Update(Timestep ts) -> void
                 physics_quadtree.Active = false;
                 auto& sprite = coordinator->GetComponent<SpriteRendererComponent>(e);
                 sprite.Colour.a = 0;
+                auto& owner = projectile.WeaponOwner;
+                auto& entity_queue_component = coordinator->GetComponent<EntityQueueComponent>(owner);
+                entity_queue_component.EntityQueue.push(e);
             }
         }
         accumulator -= step;

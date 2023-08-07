@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <set>
+#include <queue>
 #include "ECS/Entity.h"
 #include "ECS/Coordinator.h"
 
@@ -87,6 +88,7 @@ struct Animation
         None = 0,
         Running,
         Swinging,
+        Flying,
     };
     vector<size_t> AnimationIndices;
     vector<Ref<SubTexture2D>> SpriteTextures;
@@ -106,6 +108,14 @@ struct SwingingAnimationComponent
     SwingingAnimationComponent() = default;
 
     Animation Animation;  
+    bool Enabled = false;
+};
+
+struct FlyingAnimationComponent
+{
+    FlyingAnimationComponent() = default;
+
+    Animation Animation;
     bool Enabled = false;
 };
 
@@ -285,6 +295,17 @@ struct ReferenceComponent
     ReferenceComponent() = default;
     ReferenceComponent(Entity entity) : RefEntity(entity) {}
     Entity RefEntity;
+};
+
+struct EntityQueueComponent
+{
+    EntityQueueComponent() = default;
+    EntityQueueComponent(std::initializer_list<Entity> list)
+        : EntityQueue(list)
+    {
+    }
+
+    std::queue<Entity> EntityQueue;
 };
 
 struct ProjectileComponent

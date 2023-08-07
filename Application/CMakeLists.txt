@@ -53,6 +53,7 @@ set(Header_Files
     "Source/ECS/Systems/PlayerSystem.h"
     "Source/ECS/Systems/GameSystem.h"
     "Source/ECS/Systems/GUISystem.h"
+    "Source/ECS/Systems/BatSystem.h"
 
     "Source/Utils/Input.h"
     "Source/Utils/Util.h"
@@ -112,6 +113,7 @@ set(Source_Files
     "Source/ECS/Systems/PlayerSystem.cpp"
     "Source/ECS/Systems/GameSystem.cpp"
     "Source/ECS/Systems/GUISystem.cpp"
+    "Source/ECS/Systems/BatSystem.cpp"
 
     "Source/Utils/Input.cpp"
 

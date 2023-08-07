@@ -30,8 +30,6 @@ MainLayer::MainLayer()
     : Layer("Main")
     , cameraController_(1280.0f/ 720.0f)
 {
-
-
     this->nareLogoTexture_ = CreateRef<Texture2D>("Assets/Images/Nare Logo.png");
     terrainSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Terrain/Terrain (16x16).png");
     playerSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/HoodedCharacter/AnimationSheet_Character.png");
@@ -40,6 +38,7 @@ MainLayer::MainLayer()
     brownBackground_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Background/Brown.png");
     spikeTexture_ = CreateRef<Texture2D>("Assets/Spritesheets/PixelAdventure1/Traps/Spikes/Idle.png");
     buttons_ = CreateRef<Texture2D>("Assets/Images/buttons_4x.png");
+    batSpritesheet_ = CreateRef<Texture2D>("Assets/Spritesheets/Bat_Sprite_Sheet.png");
 
     playButton_ = SubTexture2D::CreateFromCoords(buttons_, { 13, 1 }, {32, 32});
     pauseButton_ = SubTexture2D::CreateFromCoords(buttons_, { 12, 1 }, {32, 32});
@@ -70,8 +69,11 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<RigidBody2DComponent>();
     coordinator->RegisterComponent<BoxCollider2DComponent>();
     coordinator->RegisterComponent<PlayerController2DComponent>();
+
     coordinator->RegisterComponent<RunningAnimationComponent>();
     coordinator->RegisterComponent<SwingingAnimationComponent>();
+    coordinator->RegisterComponent<FlyingAnimationComponent>();
+
     coordinator->RegisterComponent<WeaponComponent>();
     coordinator->RegisterComponent<OwnedByComponent>();
     coordinator->RegisterComponent<InventoryComponent>();
@@ -88,6 +90,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<PortalComponent>();
     coordinator->RegisterComponent<ReferenceComponent>();
     coordinator->RegisterComponent<ProjectileComponent>();
+    coordinator->RegisterComponent<EntityQueueComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -117,6 +120,7 @@ MainLayer::MainLayer()
     healingPotionSystem_              = coordinator->RegisterSystem<HealingPotionSystem>();
     portalSystem_                     = coordinator->RegisterSystem<PortalSystem>();
     projectileSystem_                 = coordinator->RegisterSystem<ProjectileSystem>();
+    batFlyingAnimationSystem_         = coordinator->RegisterSystem<BatFlyingAnimationSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -129,6 +133,7 @@ MainLayer::MainLayer()
     playerAffectedByAnimationSystem_->eventCallback =
     healingPotionSystem_->eventCallback =
     projectileSystem_->eventCallback =
+    batFlyingAnimationSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
@@ -172,6 +177,11 @@ MainLayer::MainLayer()
     swingingAnimationSystemSignature.set(coordinator->GetComponentType<SwingingAnimationComponent>());
     swingingAnimationSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
     coordinator->SetSystemSignature<SwingingAnimationSystem>(swingingAnimationSystemSignature);
+
+    Signature batFlyingAnimationSystemSignature;
+    batFlyingAnimationSystemSignature.set(coordinator->GetComponentType<FlyingAnimationComponent>());
+    batFlyingAnimationSystemSignature.set(coordinator->GetComponentType<SpriteRendererComponent>());
+    coordinator->SetSystemSignature<BatFlyingAnimationSystem>(batFlyingAnimationSystemSignature);
 
     Signature weaponSystemSignature;
     weaponSystemSignature.set(coordinator->GetComponentType<WeaponComponent>());
@@ -684,7 +694,17 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(wandSparkEntity, RigidBody2DComponent(Physics::RigidBodyType::Kinematic));
         coordinator->AddComponent(wandSparkEntity, PhysicsQuadtreeComponent(false));
         coordinator->AddComponent(wandSparkEntity, BoxCollider2DComponent({}, {3, 1}));
+
+        // To return
         coordinator->AddComponent(wandSparkEntity, ProjectileComponent(starterWandEntity, 150.0f));
+
+        auto wandSparkEntity2 = coordinator->CreateEntity();
+        coordinator->AddComponent(wandSparkEntity2, TransformComponent({}, {}, {6, 2, 1}));
+        coordinator->AddComponent(wandSparkEntity2, SpriteRendererComponent(Utility::Colour32BitConvert({255.f, 252.f, 127.f, 0.f})));
+        coordinator->AddComponent(wandSparkEntity2, RigidBody2DComponent(Physics::RigidBodyType::Kinematic));
+        coordinator->AddComponent(wandSparkEntity2, PhysicsQuadtreeComponent(false));
+        coordinator->AddComponent(wandSparkEntity2, BoxCollider2DComponent({}, {3, 1}));
+        coordinator->AddComponent(wandSparkEntity2, ProjectileComponent(starterWandEntity, 150.0f));
 
         WeaponComponent starterWandWeaponComponent;
         starterWandWeaponComponent.Behaviour = WeaponSystem::MageBehaviour;
@@ -692,7 +712,7 @@ auto MainLayer::OnAttach() -> void
         starterWandWeaponComponent.HandOffset = { 12, -2 };
         starterWandWeaponComponent.Damage = 5.0f;
 
-        coordinator->AddComponent(starterWandEntity, ReferenceComponent(wandSparkEntity));
+        coordinator->AddComponent(starterWandEntity, EntityQueueComponent({ wandSparkEntity, wandSparkEntity2 }));
         coordinator->AddComponent(starterWandEntity, PhysicsQuadtreeComponent()); 
         coordinator->AddComponent(starterWandEntity, BoxCollider2DComponent({}, {10, 10})); 
         coordinator->AddComponent(starterWandEntity, WeaponComponent(starterWandWeaponComponent));
@@ -756,17 +776,17 @@ auto MainLayer::OnAttach() -> void
     coordinator->AddComponent(portalEntity2, RigidBody2DComponent(Physics::RigidBodyType::Static));
     coordinator->AddComponent(portalEntity2, PhysicsQuadtreeComponent());
 
-    auto portalEntity3 = coordinator->CreateEntity();
-    coordinator->AddComponent(portalEntity3, TransformComponent(glm::vec3(-268, 460.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
-    coordinator->AddComponent(portalEntity3, SpriteRendererComponent(
-        CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
-    coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
-    {
-        GameManager::Instance()->ChangeState(GameState::MenuLevel);
-    }));
-    coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
-    coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
-    coordinator->AddComponent(portalEntity3, PhysicsQuadtreeComponent());
+    // auto portalEntity3 = coordinator->CreateEntity();
+    // coordinator->AddComponent(portalEntity3, TransformComponent(glm::vec3(-268, 460.f, 0), glm::vec3(0), glm::vec3(30, 30, 1)));
+    // coordinator->AddComponent(portalEntity3, SpriteRendererComponent(
+    //     CreateRef<SubTexture2D>(CreateRef<Texture2D>("Assets/Images/portal.png"), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f)))); 
+    // coordinator->AddComponent(portalEntity3, PortalComponent([](Entity e, PlayerEnterEvent& event)
+    // {
+    //     GameManager::Instance()->ChangeState(GameState::MenuLevel);
+    // }));
+    // coordinator->AddComponent(portalEntity3, BoxCollider2DComponent({}, {8, 8}));
+    // coordinator->AddComponent(portalEntity3, RigidBody2DComponent(Physics::RigidBodyType::Static));
+    // coordinator->AddComponent(portalEntity3, PhysicsQuadtreeComponent());
 
     auto healthPotionBoxCave = coordinator->CreateEntity();
     coordinator->AddComponent(healthPotionBoxCave, TransformComponent(glm::vec3(-520, 202, 0),
@@ -924,6 +944,20 @@ auto MainLayer::OnAttach() -> void
         coordinator->AddComponent(spikeEntity, physics_quadtree_component); 
     }
 #pragma endregion
+#pragma endregion
+#pragma region ENEMIES
+    {
+        auto batEntity = coordinator->CreateEntity();
+        coordinator->AddComponent(batEntity, TransformComponent(glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(2, 2, 1)));
+        coordinator->AddComponent(batEntity, BoxCollider2DComponent({0, 0.f}, {2.f, 2.f})); 
+        auto rigidbody = RigidBody2DComponent();
+        rigidbody.BodyType = Physics::RigidBodyType::Dynamic;
+        auto physics_quadtree_component = PhysicsQuadtreeComponent();
+        coordinator->AddComponent(batEntity, physics_quadtree_component); 
+        coordinator->AddComponent(batEntity, SpriteRendererComponent());
+        coordinator->AddComponent(batEntity, FlyingAnimationComponent());
+    }
+
 #pragma endregion
 }
 

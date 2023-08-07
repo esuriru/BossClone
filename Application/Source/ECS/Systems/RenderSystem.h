@@ -48,6 +48,13 @@ struct AnimationTypeMap<SwingingAnimationComponent>
     static constexpr const char* debug_name = "SwingingAnimationComponent";
 };
 
+template<>
+struct AnimationTypeMap<FlyingAnimationComponent>
+{
+    static constexpr AnimType value = AnimType::Flying;
+    static constexpr const char* debug_name = "FlyingAnimationComponent";
+};
+
 template<typename T>
 constexpr auto GetEnumValue() -> AnimType { return AnimationTypeMap<T>::value; }
 
@@ -166,6 +173,7 @@ private:
 
 using RunningAnimationSystem = AnimationSystem<RunningAnimationComponent>;
 using SwingingAnimationSystem = AnimationSystem<SwingingAnimationComponent>;
+using BatFlyingAnimationSystem = AnimationSystem<FlyingAnimationComponent>;
 
 class SmoothCameraFollowSystem : public System 
 {

@@ -37,6 +37,8 @@ private:
     Ref<SubTexture2D> playButton_;
     Ref<SubTexture2D> pauseButton_;
 
+    Ref<Texture2D> batSpritesheet_;
+
     Ref<Texture2D> nareLogoTexture_;
     Ref<Scene> activeScene_;
 
@@ -62,6 +64,7 @@ private:
     // Animation systems
     Ref<RunningAnimationSystem> runningAnimationSystem_;
     Ref<SwingingAnimationSystem> swingingAnimationSystem_;
+    Ref<BatFlyingAnimationSystem> batFlyingAnimationSystem_;
 
     // Physics System
     Ref<PhysicsSystem> physicsSystem_;
