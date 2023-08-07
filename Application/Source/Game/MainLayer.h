@@ -4,6 +4,7 @@
 
 #include "ECS/Systems/RenderSystem.h"
 #include "ECS/Systems/PlayerSystem.h"
+#include "ECS/Systems/BatSystem.h"
 #include "ECS/Systems/GameSystem.h"
 #include "ECS/Systems/GUISystem.h"
 
@@ -70,6 +71,7 @@ private:
     Ref<PhysicsSystem> physicsSystem_;
 
     // Game Logic systems
+    Ref<BatSystem> batSystem_;
     Ref<PlayerSystem> playerSystem_;
     Ref<DamageableSystem> damageableSystem_;
     Ref<PlayerAffectedByAnimationSystem> playerAffectedByAnimationSystem_;

@@ -319,3 +319,8 @@ struct ProjectileComponent
 
     Entity WeaponOwner;
 };
+
+struct BatComponent
+{
+    float FlightSpeed = 5.0f;
+};

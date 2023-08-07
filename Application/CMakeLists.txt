@@ -35,6 +35,8 @@ set(Header_Files
     "Source/Game/OrthographicCameraController.h"
     "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
+    "Source/Game/State.h"
+    "Source/Game/StateMachine.h"
 
     "Source/Scene/Scene.h"
     "Source/Scene/SceneManager.h"

@@ -91,6 +91,7 @@ MainLayer::MainLayer()
     coordinator->RegisterComponent<ReferenceComponent>();
     coordinator->RegisterComponent<ProjectileComponent>();
     coordinator->RegisterComponent<EntityQueueComponent>();
+    coordinator->RegisterComponent<BatComponent>();
 
 #pragma endregion
 #pragma region SYSTEM_REGISTRY
@@ -121,6 +122,7 @@ MainLayer::MainLayer()
     portalSystem_                     = coordinator->RegisterSystem<PortalSystem>();
     projectileSystem_                 = coordinator->RegisterSystem<ProjectileSystem>();
     batFlyingAnimationSystem_         = coordinator->RegisterSystem<BatFlyingAnimationSystem>();
+    batSystem_                        = coordinator->RegisterSystem<BatSystem>();
 
     // Set event callbacks for most of the systems.
     playerSystem_->eventCallback = 
@@ -134,6 +136,7 @@ MainLayer::MainLayer()
     healingPotionSystem_->eventCallback =
     projectileSystem_->eventCallback =
     batFlyingAnimationSystem_->eventCallback =
+    batSystem_->eventCallback =
         CC_BIND_EVENT_FUNC(MainLayer::OnEvent);
 
     physicsSystem_->helperSystem = inventoryGUISystem_->helperSystem;
@@ -259,6 +262,10 @@ MainLayer::MainLayer()
     Signature projectileSystemSignature;
     projectileSystemSignature.set(coordinator->GetComponentType<ProjectileComponent>());
     coordinator->SetSystemSignature<ProjectileSystem>(projectileSystemSignature);
+
+    Signature batSystemSignature;
+    batSystemSignature.set(coordinator->GetComponentType<BatComponent>());
+    coordinator->SetSystemSignature<BatSystem>(batSystemSignature);
 
 #pragma endregion
 
@@ -617,7 +624,6 @@ auto MainLayer::OnAttach() -> void
 
         coordinator->DestroyEntity(e);
         SoundController::Instance()->PlaySoundByID(10, true);
-         
     },
     [](Entity e)
     {
@@ -945,17 +951,42 @@ auto MainLayer::OnAttach() -> void
     }
 #pragma endregion
 #pragma endregion
+
 #pragma region ENEMIES
     {
         auto batEntity = coordinator->CreateEntity();
-        coordinator->AddComponent(batEntity, TransformComponent(glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(2, 2, 1)));
+        coordinator->AddComponent(batEntity, TransformComponent(glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(16, 24, 1)));
         coordinator->AddComponent(batEntity, BoxCollider2DComponent({0, 0.f}, {2.f, 2.f})); 
         auto rigidbody = RigidBody2DComponent();
         rigidbody.BodyType = Physics::RigidBodyType::Dynamic;
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
         coordinator->AddComponent(batEntity, physics_quadtree_component); 
-        coordinator->AddComponent(batEntity, SpriteRendererComponent());
-        coordinator->AddComponent(batEntity, FlyingAnimationComponent());
+
+        auto firstFrame = SubTexture2D::CreateFromCoords(batSpritesheet_, glm::vec2(0, 1), glm::vec2(16, 24));
+        coordinator->AddComponent(batEntity, SpriteRendererComponent(firstFrame));
+        coordinator->AddComponent(batEntity, BatComponent());
+
+        FlyingAnimationComponent fac;
+        constexpr glm::vec2 size = { 16, 24 };
+
+        auto& faca = fac.Animation;
+        for (int i = 0; i < 5; ++i)
+        {
+            auto texture = 
+                SubTexture2D::CreateFromCoords(batSpritesheet_, glm::vec2(i , 1), size);
+            // texture inset 
+            texture->Inset(0.001f);
+
+            faca.SpriteTextures.emplace_back(texture);
+        }
+
+        for (size_t i = 0; i < faca.SpriteTextures.size(); ++i)
+        {
+            faca.AnimationIndices.emplace_back(i);
+        }
+
+        faca.FramesBetweenTransition = 8;
+        coordinator->AddComponent(batEntity, fac);
     }
 
 #pragma endregion
@@ -992,6 +1023,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
         damageableSystem_->Update(ts);
         physicsSystem_->Update(ts);
         playerSystem_->Update(ts);
+        batSystem_->Update(ts);
         portalSystem_->Update(ts);
         projectileSystem_->Update(ts);
         cameraController_.GetCamera().SetPosition(
@@ -1011,6 +1043,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
     {
         runningAnimationSystem_->Update(ts);
         swingingAnimationSystem_->Update(ts);
+        batFlyingAnimationSystem_->Update(ts);
     } 
 
     tilemapRenderSystem_->Update(ts);
@@ -1023,7 +1056,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x) std::bind(&std::remove_reference<decltype(*(x))>::type::OnEvent, x, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 16> on_events {
+    static const std::array<std::function<void(Event&)>, 17> on_events {
         OEB(physicsSystem_),
         OEB(projectileSystem_),
         OEB(weaponSystem_),
@@ -1042,6 +1075,7 @@ auto MainLayer::OnEvent(Event &e) -> void
 
         OEB(runningAnimationSystem_),
         OEB(swingingAnimationSystem_),
+        OEB(batFlyingAnimationSystem_),
         OEB(playerAffectedByAnimationSystem_),
         OEB(weaponAffectedByAnimationSystem_)
     };
