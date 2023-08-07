@@ -1,12 +1,19 @@
 #include "Tilemap.h"
 #include "ECS/Coordinator.h"
 #include "ECS/Component.h"
+#include "Utils/Input.h"
+#include "Core/KeyCodes.h"
 
 
 TilemapComponent::TilemapComponent(const std::string &map_csv, bool make_tiles_solid)
 {
     ImportTilemapCSV(map_csv, make_tiles_solid);
     InitializeQuadtree();
+
+    _cameFrom.resize(TilemapData::TILEMAP_MAX_Y_LENGTH * TilemapData::TILEMAP_MAX_X_LENGTH);
+	_closed.resize(TilemapData::TILEMAP_MAX_Y_LENGTH * TilemapData::TILEMAP_MAX_X_LENGTH, false);
+    DirectionsCount = 8;
+    _weight = 1;
 }
 
 TilemapComponent::TilemapComponent(const std::string &map_csv, const char* tile_type_csv) 
@@ -15,6 +22,11 @@ TilemapComponent::TilemapComponent(const std::string &map_csv, const char* tile_
     TilemapTypesPath = std::string(tile_type_csv);
     ImportTilemapCSV(map_csv, TilemapTypesPath);
     InitializeQuadtree();
+    
+    _cameFrom.resize(TilemapData::TILEMAP_MAX_Y_LENGTH * TilemapData::TILEMAP_MAX_X_LENGTH);
+	_closed.resize(TilemapData::TILEMAP_MAX_Y_LENGTH * TilemapData::TILEMAP_MAX_X_LENGTH, false);
+    DirectionsCount = 8;
+    _weight = 1;
 }
 
 auto TilemapComponent::ImportTilemapCSV(const std::string &map_csv, bool make_tiles_solid) -> void
@@ -154,16 +166,9 @@ bool TilemapComponent::IsValid(const glm::vec2 &pos) const
         (pos.y >= 0) && (pos.y < TilemapData::TILEMAP_MAX_Y_LENGTH);
 }
 
-bool TilemapComponent::IsBlocked(const unsigned int row, const unsigned int col, const bool invert) const
+bool TilemapComponent::IsBlocked(const unsigned int row, const unsigned int col) const
 {
-	if (invert)
-	{
-		return ((MapData[TilemapData::TILEMAP_MAX_Y_LENGTH - row - 1][col].Type == Tile::Solid));
-	}
-	else
-	{
-		return ((MapData[row][col].Type == Tile::Solid));
-	}
+    return ((MapData[row][col].Type == Tile::TileType::Solid));
 }
 
 unsigned int Heuristic::Manhattan(const glm::vec2 &v1, const glm::vec2 &v2, int weight)
@@ -180,7 +185,7 @@ unsigned int Heuristic::Euclidean(const glm::vec2 &v1, const glm::vec2 &v2, int 
 
 std::vector<glm::vec2> TilemapComponent::Pathfind(const glm::vec2 &start, const glm::vec2 &target, HeuristicFunction func, const int weight)
 {
-    if (IsBlocked(start.x, start.y) || IsBlocked(target.x, target.y))
+    if (IsBlocked(start.y, start.x) || IsBlocked(target.y, target.x))
     {
         CC_ERROR("Invalid start or target.");
         return std::vector<glm::vec2>();
@@ -189,7 +194,7 @@ std::vector<glm::vec2> TilemapComponent::Pathfind(const glm::vec2 &start, const 
     _start = start;
     _target = target;
     _weight = weight;
-    _heuristic = std::bind(_heuristic, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    _heuristic = std::bind(func, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 
     ResetAStarLists();
 
@@ -199,7 +204,9 @@ std::vector<glm::vec2> TilemapComponent::Pathfind(const glm::vec2 &start, const 
     unsigned int newF, newG, newH;
     glm::vec2 currentPosition;
 
-    while (_open.empty())
+    bool debug = false; 
+
+    while (!_open.empty())
     {
         currentPosition = _open.top().Position;
 
@@ -220,7 +227,12 @@ std::vector<glm::vec2> TilemapComponent::Pathfind(const glm::vec2 &start, const 
             auto np = currentPosition + TilemapData::DIRECTIONS[i];
             const auto ni = ConvertTo1D(np);
 
-            if (!IsValid(np) || IsBlocked(np.x, np.y) || _closed[ni])
+            // if (!IsValid(np) || IsBlocked(np.y, np.x) || _closed[ni])
+            if (debug)
+            {
+                std::cout << "\t#" << i << ": Check this: " << np.x << ", " << np.y << ":\t";
+            }
+            if (!IsValid(np) || IsBlocked(np.y, np.x) || _closed[ni])
             {
                 continue;
             }
@@ -231,9 +243,18 @@ std::vector<glm::vec2> TilemapComponent::Pathfind(const glm::vec2 &start, const 
 
             if (_cameFrom[ni].F == 0 || newF < _cameFrom[ni].F)
             {
+                if (debug)
+                {
+                    std::cout << "Adding to Open List: " << np.x << ", " << np.y;
+                    std::cout << ". [ f : " << newF << ", g : " << newG << ", h : " << newH<< "]" << std::endl;
+                }
                 _open.push(Tile(np, newF));
-                _cameFrom[ni] = { np, currentPosition, newF, newG, newH };
+                _cameFrom[ni] = Tile(np, currentPosition, newF, newG, newH);
             }
+        }
+        if (debug)
+        {
+            system("pause");
         }
     }
     return BuildPath();

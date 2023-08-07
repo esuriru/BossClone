@@ -57,6 +57,7 @@ struct SpriteRendererComponent
     glm::vec4 Colour { 1.0f, 1.0f, 1.0f, 1.0f };
     Ref<SubTexture2D> Texture = nullptr;
     float TilingFactor = 1.0f;
+    glm::vec2 Offset {};
 
     SpriteRendererComponent() = default;
     SpriteRendererComponent(const glm::vec4& colour)
@@ -323,6 +324,7 @@ struct ProjectileComponent
 struct BatComponent
 {
     float FlightSpeed = 5.0f;
-    glm::vec3 Destination;
-    glm::vec3 Direction;
+    float Damage = 3.0f;
+    glm::vec2 Destination;
+    glm::vec2 Direction;
 };

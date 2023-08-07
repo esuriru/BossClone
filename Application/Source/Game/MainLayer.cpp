@@ -332,7 +332,7 @@ auto MainLayer::OnAttach() -> void
         // glm::vec3(0, 0, 0),
     });
 
-    coordinator->AddComponent(tilemapEntity, tilemapComponent);
+    coordinator->AddComponent(tilemapEntity, std::move(tilemapComponent));
 
     // auto tilemapEntity2 = coordinator->CreateEntity();
 
@@ -957,16 +957,23 @@ auto MainLayer::OnAttach() -> void
 #pragma region ENEMIES
     {
         auto batEntity = coordinator->CreateEntity();
-        coordinator->AddComponent(batEntity, TransformComponent(glm::vec3(0, 0, 0), glm::vec3(0), glm::vec3(16, 24, 1)));
-        coordinator->AddComponent(batEntity, BoxCollider2DComponent({0, 0.f}, {2.f, 2.f})); 
+        coordinator->AddComponent(batEntity, TransformComponent(glm::vec3(-60, 156, 0), glm::vec3(0), glm::vec3(16, 24, 1)));
+        coordinator->AddComponent(batEntity, BoxCollider2DComponent({0, -14.f}, {2.0f, 2.f})); 
         auto rigidbody = RigidBody2DComponent();
         rigidbody.BodyType = Physics::RigidBodyType::Dynamic;
+        rigidbody.GravityScale = 0.0f;
         auto physics_quadtree_component = PhysicsQuadtreeComponent();
         coordinator->AddComponent(batEntity, physics_quadtree_component); 
 
         auto firstFrame = SubTexture2D::CreateFromCoords(batSpritesheet_, glm::vec2(0, 1), glm::vec2(16, 24));
-        coordinator->AddComponent(batEntity, SpriteRendererComponent(firstFrame));
-        coordinator->AddComponent(batEntity, BatComponent());
+        SpriteRendererComponent src = SpriteRendererComponent(firstFrame);
+        src.Offset.y = -16.0f;
+        src.Offset.x = -2.0f;
+        coordinator->AddComponent(batEntity, src);
+        coordinator->AddComponent(batEntity, rigidbody);
+        BatComponent bat;
+        bat.FlightSpeed = 100;
+        coordinator->AddComponent(batEntity, bat);
 
         FlyingAnimationComponent fac;
         constexpr glm::vec2 size = { 16, 24 };
@@ -1058,7 +1065,7 @@ auto MainLayer::OnUpdate(Timestep ts) -> void
 auto MainLayer::OnEvent(Event &e) -> void 
 {
 #define OEB(x) std::bind(&std::remove_reference<decltype(*(x))>::type::OnEvent, x, std::placeholders::_1)
-    static const std::array<std::function<void(Event&)>, 17> on_events {
+    static const std::array<std::function<void(Event&)>, 18> on_events {
         OEB(physicsSystem_),
         OEB(projectileSystem_),
         OEB(weaponSystem_),
@@ -1070,6 +1077,7 @@ auto MainLayer::OnEvent(Event &e) -> void
         OEB(damageableSystem_),
 
         OEB(playerSystem_),
+        OEB(batSystem_),
         OEB(pickupSystem_),
         OEB(spikeSystem_),
         OEB(portalSystem_),

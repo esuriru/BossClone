@@ -44,7 +44,6 @@ public:
     {
         GetComponentArray<T>()->InsertData(entity, component);
     }
-
     template <typename T>
     T &GetComponent(Entity entity)
     {

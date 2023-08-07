@@ -4,6 +4,9 @@
 #include "Game/Tilemap.h"
 #include "Core/Core.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 #include "Utils/Util.h"
 
 #include "Renderer/Renderer2D.h"
@@ -22,7 +25,12 @@ auto SpriteRenderSystem::Update(Timestep ts) -> void
         auto& transform = coordinator->GetComponent<TransformComponent>(e);
         auto& sprite = coordinator->GetComponent<SpriteRendererComponent>(e);
 
-        Renderer2D::DrawSprite(transform.GetTransformMatrix(), sprite);
+
+        glm::mat4 transformation = glm::translate(glm::mat4(1.0f), transform.Position + glm::vec3(sprite.Offset, 0))
+            * glm::mat4_cast(glm::quat(transform.Rotation))
+            * glm::scale(glm::mat4(1.0f), transform.Scale);
+
+        Renderer2D::DrawSprite(transformation, sprite);
     }
 }
 

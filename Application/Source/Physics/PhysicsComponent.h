@@ -50,6 +50,7 @@ public:
     float Restitution = 0.f;
     Physics::RigidBodyType BodyType = Physics::RigidBodyType::Dynamic;
     glm::vec2 LinearVelocity = glm::vec2(0.0f);
+    float GravityScale = 1.0f;
     bool IgnoreFriction = false;
 
     inline auto GetMass() const -> float

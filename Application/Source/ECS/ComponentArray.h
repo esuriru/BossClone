@@ -11,6 +11,12 @@ template<typename T>
 class ComponentArray : public IComponentArray
 {
 public:
+    ComponentArray()
+    {
+        componentArray_.resize(MaxEntities);
+        size_ = 0;
+    }
+
 	inline void InsertData(Entity entity, T component)
 	{
 		CC_ASSERT(entityToIndexMap_.find(entity) == entityToIndexMap_.end(), "Component added to the same entity more than once.");
@@ -22,6 +28,7 @@ public:
 
 		++size_;
 	}
+
 
 	inline void RemoveData(Entity entity)
 	{
@@ -70,7 +77,7 @@ public:
 
 private:
 	// Packed array of components set to MaxEntities
-	std::array<T, MaxEntities> componentArray_;
+	std::vector<T> componentArray_;
 	// std::array<T, 30> componentArray_;
 
 	// Map from an entity ID to array index

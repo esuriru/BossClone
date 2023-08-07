@@ -199,7 +199,7 @@ auto PhysicsSystem::Update(Timestep ts) -> void
             // Add gravity.
             if (!entityOnGround)
             {
-                AddForce(rigidbody, Physics::GravityAccelerationVector, Physics::ForceMode::Acceleration);
+                AddForce(rigidbody, Physics::GravityAccelerationVector * rigidbody.GravityScale, Physics::ForceMode::Acceleration);
             }
             else
             {

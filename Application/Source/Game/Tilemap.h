@@ -25,11 +25,11 @@ struct Tile
         Empty, 
     };
 
-    Tile() = default;
-    Tile(const glm::vec2& pos, unsigned int f) : Position(pos), F(f) {}
+    Tile() : Type(Empty), Position({0, 0}), Parent({-1, -1}), F(0), G(0), H(0) {}
+    Tile(const glm::vec2& pos, unsigned int f) : Type(Empty), Position(pos), Parent(-1, 1), F(f) , G(0), H(0) {}
     Tile(glm::vec2& pos, const glm::vec2& parent, 
         unsigned int f, unsigned int g, unsigned int h) 
-    : Position(pos), Parent(parent), F(f), G(g), H(h) {}
+    : Type(Empty), Position(pos), Parent(parent), F(f), G(g), H(h) {}
 
     TileType Type = Empty;
     uint8_t TextureIndex;
@@ -37,7 +37,7 @@ struct Tile
     glm::vec2 Position; 
     glm::vec2 Parent;
 
-    unsigned int F, G, H;
+    unsigned int F = 0, G = 0, H = 0;
 
 };
 
@@ -113,7 +113,7 @@ private:
 
     std::vector<glm::vec2> BuildPath() const;
     bool IsValid(const glm::vec2& pos) const;
-    bool IsBlocked(const unsigned int row, const unsigned int col, const bool invert = false) const;
+    bool IsBlocked(const unsigned int row, const unsigned int col) const;
 
     void ResetAStarLists();
     int ConvertTo1D(const glm::vec2& pos) const;
