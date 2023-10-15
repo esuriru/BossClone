@@ -1,20 +1,21 @@
 #pragma once
 
-#include "Core/Core.h"
 #include "Component.h"
-#include <unordered_map>
-#include <typeindex>
 
 #include "Core/Timestep.h"
-
-#include <glm/glm.hpp>
+#include "Core/Core.h"
 
 #include "Components/Transform.h"
 #include "Components/Renderer.h"
 
-#include <memory>
+#include <unordered_map>
+#include <typeindex>
+#include <string>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+
+using std::string;
 
 class Component;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
@@ -105,12 +106,29 @@ public:
         return renderer_;
     }
 
+    inline void SetTag(string tag)
+    {
+        tag_ = tag;
+    }
+
+    inline string GetTag()
+    {
+        return tag_;
+    }
+
+    inline bool CompareTag(string rhs)
+    {
+        return tag_ == rhs;
+    }
+
 private:
     std::unordered_map<std::type_index, Ref<Component>> components_;
     Transform* const transform_;
     Renderer* renderer_;
 
     bool enabled_;
+    string tag_;
+
     friend class Renderer;
      
 };

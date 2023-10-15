@@ -38,7 +38,7 @@ public:
 
 protected:
     std::vector<Ref<GameObject>> sceneObjects_;
-    std::multimap<int, Renderer*, std::greater<int>> rendererMap_;
+    std::multimap<int, Renderer*, std::less<int>> rendererMap_;
     std::string name_;
 };
 

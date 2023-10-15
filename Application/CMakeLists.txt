@@ -14,6 +14,8 @@ set(Header_Files
     "Source/EC/Components/Collider2D.h"
     "Source/EC/Components/Rigidbody2D.h"
 
+    "Source/EC/Components/EnemyController.h"
+
     "Source/Core/Application.h"
     "Source/Core/Core.h"
     "Source/Core/Layer.h"
@@ -46,6 +48,8 @@ set(Header_Files
     # "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
     "Source/Game/State.h"
+    "Source/Game/ActionEntry.h"
+    "Source/Game/StateMessageMethod.h"
     "Source/Game/StateMachine.h"
     "Source/Game/SceneLayer.h"
     "Source/Game/Scenes/PlayScene.h"
@@ -92,6 +96,8 @@ set(Source_Files
     "Source/EC/Components/Collider2D.cpp"
     "Source/EC/Components/Rigidbody2D.cpp"
 
+    "Source/EC/Components/EnemyController.cpp"
+
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"
     "Source/Core/LayerStack.cpp"
@@ -121,6 +127,7 @@ set(Source_Files
     # "Source/Game/Tilemap.cpp"
     "Source/Game/GameManager.cpp"
     "Source/Game/SceneLayer.cpp"
+    "Source/Game/StateMachine.cpp"
     "Source/Game/Scenes/PlayScene.cpp"
 
     "Source/ECS/Coordinator.cpp"

@@ -1,21 +1,80 @@
+#pragma once
+
 #include "Core/Core.h"
 
-template<class T>
+#include "ActionEntry.h"
+
+#include <string>
+#include <unordered_map>
+#include <vector>
+#include <functional>
+
+using std::string;
+using std::unordered_map;
+using std::vector;
+using std::function;
+
+template<typename T = string>
 class State
 {
-public:
-    void Enter(Ref<T> owner) {}
-    void Toggle(Ref<T> owner) {}
-    void Exit(Ref<T> owner) {}
+protected:
+    T id_;
+    unordered_map<StateMessageMethod, vector<function<void()>>> actions_;
 
-    inline static State& Instance()
+public:
+    template<class... Ts>
+    State(T ID, Ts&& ... entries)
+        : id_(ID)
     {
-        static State instance;
-        return instance; 
+        AddAction(std::forward<Ts>(entries...));
     }
+
+    inline const T& GetID() const
+    {
+        return id_;
+    }
+
+    virtual void Enter() 
+    {
+        for (auto& entry : actions_[StateMessageMethod.Enter])
+        {
+            entry();
+        }
+    }
+
+    virtual void Update() {}
+    virtual void FixedUpdate() {}
+    virtual void Exit(){}
 
 private:
     State() = default;
     State(const State& other) = default;
+
+    bool TryParse(string messageMethodName, 
+        StateMessageMethod& messageMethod)
+    {
+        switch (messageMethodName)
+        {
+            case "Enter":
+                messageMethod = StateMessageMethod.Enter; 
+            case "Exit":
+                messageMethod = StateMessageMethod.Exit; 
+            case "Update":
+                messageMethod = StateMessageMethod.Update; 
+                
+            default:
+                return false;
+        }
+        return true;
+    }
+
+    void AddAction(ActionEntry actionEntry)
+    {
+        StateMessageMethod messageMethod;
+        if (TryParse(actionEntry.GetMethodName(), messageMethod))
+        {
+            actions_.insert({ messageMethod, actionEntry.GetAction() });
+        }
+    }
 
 };

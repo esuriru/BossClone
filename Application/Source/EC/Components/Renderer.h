@@ -1,4 +1,5 @@
 #pragma once
+
 #include "EC/Component.h"
 
 #include <memory>

@@ -83,5 +83,5 @@
         "*.tcc": "cpp",
         "mutex": "cpp",
         "typeindex": "cpp"
-    }
+    },
 }

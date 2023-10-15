@@ -26,6 +26,12 @@ public:
         return gameObject_;
     }
 
+    template<typename T>
+    inline Ref<T> GetComponent()
+    {
+        return gameObject_->GetComponent<T>();
+    }
+
     Transform& GetTransform();
 
 public:
