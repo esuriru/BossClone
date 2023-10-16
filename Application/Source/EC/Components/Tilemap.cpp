@@ -28,6 +28,11 @@ Tilemap::Tilemap(GameObject &gameObject, const std::string &textureCsvFilePath, 
     LoadCSV(textureCsvFilePath, typeCsvFilePath);
 }
 
+glm::vec2 Tilemap::GetBounds()
+{
+    return glm::vec2(MaxHorizontalLength, MaxVerticalLength) * tileSize;
+}
+
 Ref<Tilemap> Tilemap::SetTexture(uint32_t index, Ref<SubTexture2D> subtexture)
 {
     subTextureMap_[index] = subtexture; 

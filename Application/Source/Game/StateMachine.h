@@ -69,9 +69,10 @@ protected:
     void HandleAllTransitions(function<void()> callback)
     {
         S outStateID;
+
         if (TryAllTransitions(outStateID))
         {
-
+            SwitchState(outStateID, callback);
         }
     }
 

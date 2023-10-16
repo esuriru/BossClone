@@ -34,8 +34,8 @@ PlayScene::PlayScene()
     auto goldBlockMiddle        = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(18, 2), pixelAdventureTileSize);
     auto goldBlockEnd           = SubTexture2D::CreateFromCoords(terrainSpritesheet_, glm::vec2(19, 2), pixelAdventureTileSize);
     
-    CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f))
-        ->AddComponent<Tilemap>("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv")
+    auto tilemapObject = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f));
+        tilemapObject->AddComponent<Tilemap>("Assets/Maps/TestMap.csv", "Assets/Maps/TestMapTypes.csv")
         ->PushTexture(grassTileTopLeft)
         ->PushTexture(grassTileTopMiddle)
         ->PushTexture(grassTileTopRight)
@@ -53,4 +53,6 @@ PlayScene::PlayScene()
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(3);
 
+    auto bounds = tilemapObject->GetComponent<Tilemap>()->GetBounds();
+    tilemapObject->GetTransform().SetPosition(glm::vec3(bounds.x * -0.5f, bounds.y * -0.5f, 0));
 }
