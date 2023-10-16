@@ -48,6 +48,7 @@ set(Header_Files
     # "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
     "Source/Game/State.h"
+    "Source/Game/Transition.h"
     "Source/Game/ActionEntry.h"
     "Source/Game/StateMessageMethod.h"
     "Source/Game/StateMachine.h"

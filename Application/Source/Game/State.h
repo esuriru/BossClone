@@ -36,9 +36,9 @@ public:
 
     virtual void Enter() 
     {
-        for (auto& entry : actions_[StateMessageMethod.Enter])
+        for (auto& action : actions_[StateMessageMethod::Enter])
         {
-            entry();
+            action();
         }
     }
 

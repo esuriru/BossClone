@@ -1,4 +1,4 @@
-#include "PlayerController.h"
+#include "EnemyController.h"
 
 EnemyController::EnemyController(GameObject &gameObject)
     : Component(gameObject)
