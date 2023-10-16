@@ -44,10 +44,17 @@ auto OrthographicCameraController::OnEvent(Event &e) -> void
     dispatcher.Dispatch<WindowResizeEvent>(CC_BIND_EVENT_FUNC(OrthographicCameraController::OnWindowResized));
 }
 
+void OrthographicCameraController::SetZoomLevel(float zoomLevel)
+{
+    zoomLevel_ = zoomLevel;
+    UpdateProjection();
+    CC_TRACE("Zoom Level: ", zoomLevel_);
+}
+
 auto OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent &e) -> bool
 {
     zoomLevel_ -= e.GetOffset().y;
-    camera_.SetProjection(-aspectRatio_ * zoomLevel_, aspectRatio_ * zoomLevel_, -zoomLevel_, zoomLevel_);
+    UpdateProjection();
     CC_TRACE("Zoom Level: ", zoomLevel_);
     return false;
 }
@@ -55,7 +62,12 @@ auto OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent &e) -> boo
 auto OrthographicCameraController::OnWindowResized(WindowResizeEvent &e) -> bool
 {
     aspectRatio_ = static_cast<float>(e.GetWidth()) / static_cast<float>(e.GetHeight());
-    camera_.SetProjection(-aspectRatio_ * zoomLevel_, aspectRatio_ * zoomLevel_, -zoomLevel_, zoomLevel_);
+    UpdateProjection();
     CC_TRACE("Aspect Ratio: ", aspectRatio_);
     return false;
+}
+
+void OrthographicCameraController::UpdateProjection()
+{
+    camera_.SetProjection(-aspectRatio_ * zoomLevel_, aspectRatio_ * zoomLevel_, -zoomLevel_, zoomLevel_);
 }

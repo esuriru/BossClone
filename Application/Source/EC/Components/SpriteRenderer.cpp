@@ -50,3 +50,8 @@ void SpriteRenderer::SetTexture(Ref<Texture2D> texture)
 {
     subtexture_ = CreateRef<SubTexture2D>(texture, glm::vec2(), glm::vec2(1.0f));
 }
+
+void SpriteRenderer::SetNativeSize()
+{
+    gameObject_.GetTransform().SetScale(glm::vec3(subtexture_->GetWidth(), subtexture_->GetHeight(), 1.0f));
+}

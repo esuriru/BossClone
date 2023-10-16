@@ -11,4 +11,5 @@ public:
     void Start() override;
 private:
     Scope<StateMachine<>> _stateMachine;
+
 };

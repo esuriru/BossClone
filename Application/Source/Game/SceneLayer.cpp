@@ -15,6 +15,7 @@ SceneLayer::SceneLayer()
 void SceneLayer::OnAttach() 
 {
     activeScene_->Start();
+    cameraController_.SetZoomLevel(215);
 }
 
 void SceneLayer::OnDetach()
@@ -23,7 +24,6 @@ void SceneLayer::OnDetach()
 
 void SceneLayer::OnUpdate(Timestep ts)
 {
-
     constexpr float step = 1 / CC_FIXED_UPDATE_FRAME_RATE;
     static float accumulator = 0.f;
 

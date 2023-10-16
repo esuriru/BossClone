@@ -17,10 +17,15 @@ public:
     {
         return camera_;
     }
+
+    void SetZoomLevel(float zoomLevel);
+
 private:
     // Callbacks
     auto OnMouseScrolled(MouseScrolledEvent& e) -> bool;
     auto OnWindowResized(WindowResizeEvent& e) -> bool;
+
+    void UpdateProjection();
 
     float aspectRatio_ = 0.f;
     float zoomLevel_ = 25.0f;

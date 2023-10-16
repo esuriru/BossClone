@@ -16,6 +16,8 @@ public:
     void SetTexture(Ref<SubTexture2D> subtexture);
     void SetTexture(Ref<Texture2D> texture);
 
+    void SetNativeSize();
+
     glm::vec4 colour;
     float tilingFactor;
 
