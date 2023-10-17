@@ -6,6 +6,7 @@
 #include <array>
 #include <limits>
 #include <glm/glm.hpp>
+#include <utility>
 #include "Renderer/SubTexture2D.h"
 
 struct Tile
@@ -41,6 +42,8 @@ public:
     Ref<SubTexture2D>& GetTexture(uint32_t index);
     Ref<Tilemap> SetTexture(uint32_t index, Ref<SubTexture2D> subtexture);
     Ref<Tilemap> PushTexture(Ref<SubTexture2D> subtexture);
+    glm::vec3 LocalToWorld(uint32_t x, uint32_t y);
+    std::pair<uint32_t, uint32_t> WorldToLocal(glm::vec3 worldPosition);
 
 private:
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_{};

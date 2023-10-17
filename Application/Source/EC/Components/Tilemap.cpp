@@ -49,7 +49,21 @@ Ref<Tilemap> Tilemap::PushTexture(Ref<SubTexture2D> subtexture)
     return shared_from_this();
 }
 
+glm::vec3 Tilemap::LocalToWorld(uint32_t x, uint32_t y)
+{
+    glm::vec3 worldPosition = GetTransform().GetPosition();
+    return worldPosition + glm::vec3((glm::vec2(x, y) * tileSize), 0);
+}
 
+std::pair<uint32_t, uint32_t> Tilemap::WorldToLocal(glm::vec3 worldPosition)
+{
+    glm::vec3 tilemapWorldPosition = GetTransform().GetPosition(); 
+    return std::make_pair(static_cast<uint32_t>((worldPosition.x - tilemapWorldPosition.x + 
+        tileSize.x * 0.5f) / tileSize.x),
+        static_cast<uint32_t>((worldPosition.y - 
+        tilemapWorldPosition.y + 
+        tileSize.y * 0.5f) / tileSize.y));
+}
 
 auto CharToTileType(char csv_input) -> decltype(Tile::Empty) 
 {

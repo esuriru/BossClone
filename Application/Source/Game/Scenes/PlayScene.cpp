@@ -40,9 +40,15 @@ PlayScene::PlayScene()
         ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
             enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
     enemySpriteRenderer->SetNativeSize();
-    enemySpriteRenderer->GetGameObject().GetTransform().SetScale(
-        enemySpriteRenderer->GetGameObject().GetTransform().GetScale()
+    enemySpriteRenderer->GetTransform().SetScale(
+        enemySpriteRenderer->GetTransform().GetScale()
         * glm::vec3(ppiMultiplier, 0));
     enemySpriteRenderer->SetSortingOrder(10);
+
+    auto localPosition = tilemapObject->GetComponent<Tilemap>()
+        ->WorldToLocal(enemySpriteRenderer->GetTransform()
+        .GetPosition());
+
+    CC_TRACE("Enemy tile position: x: ", localPosition.first, ", y: ", localPosition.second);
 
 }
