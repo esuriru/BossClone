@@ -42,7 +42,10 @@ public:
     Ref<SubTexture2D>& GetTexture(uint32_t index);
     Ref<Tilemap> SetTexture(uint32_t index, Ref<SubTexture2D> subtexture);
     Ref<Tilemap> PushTexture(Ref<SubTexture2D> subtexture);
+
     glm::vec3 LocalToWorld(uint32_t x, uint32_t y);
+    glm::vec3 LocalToWorld(std::pair<uint32_t, uint32_t> xyPair);
+
     std::pair<uint32_t, uint32_t> WorldToLocal(glm::vec3 worldPosition);
 
 private:

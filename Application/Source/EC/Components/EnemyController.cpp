@@ -12,15 +12,15 @@ EnemyController::EnemyController(GameObject &gameObject)
 
 void EnemyController::Start()
 {
-
+    localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
 }
 
 void EnemyController::Update(Timestep ts)
 {
     if (Input::Instance()->IsKeyPressed(Key::L))
     {
-        auto localPosition = tilemap_->WorldToLocal(GetTransform().GetPosition());
-        GetTransform().SetPosition(tilemap_->LocalToWorld(localPosition.first + 1, localPosition.second));
+        ++localTilemapPosition_.first;
+        GetTransform().SetPosition(tilemap_->LocalToWorld(localTilemapPosition_));
     }
 }
 

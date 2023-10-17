@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "EC/Component.h"
 
 #include "Game/StateMachine.h"
@@ -17,5 +19,6 @@ public:
 private:
     Scope<StateMachine<>> stateMachine_;
     Ref<Tilemap> tilemap_;
+    std::pair<uint32_t, uint32_t> localTilemapPosition_;
 
 };

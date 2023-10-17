@@ -55,6 +55,11 @@ glm::vec3 Tilemap::LocalToWorld(uint32_t x, uint32_t y)
     return worldPosition + glm::vec3((glm::vec2(x, y) * tileSize), 0);
 }
 
+glm::vec3 Tilemap::LocalToWorld(std::pair<uint32_t, uint32_t> xyPair)
+{
+    return LocalToWorld(xyPair.first, xyPair.second);
+}
+
 std::pair<uint32_t, uint32_t> Tilemap::WorldToLocal(glm::vec3 worldPosition)
 {
     glm::vec3 tilemapWorldPosition = GetTransform().GetPosition(); 
