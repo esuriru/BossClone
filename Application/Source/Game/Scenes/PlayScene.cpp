@@ -2,6 +2,7 @@
 #include "EC/Components/SpriteRenderer.h"
 #include "EC/Components/Tilemap.h"
 #include "EC/Components/TilemapRenderer.h"
+#include "EC/Components/EnemyController.h"
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -44,6 +45,8 @@ PlayScene::PlayScene()
         enemySpriteRenderer->GetTransform().GetScale()
         * glm::vec3(ppiMultiplier, 0));
     enemySpriteRenderer->SetSortingOrder(10);
+    enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
+        ->SetTilemap(tilemapObject->GetComponent<Tilemap>());
 
     auto localPosition = tilemapObject->GetComponent<Tilemap>()
         ->WorldToLocal(enemySpriteRenderer->GetTransform()
