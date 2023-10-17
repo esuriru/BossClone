@@ -12,6 +12,7 @@ set(Header_Files
     "Source/EC/Components/Tilemap.h"
     "Source/EC/Components/TilemapRenderer.h"
     "Source/EC/Components/Collider2D.h"
+    "Source/EC/Components/BoxCollider2D.h"
     "Source/EC/Components/Rigidbody2D.h"
 
     "Source/EC/Components/EnemyController.h"
@@ -76,6 +77,7 @@ set(Header_Files
     "Source/Utils/Singleton.h"
 
     "Source/Physics/PhysicsWorld.h"
+    "Source/Physics/Bounds.h"
     # "Source/Physics/PhysicsSystem.h"
     # "Source/Physics/PhysicsComponent.h"
     # "Source/Physics/Quadtree.h"
@@ -95,6 +97,7 @@ set(Source_Files
     "Source/EC/Components/Tilemap.cpp"
     "Source/EC/Components/TilemapRenderer.cpp"
     "Source/EC/Components/Collider2D.cpp"
+    "Source/EC/Components/BoxCollider2D.cpp"
     "Source/EC/Components/Rigidbody2D.cpp"
 
     "Source/EC/Components/EnemyController.cpp"
@@ -144,6 +147,7 @@ set(Source_Files
     "Source/Utils/Util.cpp"
 
     "Source/Physics/PhysicsWorld.cpp"
+    "Source/Physics/Bounds.cpp"
     # "Source/Physics/PhysicsSystem.cpp"
     # "Source/Physics/PhysicsComponent.cpp"
     # "Source/Physics/Quadtree.cpp"

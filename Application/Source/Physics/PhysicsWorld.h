@@ -13,6 +13,7 @@ public:
     Collider2D* AddCollider(Collider2D* collider);
 
     void Update(Timestep ts);
+    void FixedUpdate(float fixedDeltaTime);
 
 private:
     std::vector<Collider2D*> colliders_;   
