@@ -3,10 +3,12 @@
 #include "EC/Components/Tilemap.h"
 #include "EC/Components/TilemapRenderer.h"
 #include "EC/Components/EnemyController.h"
+#include "EC/Components/BoxCollider2D.h"
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 PlayScene::PlayScene()
     : Scene("PlayScene")
@@ -47,11 +49,19 @@ PlayScene::PlayScene()
     enemySpriteRenderer->SetSortingOrder(10);
     enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
         ->SetTilemap(tilemapObject->GetComponent<Tilemap>());
+    enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>();
 
-    auto localPosition = tilemapObject->GetComponent<Tilemap>()
-        ->WorldToLocal(enemySpriteRenderer->GetTransform()
-        .GetPosition());
+    {
+        auto enemySpriteRenderer = CreateGameObject(glm::vec3(10, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
+            ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
+                enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
+        enemySpriteRenderer->SetNativeSize();
+        enemySpriteRenderer->GetTransform().SetScale(
+            enemySpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(ppiMultiplier, 0));
+        enemySpriteRenderer->SetSortingOrder(10);
+        enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>();
+    }
 
-    CC_TRACE("Enemy tile position: x: ", localPosition.first, ", y: ", localPosition.second);
 
 }

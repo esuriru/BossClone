@@ -109,6 +109,7 @@ auto Application::OnWindowClose(WindowCloseEvent& e) -> bool
 {
 	// Turn off the application.
 	running_ = false;
+    SceneManager::Instance()->GetActiveScene()->OnDestroy();
 	return false;
 }
 
@@ -238,9 +239,6 @@ Application::~Application()
 {
 	//Finalize and clean up GLFW
 	glfwTerminate();
-
-    Input::Destroy();
-    Coordinator::Destroy();
 }
 
 auto Application::Run() -> void

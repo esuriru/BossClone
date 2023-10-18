@@ -1,5 +1,7 @@
 #include "Transform.h"
+
 #include "glm/gtc/matrix_transform.hpp"
+#include "Utils/Util.h"
 
 Transform::Transform(GameObject& gameObject)
     : Component(gameObject)
@@ -65,12 +67,32 @@ void Transform::SetScale(const glm::vec3 &scl)
 
 const glm::mat4 &Transform::GetWorldMatrix() 
 {
+    InternalCheckDirty();
+    return worldMatrix_;
+}
+
+void Transform::AddCallback(void *owner, std::function<void(Transform &)> callback)
+{
+    onChangeCallbacks_.insert({ owner, callback });
+}
+
+void Transform::RemoveCallback(void *owner)
+{
+    onChangeCallbacks_.erase(owner);
+}
+
+void Transform::InternalCheckDirty()
+{
     if (isDirty)
     {
         isDirty = false;
         CalculateWorldMatrix();
+
+        for (auto& callbackPair : onChangeCallbacks_)
+        {
+            callbackPair.second(*this);
+        }
     }
-    return worldMatrix_;
 }
 
 void Transform::CalculateWorldMatrix()

@@ -5,5 +5,4 @@ int main()
 {
 	Application* app = Application::Instance();
 	app->Run();
-	app->Destroy();
 }

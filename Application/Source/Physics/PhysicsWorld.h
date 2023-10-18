@@ -6,11 +6,14 @@
 #include <vector> 
 
 
-class PhysicsWorld : Utility::Singleton<PhysicsWorld>
+class PhysicsWorld : public Utility::Singleton<PhysicsWorld>
 {
 public:
     PhysicsWorld() = default;
-    Collider2D* AddCollider(Collider2D* collider);
+    uint32_t AddCollider(Collider2D* collider);
+    void RemoveColliderAtIndex(uint32_t index);
+    void RemoveCollider(Collider2D* collider);
+
 
     void Update(Timestep ts);
     void FixedUpdate(float fixedDeltaTime);

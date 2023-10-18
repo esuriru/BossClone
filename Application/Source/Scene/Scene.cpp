@@ -51,6 +51,14 @@ void Scene::Render()
     }
 }
 
+void Scene::OnDestroy()
+{
+    for (auto& gameObject : sceneObjects_)
+    {
+        gameObject->OnDestroy();
+    }
+}
+
 Ref<GameObject> Scene::CreateGameObject()
 {
     Ref<GameObject> gameObject = CreateRef<GameObject>();

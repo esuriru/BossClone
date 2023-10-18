@@ -34,6 +34,7 @@ public:
     void Start();
     void Update(Timestep ts);
     void FixedUpdate(float fixedStep);
+    void OnDestroy();
 
     inline Transform& GetTransform()
     {

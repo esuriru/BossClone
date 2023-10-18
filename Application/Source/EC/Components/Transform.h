@@ -4,6 +4,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/quaternion.hpp"
 
+#include <vector>
+#include <functional>
+#include <unordered_map>
+
 class Transform : public Component
 {
 public:
@@ -23,7 +27,14 @@ public:
 
     const glm::mat4& GetWorldMatrix();
 
+    void AddCallback(void* owner, std::function<void(Transform&)> callback);
+    void RemoveCallback(void* owner);
+
 private:
+    std::unordered_map<void*, std::function<void(Transform&)>> onChangeCallbacks_;
+
+    void InternalCheckDirty();
+
     glm::mat4 localMatrix_;
     glm::mat4 worldMatrix_;
 

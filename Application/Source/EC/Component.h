@@ -21,6 +21,8 @@ public:
     // TODO - Should this be the implementation?
     virtual void FixedUpdate(float fixedStep) {}
 
+    virtual void OnDestroy() {}
+
     inline GameObject& GetGameObject()
     {
         return gameObject_;

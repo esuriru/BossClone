@@ -4,10 +4,23 @@
 #include "EC/Components/Collider2D.h"
 #include "Physics/Bounds.h"
 
-Collider2D *PhysicsWorld::AddCollider(Collider2D *collider)
+#include <algorithm>
+
+uint32_t PhysicsWorld::AddCollider(Collider2D *collider)
 {
     colliders_.emplace_back(collider);
-    return collider;
+    return colliders_.size() - 1;
+}
+
+void PhysicsWorld::RemoveColliderAtIndex(uint32_t index)
+{
+    Utility::RemoveAt(colliders_, index);
+}
+
+void PhysicsWorld::RemoveCollider(Collider2D *collider)
+{
+    colliders_.erase(std::remove(
+        colliders_.begin(), colliders_.end(), collider), colliders_.end());
 }
 
 void PhysicsWorld::Update(Timestep ts)

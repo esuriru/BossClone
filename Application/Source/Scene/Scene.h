@@ -24,6 +24,8 @@ public:
 
     virtual void Render();
 
+    virtual void OnDestroy();
+
     virtual Ref<GameObject> CreateGameObject();
 
     template<typename... Args>

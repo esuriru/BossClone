@@ -4,12 +4,14 @@
 #include "Utils/Util.h"
 #include "Scenes/PlayScene.h"
 #include "Scene/SceneManager.h"
+#include "Physics/PhysicsWorld.h"
 
 SceneLayer::SceneLayer()
     : Layer("SceneLayer")
     , cameraController_(1280.0f/ 720.0f)
 {
     activeScene_ = SceneManager::Instance()->CreateScene<PlayScene>();
+    SceneManager::Instance()->SetActiveScene(activeScene_);
 }
 
 void SceneLayer::OnAttach() 
@@ -32,6 +34,7 @@ void SceneLayer::OnUpdate(Timestep ts)
     while (accumulator >= step)
     {
         activeScene_->FixedUpdate(step);
+        PhysicsWorld::Instance()->FixedUpdate(step);
         accumulator -= step;
     }
 

@@ -46,3 +46,11 @@ void GameObject::FixedUpdate(float fixedStep)
         component.second->FixedUpdate(fixedStep);
     }
 }
+
+void GameObject::OnDestroy()
+{
+    for (auto& component : components_)
+    {
+        component.second->OnDestroy();
+    }
+}
