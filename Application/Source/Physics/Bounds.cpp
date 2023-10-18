@@ -1,8 +1,22 @@
 #include "Bounds.h"
 
-void Bounds::SetCenter(glm::vec3 newCenter)
+#include "EC/Components/Collider2D.h"
+#include "EC/Components/Transform.h"
+
+void Bounds::SetCenter(const glm::vec3& newCenter)
 {
     center_ = newCenter;
+}
+
+void Bounds::SetLocalExtents(const glm::vec3 &localExtents)
+{
+    localExtents_ = localExtents;
+    extents_ = localExtents_ * ownerCollider_->GetTransform().GetScale();
+}
+
+void Bounds::SetExtents(const glm::vec3 &extents)
+{
+    extents_ = extents; 
 }
 
 void Bounds::UpdateScale(const glm::vec3 &scale)

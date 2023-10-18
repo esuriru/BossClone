@@ -9,7 +9,7 @@
 Collider2D::Collider2D(GameObject & gameObject)
     : Component(gameObject)
     , offset_()
-    , bounds_()
+    , bounds_(this)
 {
     PhysicsWorld::Instance()->AddCollider(this);
     GetTransform()

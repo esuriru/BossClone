@@ -13,7 +13,6 @@
 PlayScene::PlayScene()
     : Scene("PlayScene")
 {
-
     auto tilemapSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Tilemap/TX Tileset Grass.png");
 
     constexpr glm::vec2 tilemapTileSize = glm::vec2(32, 32);
@@ -39,29 +38,23 @@ PlayScene::PlayScene()
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
     auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
 
-    auto enemySpriteRenderer = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f))
-        ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
-            enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
-    enemySpriteRenderer->SetNativeSize();
-    enemySpriteRenderer->GetTransform().SetScale(
-        enemySpriteRenderer->GetTransform().GetScale()
-        * glm::vec3(ppiMultiplier, 0));
-    enemySpriteRenderer->SetSortingOrder(10);
-    enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
-        ->SetTilemap(tilemapObject->GetComponent<Tilemap>());
-    enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>();
-
+    for (int i = 0; i < 2; ++i)
     {
-        auto enemySpriteRenderer = CreateGameObject(glm::vec3(10, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
+        auto enemySpriteRenderer = CreateGameObject(glm::vec3(i * 10.0f, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
                 enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
         enemySpriteRenderer->SetNativeSize();
+        if (i)
+        {
+            enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
+                ->SetTilemap(tilemapObject->GetComponent<Tilemap>());
+        }
+        enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(39.0f/126.0f, 1, 1) 
+            * glm::vec3(ppiMultiplier, 1));
         enemySpriteRenderer->GetTransform().SetScale(
             enemySpriteRenderer->GetTransform().GetScale()
-            * glm::vec3(ppiMultiplier, 0));
+            * glm::vec3(ppiMultiplier, 1));
         enemySpriteRenderer->SetSortingOrder(10);
-        enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>();
     }
-
 
 }

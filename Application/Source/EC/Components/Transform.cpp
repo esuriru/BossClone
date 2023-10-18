@@ -65,6 +65,12 @@ void Transform::SetScale(const glm::vec3 &scl)
     isDirty = true;
 }
 
+void Transform::Translate(const glm::vec3 & trans)
+{
+    position_ += trans;
+    isDirty = true;
+}
+
 const glm::mat4 &Transform::GetWorldMatrix() 
 {
     InternalCheckDirty();

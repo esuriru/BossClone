@@ -1,9 +1,12 @@
 #pragma once
 #include <glm/glm.hpp>
 
+class Collider2D;
+
 struct Bounds
 {
 private:
+    Collider2D* ownerCollider_;
     glm::vec3 localExtents_ {};
     glm::vec3 center_ {};
     glm::vec3 extents_ {};
@@ -19,11 +22,14 @@ public:
         return extents_;
     }
 
-    void SetCenter(glm::vec3 newCenter);
+    void SetCenter(const glm::vec3& newCenter);
+    void SetLocalExtents(const glm::vec3& localExtents);
+    void SetExtents(const glm::vec3& extents);
 
-    Bounds(glm::vec3 center = glm::vec3(), 
+    Bounds(Collider2D* ownerCollider, glm::vec3 center = glm::vec3(), 
         glm::vec3 extents = glm::vec3(1.0f))
-        : center_(center)
+        : ownerCollider_(ownerCollider)
+        , center_(center)
         , extents_(extents)
         , localExtents_(extents)
     {

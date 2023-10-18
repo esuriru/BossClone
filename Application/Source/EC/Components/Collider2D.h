@@ -15,7 +15,7 @@ public:
     void SetOffset(const glm::vec2& offset);
     glm::vec2 GetOffset() const;
 
-    inline const Bounds& GetBounds() const
+    inline Bounds& GetBounds()
     {
         return bounds_;
     }

@@ -25,6 +25,8 @@ public:
     void SetRotation(const glm::quat& rot);
     void SetScale(const glm::vec3& scl);
 
+    void Translate(const glm::vec3& trans);
+
     const glm::mat4& GetWorldMatrix();
 
     void AddCallback(void* owner, std::function<void(Transform&)> callback);
