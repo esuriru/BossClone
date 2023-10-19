@@ -3,6 +3,7 @@
 #include "Utils/Input.h"
 #include "Core/KeyCodes.h"
 #include "EC/Components/Transform.h"
+#include "EC/Components/Collider2D.h"
 
 EnemyController::EnemyController(GameObject &gameObject)
     : Component(gameObject)
@@ -35,6 +36,11 @@ void EnemyController::Update(Timestep ts)
     {
         GetTransform().Translate(glm::vec3(0, -ts * 3.0f, 0));
     }
+}
+
+void EnemyController::OnTriggerEnter2D(Collider2D *other)
+{
+    CC_TRACE("Trigger enter 2D");
 }
 
 void EnemyController::SetTilemap(Ref<Tilemap> tilemap)

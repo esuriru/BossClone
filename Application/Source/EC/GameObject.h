@@ -18,6 +18,7 @@
 using std::string;
 
 class Component;
+class Collider2D;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
 class GameObject : public std::enable_shared_from_this<GameObject>
@@ -35,6 +36,7 @@ public:
     void Update(Timestep ts);
     void FixedUpdate(float fixedStep);
     void OnDestroy();
+    void OnTriggerEnter2D(Collider2D* other);
 
     inline Transform& GetTransform()
     {

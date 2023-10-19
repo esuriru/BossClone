@@ -54,3 +54,11 @@ void GameObject::OnDestroy()
         component.second->OnDestroy();
     }
 }
+
+void GameObject::OnTriggerEnter2D(Collider2D *other)
+{
+    for (auto& component : components_)
+    {
+        component.second->OnTriggerEnter2D(other);
+    }
+}

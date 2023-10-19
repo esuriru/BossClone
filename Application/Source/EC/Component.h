@@ -4,6 +4,7 @@
 
 class GameObject;
 class Transform;
+class Collider2D;
 
 class Component
 {
@@ -22,6 +23,7 @@ public:
     virtual void FixedUpdate(float fixedStep) {}
 
     virtual void OnDestroy() {}
+    virtual void OnTriggerEnter2D(Collider2D* other) {}
 
     inline GameObject& GetGameObject()
     {

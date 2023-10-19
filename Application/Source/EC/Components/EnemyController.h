@@ -14,6 +14,8 @@ public:
 
     void Start() override;
     void Update(Timestep ts) override;
+
+    void OnTriggerEnter2D(Collider2D* other) override;
     
     void SetTilemap(Ref<Tilemap> tilemap);
 private:

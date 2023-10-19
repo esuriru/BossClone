@@ -3,6 +3,7 @@
 #include "Utils/Util.h"
 #include "EC/Components/Collider2D.h"
 #include "Physics/Bounds.h"
+#include "EC/GameObject.h"
 
 #include <algorithm>
 
@@ -39,7 +40,8 @@ void PhysicsWorld::FixedUpdate(float fixedDeltaTime)
             Collider2D* colliderY = colliders_[j];
             if (colliderX->GetBounds().Intersects(colliderY->GetBounds()))
             {
-                CC_TRACE("Collision");
+                colliderX->GetGameObject().OnTriggerEnter2D(colliderY);
+                colliderY->GetGameObject().OnTriggerEnter2D(colliderX);
             }
         }
     }
