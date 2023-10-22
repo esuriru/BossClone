@@ -18,14 +18,36 @@ struct Tile
         Solid
     } tileType = Empty;
 
+    Tile() : tileType(Empty), position({0, 0}), parent({-1, -1}), F(0), G(0), H(0) {}
+    Tile(const glm::vec2& pos, unsigned int f) : 
+        tileType(Empty), position(pos), parent(-1, 1), F(f) , G(0), H(0) {}
+    Tile(glm::vec2& pos, const glm::vec2& parent, 
+        unsigned int f, unsigned int g, unsigned int h) 
+        : tileType(Empty), position(pos), parent(parent), F(f), G(g), H(h) {}
+
     uint8_t textureIndex = 0;
+
+    glm::vec2 position;
+    glm::vec2 parent;
+    unsigned int F = 0, G = 0, H = 0;
 };
+
+inline bool operator<(const Tile& a, const Tile& b)
+{
+    return b.F < a.F;
+}
 
 class Tilemap : public Component, public std::enable_shared_from_this<Tilemap>
 {
 public:
     constexpr static uint32_t MaxHorizontalLength = 128;
     constexpr static uint32_t MaxVerticalLength = 72;
+    constexpr static uint32_t MaxSize = MaxHorizontalLength * MaxVerticalLength;
+    constexpr static std::array<glm::vec2, 8> Directions
+    {
+        glm::vec2(-1, 0), glm::vec2(1, 0), glm::vec2(0, 1), glm::vec2(0, -1),
+        glm::vec2(-1, -1), glm::vec2(1, 1), glm::vec2(-1, 1), glm::vec2(1, -1)
+    };
 
 public:
     Tilemap(GameObject& gameObject);

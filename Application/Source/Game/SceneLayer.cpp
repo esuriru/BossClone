@@ -17,7 +17,7 @@ SceneLayer::SceneLayer()
 void SceneLayer::OnAttach() 
 {
     activeScene_->Start();
-    cameraController_.SetZoomLevel(215);
+    cameraController_.SetZoomLevel(125);
 }
 
 void SceneLayer::OnDetach()

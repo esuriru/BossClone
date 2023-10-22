@@ -9,6 +9,9 @@ class Collider2D;
 class Component
 {
 public:
+    template<typename T>
+    using is_component = std::enable_if_t<std::is_base_of_v<Component, T>>;
+
     virtual ~Component() = default;
     Component(GameObject& gameObject) : gameObject_(gameObject) {}
 
@@ -28,12 +31,6 @@ public:
     inline GameObject& GetGameObject()
     {
         return gameObject_;
-    }
-
-    template<typename T>
-    inline Ref<T> GetComponent()
-    {
-        return gameObject_->GetComponent<T>();
     }
 
     Transform& GetTransform();

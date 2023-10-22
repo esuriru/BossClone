@@ -17,13 +17,12 @@
 
 using std::string;
 
-class Component;
 class Collider2D;
 // NOTE - This game object will copy Unity's style in the essence that every game object will have a (cached) Transform component.
 
 class GameObject : public std::enable_shared_from_this<GameObject>
 {
-private:
+public:
     template<typename T>
     using is_component = std::enable_if_t<std::is_base_of_v<Component, T>>;
 
