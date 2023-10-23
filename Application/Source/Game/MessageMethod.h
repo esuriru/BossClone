@@ -1,9 +1,10 @@
 #pragma once
 
-enum class StateMessageMethod
+enum class MessageMethod
 {
     None,
     Enter,
     Update,
+    FixedUpdate,
     Exit
 };

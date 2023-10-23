@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "StateMessageMethod.h"
+#include "MessageMethod.h"
 
 #include <string>
 #include <functional>

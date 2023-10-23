@@ -23,6 +23,11 @@ namespace Utility
         return glm::vec4(colour.r / 255.f, colour.g / 255.f, colour.b / 255.f, colour.a);
     }
 
+    constexpr uint32_t Hash(const char* s, int off = 0) noexcept
+    {
+        return !s[off] ? 5381 : (Hash(s, off+1)*33) ^ s[off];
+    }
+
     template<typename T, typename A>
     void RemoveAt(std::vector<T, A>& container, size_t index)
     {

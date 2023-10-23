@@ -52,7 +52,7 @@ set(Header_Files
     "Source/Game/State.h"
     "Source/Game/Transition.h"
     "Source/Game/ActionEntry.h"
-    "Source/Game/StateMessageMethod.h"
+    "Source/Game/MessageMethod.h"
     "Source/Game/StateMachine.h"
     "Source/Game/SceneLayer.h"
     "Source/Game/Scenes/PlayScene.h"

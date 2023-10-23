@@ -2,7 +2,9 @@
 
 #include "State.h"
 #include "Transition.h"
+
 #include "Core/Core.h"
+#include "Core/Timestep.h"
 
 #include <unordered_map>
 #include <string>
@@ -31,7 +33,7 @@ protected:
             currentState_->Exit();
         }
 
-        currentState_ = states_[destinationStateID];
+        currentState_ = states_[destinationStateID].get();
 
         if (currentState_)
         {
@@ -47,20 +49,20 @@ protected:
 
     bool TryAllTransitions(S stateID, S& outStateID)
     {
-        auto& it = transitions_.find(stateID);
+        const auto& it = transitions_.find(stateID);
         if (it == transitions_.end())
         {
             return false;
         }
 
-        auto& transitions = it.second;
+        auto& transitions = it->second;
 
         for (auto& transition : transitions)
         {
             if (transition->TestConditions())
             {
-                transition->TriggerCallback();
-                outStateID = transition.GetToID();
+                transition->InvokeCallback();
+                outStateID = transition->GetToID();
                 return true;
             }
         }
@@ -70,7 +72,7 @@ protected:
     {
         S outStateID;
 
-        if (TryAllTransitions(outStateID))
+        if (TryAllTransitions(currentState_->GetID(), outStateID))
         {
             SwitchState(outStateID, callback);
         }
@@ -79,6 +81,11 @@ protected:
     void InitiateTransitionHandling(function<void()> messageCallback, 
         function<void()> callback)
     {
+        if (!currentState_)
+        {
+            return;
+        }
+
         if (handleTransitionsAfter_)
         {
             messageCallback();
@@ -92,7 +99,10 @@ protected:
     }
 
 public:
-    StateMachine(T selfID, bool handleTransitionAfter)
+    Timestep currentTimestep;
+    float fixedDeltaTime;
+
+    StateMachine(T selfID, bool handleTransitionAfter = true)
         : id_(selfID) 
         , handleTransitionsAfter_(handleTransitionAfter)
     {
@@ -116,12 +126,35 @@ public:
         return id_;
     }
 
-    void Update()
+    void FixedUpdate(float fixedDeltaTime)
     {
-        currentState_->Update();
-        InitiateTransitionHandling([](){
-            Update(); 
+        this->fixedDeltaTime = fixedDeltaTime;
+
+        InitiateTransitionHandling([&](){
+            if (currentState_)
+            {
+                currentState_->FixedUpdate();
+            }
         }, nullptr);
+    }
+
+    void Update(Timestep ts)
+    {
+        currentTimestep = ts;
+
+        InitiateTransitionHandling([&](){
+            if (currentState_)
+            {
+                currentState_->Update();
+            }
+        }, nullptr);
+    }
+
+    void InitateStartState(std::string ID)
+    {
+        CC_ASSERT(states_.find(ID) != states_.end(), "Starting state" 
+            "could not be found.");
+        currentState_ = states_[ID].get();
     }
 
     bool IsHandlingTransitionsAfter() const

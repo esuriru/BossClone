@@ -1,8 +1,10 @@
 #pragma once
 
 #include "Core/Core.h"
+#include "Core/Timestep.h"
 
 #include "ActionEntry.h"
+#include "Utils/Util.h"
 
 #include <string>
 #include <unordered_map>
@@ -19,15 +21,17 @@ class State
 {
 protected:
     T id_;
-    unordered_map<StateMessageMethod, vector<function<void()>>> actions_;
+    unordered_map<MessageMethod, vector<function<void()>>> actions_;
 
 public:
     template<class... Ts>
     State(T ID, Ts&& ... entries)
         : id_(ID)
     {
-        AddAction(std::forward<Ts>(entries...));
+        AddAction(std::forward<Ts>(entries)...);
     }
+
+    State(T ID) : id_(ID) {}
 
     inline const T& GetID() const
     {
@@ -36,14 +40,37 @@ public:
 
     virtual void Enter() 
     {
-        for (auto& action : actions_[StateMessageMethod::Enter])
+        for (auto& action : actions_[MessageMethod::Enter])
         {
             action();
         }
     }
 
-    virtual void Update() {}
-    virtual void FixedUpdate() {}
+    State* AddAction(ActionEntry actionEntry)
+    {
+        MessageMethod messageMethod;
+        if (TryParse(actionEntry.GetMethodName(), messageMethod))
+        {
+            actions_[messageMethod].emplace_back(actionEntry.GetAction());
+        }
+        return this;
+    }
+
+    virtual void Update() 
+    {
+        for (auto& action : actions_[MessageMethod::Update])
+        {
+            action();
+        }
+    }
+
+    virtual void FixedUpdate(float fixedDeltaTime) 
+    {
+        for (auto& action : actions_[MessageMethod::Update])
+        {
+            action();
+        }
+    }
     virtual void Exit(){}
 
 private:
@@ -51,30 +78,29 @@ private:
     State(const State& other) = default;
 
     bool TryParse(string messageMethodName, 
-        StateMessageMethod& messageMethod)
+        MessageMethod& messageMethod)
     {
-        switch (messageMethodName)
+        if (messageMethodName == "Enter")
         {
-            case "Enter":
-                messageMethod = StateMessageMethod.Enter; 
-            case "Exit":
-                messageMethod = StateMessageMethod.Exit; 
-            case "Update":
-                messageMethod = StateMessageMethod.Update; 
-                
-            default:
-                return false;
+            messageMethod = MessageMethod::Enter;
         }
-        return true;
-    }
-
-    void AddAction(ActionEntry actionEntry)
-    {
-        StateMessageMethod messageMethod;
-        if (TryParse(actionEntry.GetMethodName(), messageMethod))
+        else if (messageMethodName == "Exit")
         {
-            actions_.insert({ messageMethod, actionEntry.GetAction() });
+            messageMethod = MessageMethod::Exit;
         }
+        else if (messageMethodName == "Update")
+        {
+            messageMethod = MessageMethod::Update;
+        }
+        else if (messageMethodName == "FixedUpdate")
+        {
+            messageMethod = MessageMethod::FixedUpdate;
+        }
+        else
+        {
+            return false;
+        }
+        return true; 
     }
 
 };
