@@ -66,11 +66,12 @@ public:
 
     virtual void FixedUpdate(float fixedDeltaTime) 
     {
-        for (auto& action : actions_[MessageMethod::Update])
+        for (auto& action : actions_[MessageMethod::FixedUpdate])
         {
             action();
         }
     }
+
     virtual void Exit(){}
 
 private:
