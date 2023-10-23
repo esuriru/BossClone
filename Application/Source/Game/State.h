@@ -28,7 +28,10 @@ public:
     State(T ID, Ts&& ... entries)
         : id_(ID)
     {
-        AddAction(std::forward<Ts>(entries)...);
+        for (const auto& entry : {entries...})
+        {
+            AddAction(entry);
+        }
     }
 
     State(T ID) : id_(ID) {}
@@ -38,13 +41,7 @@ public:
         return id_;
     }
 
-    virtual void Enter() 
-    {
-        for (auto& action : actions_[MessageMethod::Enter])
-        {
-            action();
-        }
-    }
+    void AddAction() {}
 
     State* AddAction(ActionEntry actionEntry)
     {
@@ -55,6 +52,15 @@ public:
         }
         return this;
     }
+
+    virtual void Enter() 
+    {
+        for (auto& action : actions_[MessageMethod::Enter])
+        {
+            action();
+        }
+    }
+
 
     virtual void Update() 
     {
@@ -72,7 +78,13 @@ public:
         }
     }
 
-    virtual void Exit(){}
+    virtual void Exit()
+    {
+        for (auto& action : actions_[MessageMethod::Exit])
+        {
+            action();
+        }
+    }
 
 private:
     State() = default;

@@ -17,11 +17,56 @@ EnemyController::EnemyController(GameObject &gameObject)
     : Component(gameObject)
     , stateMachine_(CreateScope<StateMachine<>>("Default"))
 {
-    stateMachine_->AddState(CreateScope<State<>>(std::string("Idle State"), ActionEntry("Update", 
-        [&]() 
-        {
-            CC_TRACE(stateMachine_->currentTimestep);
-        })));
+    stateMachine_->AddState(
+        CreateScope<State<>>(
+            std::string("Idle State")
+        )
+    );
+
+    stateMachine_->AddState(
+        CreateScope<State<>>(
+            std::string("Other State"), 
+            ActionEntry("Update", 
+            [&]() 
+            {
+                static float timer_ = 0.0f;
+                timer_ += stateMachine_->currentTimestep;
+
+                if (timer_ >= 1.0f)
+                {
+                    ++localTilemapPosition_.first;
+                    ++localTilemapPosition_.second;
+                    GetTransform().SetPosition(tilemap_->LocalToWorld(localTilemapPosition_));
+                    timer_ -= 1.0f;
+                }
+            }),
+            ActionEntry("Enter", 
+            [&]() 
+            {
+                CC_TRACE("Test");
+            })
+        )
+    );
+
+    stateMachine_->AddTransition(
+        CreateScope<Transition<>>(
+            std::string("Idle State"),
+            std::string("Other State"),
+            [&]()
+            {
+                return Input::Instance()->IsKeyPressed(Key::B);
+            })
+    );
+
+    stateMachine_->AddTransition(
+        CreateScope<Transition<>>(
+            std::string("Other State"),
+            std::string("Idle State"),
+            [&]()
+            {
+                return Input::Instance()->IsKeyPressed(Key::V);
+            })
+    );
 
     stateMachine_->InitateStartState("Idle State");
 }

@@ -118,7 +118,10 @@ public:
 
     StateMachine* AddTransition(Scope<Transition<S>> transition)
     {
-        transitions_.insert({ transition->GetID(), std::move(transition) });
+        CC_ASSERT(states_.find(transition->GetFromID()) != states_.end() &&
+            states_.find(transition->GetToID()) != states_.end(), "Transition to or from state is invalid.");
+
+        transitions_[transition->GetFromID()].push_back(std::move(transition));
         return this;
     }
 

@@ -18,11 +18,12 @@ private:
     T toID_;
 
 public:
-    Transition(T fromID, T toID)
+    template <class... Args>
+    Transition(T fromID, T toID, Args&& ... args)
         : fromID_(fromID)
         , toID_(toID)
     {
-
+        conditions_.push_back(std::forward<Args>(args)...);
     }
 
     virtual T GetFromID()
@@ -42,7 +43,10 @@ public:
 
     virtual void InvokeCallback()
     {
-        callback_();
+        if (callback_)
+        {
+            callback_();
+        }
     }
 
     virtual bool TestConditions()
