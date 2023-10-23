@@ -66,6 +66,7 @@ protected:
                 return true;
             }
         }
+        return false;
     }
 
     void HandleAllTransitions(function<void()> callback)
