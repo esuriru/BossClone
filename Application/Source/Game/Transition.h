@@ -2,10 +2,11 @@
 
 #include <vector>
 #include <functional>
+#include <string>
 
 using std::vector;
 
-template<typename T = string>
+template<typename T = std::string>
 class Transition
 {
 private:
@@ -23,7 +24,10 @@ public:
         : fromID_(fromID)
         , toID_(toID)
     {
-        conditions_.push_back(std::forward<Args>(args)...);
+        for (const auto& condition : {args...})
+        {
+            conditions_.push_back(condition);
+        }
     }
 
     virtual T GetFromID()

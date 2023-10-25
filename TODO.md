@@ -1,11 +1,6 @@
-- 2 levels at max, side-scrolling with gate lock by key,
-- FIX A GLITCH WHERE WHEN A BREAKABLE DROPS AN ASSERT IS SHOWN. - SHOULD BE DONE
-- end up at town centre?
-- scoring: time spent doing the beginning part
-- fix dashing + jumping - SHOULD BE DONE
-- add camera scrolling to player - DONE
-- add pots that drop stuff.
-- add an altar that will defo drop a better weapon.
-- add progressive breakables, gated by better weapons you find
-- if dashing not enough, ledge grabbing
-- maybe shop at town centre? collect coins
+
+- QUESTIONS:
+    - Do we need pathfinding?
+    - Do we need sprite animations?
+    - If not, do we need to indicate their next move?
+    - Do we need a win or lose condition

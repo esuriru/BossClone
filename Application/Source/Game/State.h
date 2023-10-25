@@ -55,32 +55,27 @@ public:
 
     virtual void Enter() 
     {
-        for (auto& action : actions_[MessageMethod::Enter])
-        {
-            action();
-        }
+        CallMessageMethod(MessageMethod::Enter);
     }
-
 
     virtual void Update() 
     {
-        for (auto& action : actions_[MessageMethod::Update])
-        {
-            action();
-        }
+        CallMessageMethod(MessageMethod::Update);
     }
 
     virtual void FixedUpdate(float fixedDeltaTime) 
     {
-        for (auto& action : actions_[MessageMethod::FixedUpdate])
-        {
-            action();
-        }
+        CallMessageMethod(MessageMethod::FixedUpdate);
     }
 
     virtual void Exit()
     {
-        for (auto& action : actions_[MessageMethod::Exit])
+        CallMessageMethod(MessageMethod::Exit);
+    }
+
+    void CallMessageMethod(MessageMethod messageMethod)
+    {
+        for (auto& action : actions_[messageMethod])
         {
             action();
         }

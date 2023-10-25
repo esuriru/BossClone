@@ -29,7 +29,7 @@ PlayScene::PlayScene()
         ->PushTexture(grassTileTopMiddle)
         ->PushTexture(flowerTileTopLeft)
         ->GetGameObject().GetComponent<TilemapRenderer>()
-        ->SetSortingOrder(1);
+        ->SetSortingOrder(-1);
 
     tilemapObject->GetComponent<Tilemap>()->tileSize = glm::vec2(8, 8);
     auto bounds = tilemapObject->GetComponent<Tilemap>()->GetBounds();
@@ -37,6 +37,8 @@ PlayScene::PlayScene()
 
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
     auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
+
+    auto ironOreSprite = CreateRef<Texture2D>("Assets/Images/Ore2.png");
 
     for (int i = 0; i < 2; ++i)
     {
@@ -57,4 +59,13 @@ PlayScene::PlayScene()
         enemySpriteRenderer->SetSortingOrder(10);
     }
 
+    {
+        auto gameObject = CreateGameObject();
+        gameObject->AddComponent<SpriteRenderer>(ironOreSprite);
+        gameObject->GetTransform().SetScale(glm::vec3(glm::vec2(32, 32) * ppiMultiplier, 0));
+        gameObject->GetTransform().SetPosition(
+            tilemapObject
+                ->GetComponent<Tilemap>()
+                ->LocalToWorld(std::make_pair(56, 36)));
+    }
 }
