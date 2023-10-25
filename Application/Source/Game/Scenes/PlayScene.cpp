@@ -57,6 +57,10 @@ PlayScene::PlayScene()
             enemySpriteRenderer->GetTransform().GetScale()
             * glm::vec3(ppiMultiplier, 1));
         enemySpriteRenderer->SetSortingOrder(10);
+        enemySpriteRenderer->GetTransform().SetPosition(
+            tilemapObject
+                ->GetComponent<Tilemap>()
+                ->LocalToWorld(std::make_pair(64, 24)));
     }
 
     {
@@ -66,6 +70,6 @@ PlayScene::PlayScene()
         gameObject->GetTransform().SetPosition(
             tilemapObject
                 ->GetComponent<Tilemap>()
-                ->LocalToWorld(std::make_pair(56, 36)));
+                ->LocalToWorld(std::make_pair(64, 36)));
     }
 }
