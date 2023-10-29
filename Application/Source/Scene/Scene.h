@@ -38,6 +38,8 @@ public:
 
     virtual std::string GetName() = 0;
 
+    Ref<GameObject> FindGameObjectByTag(const std::string& tag);
+
 protected:
     std::vector<Ref<GameObject>> sceneObjects_;
     std::multimap<int, Renderer*, std::less<int>> rendererMap_;

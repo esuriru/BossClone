@@ -39,6 +39,11 @@ public:
     std::vector<glm::vec2> Pathfind(const glm::vec2& start,
         const glm::vec2& target, HeuristicFunction func,
         const int weight);
+    
+    inline Ref<Tilemap> GetReferenceTilemap() const
+    {
+        return tilemap_;
+    }
 
     void Start() override;
 };

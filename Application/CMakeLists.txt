@@ -16,6 +16,7 @@ set(Header_Files
     "Source/EC/Components/Rigidbody2D.h"
     "Source/EC/Components/Pathfinder.h"
 
+    "Source/EC/Components/MineController.h"
     "Source/EC/Components/EnemyController.h"
 
     "Source/Core/Application.h"
@@ -51,6 +52,7 @@ set(Header_Files
     "Source/Game/GameManager.h"
     "Source/Game/State.h"
     "Source/Game/Transition.h"
+    "Source/Game/TimedTransition.h"
     "Source/Game/ActionEntry.h"
     "Source/Game/MessageMethod.h"
     "Source/Game/StateMachine.h"
@@ -93,7 +95,6 @@ source_group("Header Files" FILES ${Header_Files})
 set(Source_Files
     "Source/EC/GameObject.cpp"
     "Source/EC/Component.cpp"
-    "Source/EC/Component.tpp"
     "Source/EC/Components/Transform.cpp"
     "Source/EC/Components/Renderer.cpp"
     "Source/EC/Components/SpriteRenderer.cpp"
@@ -104,6 +105,7 @@ set(Source_Files
     "Source/EC/Components/Rigidbody2D.cpp"
     "Source/EC/Components/Pathfinder.cpp"
 
+    "Source/EC/Components/MineController.cpp"
     "Source/EC/Components/EnemyController.cpp"
 
     "Source/Core/Application.cpp"

@@ -118,7 +118,7 @@ public:
         return tag_;
     }
 
-    inline bool CompareTag(string rhs)
+    inline bool CompareTag(const string& rhs)
     {
         return tag_ == rhs;
     }

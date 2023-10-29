@@ -98,7 +98,8 @@ int Pathfinder::ConvertTo1D(const glm::vec2 &pos) const
 
 std::vector<glm::vec2> Pathfinder::Pathfind(const glm::vec2 &start, const glm::vec2 &target, HeuristicFunction func, const int weight)
 {
-    if (IsBlocked(start.y, start.x) || IsBlocked(target.y, target.x))
+    if (IsBlocked(static_cast<uint32_t>(start.y), static_cast<uint32_t>(start.x)) || 
+        IsBlocked(static_cast<uint32_t>(target.y), static_cast<uint32_t>(target.x)))
     {
         CC_ERROR("Invalid start or target");
         return std::vector<glm::vec2>();
@@ -140,7 +141,8 @@ std::vector<glm::vec2> Pathfinder::Pathfind(const glm::vec2 &start, const glm::v
         glm::vec2 newPosition = currentPosition + Tilemap::Directions[i];
         const uint32_t newIndex = ConvertTo1D(newPosition);
 
-        if (!IsValid(newPosition) || IsBlocked(newPosition.y, newPosition.x)
+        if (!IsValid(newPosition) || IsBlocked(static_cast<uint32_t>(newPosition.y), 
+            static_cast<uint32_t>(newPosition.x))
             || closed_[newIndex])
         {
             continue;

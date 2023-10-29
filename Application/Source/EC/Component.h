@@ -2,6 +2,8 @@
 #include "Core/Core.h"
 #include "Core/Timestep.h"
 
+#include <string>
+
 class GameObject;
 class Transform;
 class Collider2D;
@@ -42,5 +44,7 @@ public:
 protected:
     Component() = default;
     GameObject& gameObject_;
+
+    Ref<GameObject> FindGameObjectByTag(const std::string& tag);
 
 };

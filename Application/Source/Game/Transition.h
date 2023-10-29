@@ -4,6 +4,8 @@
 #include <functional>
 #include <string>
 
+#include "Core/Timestep.h"
+
 using std::vector;
 
 template<typename T = std::string>
@@ -24,11 +26,17 @@ public:
         : fromID_(fromID)
         , toID_(toID)
     {
-        for (const auto& condition : {args...})
-        {
-            conditions_.push_back(condition);
-        }
+		using pack_expander = int[];
+		static_cast<void>(pack_expander{ 0, (static_cast<void>(AddCondition(std::forward<Args>(args))), 0)... });
     }
+
+    void AddCondition() {}
+    void AddCondition(predicate condition)
+    {
+        conditions_.push_back(condition);
+    }
+
+    virtual void Update(Timestep ts) {}
 
     virtual T GetFromID()
     {

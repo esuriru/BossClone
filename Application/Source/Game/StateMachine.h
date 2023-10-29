@@ -1,7 +1,7 @@
 #pragma once
 
 #include "State.h"
-#include "Transition.h"
+#include "TimedTransition.h"
 
 #include "Core/Core.h"
 #include "Core/Timestep.h"
@@ -23,6 +23,8 @@ protected:
     std::unordered_map<S, Scope<State<S>>> states_;
     std::unordered_map<S, vector<Scope<Transition<S>>>> transitions_;
 
+    vector<TimedTransition<>*> timedTransitions_;
+
     State<S>* currentState_;
 
     void SwitchState(S destinationStateID,
@@ -38,7 +40,9 @@ protected:
         if (currentState_)
         {
             currentState_->Enter();
+            ResetTimedTransitions(currentState_->GetID());
         }
+
     
         if (callback)
         {
@@ -125,9 +129,34 @@ public:
         return this;
     }
 
+    StateMachine* AddTransition(Scope<TimedTransition<S>> transition)
+    {
+        CC_ASSERT(states_.find(transition->GetFromID()) != states_.end() &&
+            states_.find(transition->GetToID()) != states_.end(), 
+            "Timed transition to or from state is invalid.");
+
+        auto transitionFromID = transition->GetFromID();
+        auto timedTransition = transition.get();
+        transitions_[transitionFromID].push_back(std::move(transition));
+        timedTransitions_.push_back(timedTransition);
+        return this;
+    }
+
     const T& GetID() const
     {
         return id_;
+    }
+
+    void UpdateTimedTransitions(Timestep ts)
+    {
+        for (auto& transition : timedTransitions_)
+        {
+            if (transition->GetFromID() != currentState_->GetID())
+            {
+                continue;
+            }
+            transition->Update(ts);
+        }
     }
 
     void FixedUpdate(float fixedDeltaTime)
@@ -145,6 +174,7 @@ public:
     void Update(Timestep ts)
     {
         currentTimestep = ts;
+        UpdateTimedTransitions(ts);
 
         InitiateTransitionHandling([&](){
             if (currentState_)
@@ -154,11 +184,27 @@ public:
         }, nullptr);
     }
 
-    void InitateStartState(std::string ID)
+    void InitateStartState(S ID)
     {
         CC_ASSERT(states_.find(ID) != states_.end(), "Starting state" 
             "could not be found.");
+
         currentState_ = states_[ID].get();
+        currentState_->Enter();
+
+        ResetTimedTransitions(currentState_->GetID());
+    }
+
+    void ResetTimedTransitions(S ID)
+    {
+        for (const auto& transition : timedTransitions_)
+        {
+            if (transition->GetFromID() != ID)
+            {
+                continue;
+            }
+            transition->ResetTimer();
+        }
     }
 
     bool IsHandlingTransitionsAfter() const

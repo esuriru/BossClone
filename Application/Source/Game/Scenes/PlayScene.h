@@ -3,6 +3,10 @@
 #include "Core/Core.h"
 #include "Renderer/Texture.h"
 
+#include "EC/Components/MineController.h"
+
+#include <vector>
+
 class PlayScene : public Scene
 {
 public:
@@ -20,7 +24,10 @@ private:
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
+    Ref<MineController> mineController_;
 
+    void SetupTilemap();
+    void SetupMiners();
     void CreateMines();
-    void CreateOrePile(uint32_t x, uint32_t y);
+    std::vector<Ref<GameObject>> CreateOrePile(uint32_t x, uint32_t y);
 };

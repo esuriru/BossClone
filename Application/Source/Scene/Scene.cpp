@@ -66,4 +66,17 @@ Ref<GameObject> Scene::CreateGameObject()
     return gameObject;
 }
 
+Ref<GameObject> Scene::FindGameObjectByTag(const std::string & tag)
+{
+    // TODO - Cache the game objects by tags
+    for (auto& gameObject : sceneObjects_)
+    {
+        if (gameObject->CompareTag(tag))
+        {
+            return gameObject;
+        }
+    }
+    return nullptr;
+}
+
 
