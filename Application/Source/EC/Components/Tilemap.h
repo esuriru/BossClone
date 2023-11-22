@@ -61,14 +61,19 @@ public:
     void LoadCSV(const std::string& textureCsvFilePath, const std::string& typeCsvFilePath);
 
     Tile& GetTile(uint32_t x, uint32_t y); 
+
     Ref<SubTexture2D>& GetTexture(uint32_t index);
     Ref<Tilemap> SetTexture(uint32_t index, Ref<SubTexture2D> subtexture);
     Ref<Tilemap> PushTexture(Ref<SubTexture2D> subtexture);
 
     glm::vec3 LocalToWorld(uint32_t x, uint32_t y);
     glm::vec3 LocalToWorld(std::pair<uint32_t, uint32_t> xyPair);
+    glm::vec3 LocalToWorld(glm::ivec2 vec);
 
-    std::pair<uint32_t, uint32_t> WorldToLocal(glm::vec3 worldPosition);
+    static bool InBounds(glm::ivec2 tileCoordinates);
+    static bool InBounds(int x, int y);
+
+    glm::ivec2 WorldToLocal(glm::vec3 worldPosition);
 
 private:
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_{};

@@ -10,6 +10,10 @@
 #include "EC/Components/MineController.h"
 #include "EC/Components/Pathfinder.h"
 
+#include "Game/EightWayDirectionFlags.h"
+
+#include <glm/glm.hpp>
+
 class EnemyController : public Component
 {
 public:
@@ -28,5 +32,10 @@ private:
     Ref<Tilemap> tilemap_;
     Ref<MineController> mineController_;
 
-    std::pair<uint32_t, uint32_t> localTilemapPosition_;
+    glm::ivec2 localTilemapPosition_;
+    glm::ivec2 targetTilemapPosition_;
+
+    EightWayDirectionFlags GetPossibleDirections();
+    EightWayDirectionFlags GetNextTargetDirections();
+     
 };

@@ -60,12 +60,36 @@ glm::vec3 Tilemap::LocalToWorld(std::pair<uint32_t, uint32_t> xyPair)
     return LocalToWorld(xyPair.first, xyPair.second);
 }
 
-std::pair<uint32_t, uint32_t> Tilemap::WorldToLocal(glm::vec3 worldPosition)
+glm::vec3 Tilemap::LocalToWorld(glm::ivec2 vec)
+{
+    CC_ASSERT(glm::all(glm::greaterThan(vec, glm::ivec2())), 
+        "Vector had negative components");
+    return LocalToWorld(static_cast<uint32_t>(vec.x), 
+        static_cast<uint32_t>(vec.y));
+}
+
+bool Tilemap::InBounds(glm::ivec2 tileCoordinates)
+{
+    return (tileCoordinates.x > 0 && 
+        tileCoordinates.y > 0 && 
+        tileCoordinates.x < Tilemap::MaxHorizontalLength &&
+        tileCoordinates.y < Tilemap::MaxVerticalLength);
+}
+
+bool Tilemap::InBounds(int x, int y)
+{
+    return (x > 0 && 
+        y > 0 && 
+        x < Tilemap::MaxHorizontalLength &&
+        y < Tilemap::MaxVerticalLength);
+}
+
+glm::ivec2 Tilemap::WorldToLocal(glm::vec3 worldPosition)
 {
     glm::vec3 tilemapWorldPosition = GetTransform().GetPosition(); 
-    return std::make_pair(static_cast<uint32_t>((worldPosition.x - tilemapWorldPosition.x + 
+    return glm::ivec2(static_cast<int>((worldPosition.x - tilemapWorldPosition.x + 
         tileSize.x * 0.5f) / tileSize.x),
-        static_cast<uint32_t>((worldPosition.y - 
+        static_cast<int>((worldPosition.y - 
         tilemapWorldPosition.y + 
         tileSize.y * 0.5f) / tileSize.y));
 }

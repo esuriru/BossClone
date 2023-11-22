@@ -28,7 +28,6 @@ public:
     void Update(Timestep ts) override
     {
         timer_ -= ts;
-        CC_TRACE(timer_);
     }
 
     bool TestConditions() override 

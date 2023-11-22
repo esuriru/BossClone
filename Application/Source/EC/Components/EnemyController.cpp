@@ -14,6 +14,8 @@
 
 #include "Game/TimedTransition.h"
 
+#include "Tilemap.h"
+
 #include <string>
 
 EnemyController::EnemyController(GameObject &gameObject)
@@ -37,8 +39,7 @@ EnemyController::EnemyController(GameObject &gameObject)
 
                 if (timer_ >= 1.0f)
                 {
-                    ++localTilemapPosition_.first;
-                    ++localTilemapPosition_.second;
+                    localTilemapPosition_ += glm::ivec2(1, 1);
                     GetTransform().SetPosition(tilemap_->LocalToWorld(localTilemapPosition_));
                     timer_ -= 1.0f;
                 }
@@ -107,4 +108,91 @@ EnemyController* EnemyController::SetMineController(Ref<MineController> mineCont
 {
     mineController_ = mineController;
     return this;
+}
+
+EightWayDirectionFlags EnemyController::GetPossibleDirections()
+{
+    EightWayDirectionFlags flags;
+
+    bool upPossible = Tilemap::InBounds(localTilemapPosition_.x, 
+        localTilemapPosition_.y + 1); 
+    bool rightPossible = Tilemap::InBounds(localTilemapPosition_.x + 1, 
+        localTilemapPosition_.y); 
+    bool downPossible = Tilemap::InBounds(localTilemapPosition_.x, 
+        localTilemapPosition_.y - 1); 
+    bool leftPossible = Tilemap::InBounds(localTilemapPosition_.x - 1, 
+        localTilemapPosition_.y); 
+
+    std::array<std::pair<EightWayDirectionFlags, bool>, 8> conditions
+    {
+        { 
+            { EightWayDirectionFlags::Up, upPossible },
+            { EightWayDirectionFlags::Up_Right, upPossible && rightPossible },
+            { EightWayDirectionFlags::Right, rightPossible },
+            { EightWayDirectionFlags::Down_Right, downPossible && rightPossible },
+            { EightWayDirectionFlags::Down, downPossible },
+            { EightWayDirectionFlags::Down_Left, downPossible && leftPossible },
+            { EightWayDirectionFlags::Left, leftPossible },
+            { EightWayDirectionFlags::Up_Left, upPossible && leftPossible },
+        }
+    };
+
+    for (auto& pair : conditions)
+    {
+        if (pair.second)
+        {
+            flags |= pair.first;
+        }
+    }
+
+    return flags;
+}
+
+EightWayDirectionFlags EnemyController::GetNextTargetDirections()
+{
+    auto flags = GetPossibleDirections();
+    auto delta = targetTilemapPosition_ - localTilemapPosition_;
+
+    EightWayDirectionFlags deltaFlags;
+
+    if (delta.x > 0)
+    {
+        if (delta.y > 0)
+        {
+            deltaFlags |= EightWayDirectionFlags::Up | EightWayDirectionFlags::Right | 
+                EightWayDirectionFlags::Up_Right;
+        }
+        else if (delta.y < 0)
+        {
+            deltaFlags |= EightWayDirectionFlags::Down | EightWayDirectionFlags::Right | 
+                EightWayDirectionFlags::Down_Right;
+        }
+        else
+        {
+            deltaFlags |= EightWayDirectionFlags::Right;
+        }
+    }
+    else if (delta.x < 0)
+    {
+        if (delta.y > 0)
+        {
+            deltaFlags |= EightWayDirectionFlags::Up | EightWayDirectionFlags::Left | 
+                EightWayDirectionFlags::Up_Left;
+        }
+        else if (delta.y < 0)
+        {
+            deltaFlags |= EightWayDirectionFlags::Down | EightWayDirectionFlags::Left | 
+                EightWayDirectionFlags::Down_Left;
+        }
+        else
+        {
+            deltaFlags |= EightWayDirectionFlags::Left;
+        }
+    }
+    else if (delta.y != 0)
+    {
+        deltaFlags |= delta.y > 0 ? EightWayDirectionFlags::Right : 
+            EightWayDirectionFlags::Left;
+    }
+    return deltaFlags;
 }

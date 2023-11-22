@@ -27,7 +27,9 @@ public:
         , toID_(toID)
     {
 		using pack_expander = int[];
-		static_cast<void>(pack_expander{ 0, (static_cast<void>(AddCondition(std::forward<Args>(args))), 0)... });
+		static_cast<void>(pack_expander{ 0, 
+            (static_cast<void>(
+                AddCondition(std::forward<Args>(args))), 0)... });
     }
 
     void AddCondition() {}
