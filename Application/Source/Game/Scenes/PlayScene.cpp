@@ -35,7 +35,7 @@ void PlayScene::SetupTilemap()
     auto flowerTileTopLeft = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(4, 7), tilemapTileSize);
 
     tilemapGameObject_ = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f));
-        tilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/SimulationMap.csv", "Assets/Maps/SimulationMapTypes.csv")
+        tilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/TwentyFiveMap.csv", "Assets/Maps/TwentyFiveMapTypes.csv")
         ->PushTexture(grassTileTopLeft)
         ->PushTexture(grassTileTopMiddle)
         ->PushTexture(flowerTileTopLeft)
@@ -43,6 +43,7 @@ void PlayScene::SetupTilemap()
         ->SetSortingOrder(-1);
 
     tilemapGameObject_->GetComponent<Tilemap>()->tileSize = glm::vec2(8, 8);
+    // tilemapGameObject_->GetComponent<Tilemap>()->SetDataBounds({0, 0}, {25, 25});
     auto bounds = tilemapGameObject_->GetComponent<Tilemap>()->GetBounds();
     tilemapGameObject_->GetTransform().SetPosition(glm::vec3(bounds.x * -0.5f, bounds.y * -0.5f, 0));
     // tilemapGameObject_->AddComponent<Pathfinder>();
@@ -54,18 +55,18 @@ void PlayScene::SetupMiners()
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
     auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
 
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 1; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
                 enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
         enemySpriteRenderer->SetNativeSize();
-        if (i)
-        {
+        // if (i)
+        // {
             enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
                 ->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>())
                 ->SetMineController(mineController_);
-        }
+        // }
 
         enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(39.0f/126.0f, 1, 1) 
             * glm::vec3(ppiMultiplier_, 1));
@@ -76,7 +77,7 @@ void PlayScene::SetupMiners()
         enemySpriteRenderer->GetTransform().SetPosition(
             tilemapGameObject_
                 ->GetComponent<Tilemap>()
-                ->LocalToWorld(std::make_pair(64 + i * 5, 24)));
+                ->LocalToWorld(glm::ivec2(0)));
     }
 
 }

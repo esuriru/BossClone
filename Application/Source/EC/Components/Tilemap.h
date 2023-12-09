@@ -40,8 +40,8 @@ inline bool operator<(const Tile& a, const Tile& b)
 class Tilemap : public Component, public std::enable_shared_from_this<Tilemap>
 {
 public:
-    constexpr static uint32_t MaxHorizontalLength = 128;
-    constexpr static uint32_t MaxVerticalLength = 72;
+    constexpr static uint32_t MaxHorizontalLength = 25;
+    constexpr static uint32_t MaxVerticalLength = 25;
     constexpr static uint32_t MaxSize = MaxHorizontalLength * MaxVerticalLength;
     constexpr static std::array<glm::vec2, 8> Directions
     {
@@ -73,11 +73,15 @@ public:
     static bool InBounds(glm::ivec2 tileCoordinates);
     static bool InBounds(int x, int y);
 
+    void SetDataBounds(glm::ivec2 dataBoundsMin, glm::ivec2 dataBoundsMax);
+    bool InDataBounds(glm::ivec2 coordinates);
+
     glm::ivec2 WorldToLocal(glm::vec3 worldPosition);
 
 private:
     std::array<Ref<SubTexture2D>, std::numeric_limits<uint8_t>::max()> subTextureMap_{};
     std::array<std::array<Tile, MaxHorizontalLength>, MaxVerticalLength> tileData_{};
+    glm::ivec2 dataBounds_;
 
     std::string textureCsvFilePath_, typeCsvFilePath_;
     uint32_t nextTextureIndex_;

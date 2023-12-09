@@ -1,6 +1,3 @@
-
-- QUESTIONS:
-    - Do we need pathfinding?
-    - Do we need sprite animations?
-    - If not, do we need to indicate their next move?
-    - Do we need a win or lose condition
+- NOW:
+    Probably change max tiles to 25x25 since I'm using only 25x25 and will
+    reduce headache

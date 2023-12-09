@@ -8,6 +8,7 @@
 #include "Core/Core.h"
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
+#include "Game/EightWayDirectionFlags.h"
 
 namespace Utility
 {
@@ -78,5 +79,32 @@ namespace Utility
             ? sqrtNewtonRaphson(x, x, 0)
             : std::numeric_limits<double>::quiet_NaN();
 	}
+
+    inline glm::ivec2 ConvertDirection(EightWayDirection direction)
+    {
+        switch (direction)
+        {
+            case EightWayDirection::Up:
+                return { 0, 1 };
+            case EightWayDirection::Up_Right:
+                return { 1, 1 };
+            case EightWayDirection::Right:
+                return { 1, 0 };
+            case EightWayDirection::Down_Right:
+                return { 1, -1 };
+            case EightWayDirection::Down:
+                return { 0, -1 };
+            case EightWayDirection::Down_Left:
+                return { -1, -1 };
+            case EightWayDirection::Left:
+                return { -1, 0 };
+            case EightWayDirection::Up_Left:
+                return { -1, 1 };
+            default:
+                CC_FATAL("Direction could not be converted");
+                break;
+        }
+        return { 0, 0 };
+    }
 
 }

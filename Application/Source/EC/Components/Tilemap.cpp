@@ -62,7 +62,7 @@ glm::vec3 Tilemap::LocalToWorld(std::pair<uint32_t, uint32_t> xyPair)
 
 glm::vec3 Tilemap::LocalToWorld(glm::ivec2 vec)
 {
-    CC_ASSERT(glm::all(glm::greaterThan(vec, glm::ivec2())), 
+    CC_ASSERT(glm::all(glm::greaterThanEqual(vec, glm::ivec2())), 
         "Vector had negative components");
     return LocalToWorld(static_cast<uint32_t>(vec.x), 
         static_cast<uint32_t>(vec.y));
@@ -70,18 +70,31 @@ glm::vec3 Tilemap::LocalToWorld(glm::ivec2 vec)
 
 bool Tilemap::InBounds(glm::ivec2 tileCoordinates)
 {
-    return (tileCoordinates.x > 0 && 
-        tileCoordinates.y > 0 && 
+    return (tileCoordinates.x >= 0 && 
+        tileCoordinates.y >= 0 && 
         tileCoordinates.x < Tilemap::MaxHorizontalLength &&
         tileCoordinates.y < Tilemap::MaxVerticalLength);
 }
 
 bool Tilemap::InBounds(int x, int y)
 {
-    return (x > 0 && 
-        y > 0 && 
+    return (x >= 0 && 
+        y >= 0 && 
         x < Tilemap::MaxHorizontalLength &&
         y < Tilemap::MaxVerticalLength);
+}
+
+void Tilemap::SetDataBounds(glm::ivec2 dataBoundsMin, glm::ivec2 dataBoundsMax)
+{
+    // dataBounds_ = dataBounds;
+}
+
+bool Tilemap::InDataBounds(glm::ivec2 coordinates)
+{
+    return (coordinates.x > 0 && 
+        coordinates.y > 0 && 
+        coordinates.x < dataBounds_.x &&
+        coordinates.y < dataBounds_.y);
 }
 
 glm::ivec2 Tilemap::WorldToLocal(glm::vec3 worldPosition)

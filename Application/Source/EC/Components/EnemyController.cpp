@@ -14,9 +14,14 @@
 
 #include "Game/TimedTransition.h"
 
+#include "Utils/Random.h"
+
+#include "Game/EightWayDirectionFlags.h"
+
 #include "Tilemap.h"
 
 #include <string>
+#include <glm/gtx/string_cast.hpp>
 
 EnemyController::EnemyController(GameObject &gameObject)
     : Component(gameObject)
@@ -39,7 +44,17 @@ EnemyController::EnemyController(GameObject &gameObject)
 
                 if (timer_ >= 1.0f)
                 {
-                    localTilemapPosition_ += glm::ivec2(1, 1);
+                    // localTilemapPosition_ += glm::ivec2(1, 1);
+                    auto randomDirection = GetRandomDirection();
+                    if (randomDirection == EightWayDirection::None)
+                    {
+                        CC_ERROR("Direction None");
+                        timer_ -= 1.0f;
+                        return;
+                    }
+                    CC_ASSERT(fabs(Utility::ConvertDirection(randomDirection).x) < 2, "Test");
+                    localTilemapPosition_ += Utility::ConvertDirection(randomDirection);
+                    CC_TRACE(glm::to_string(localTilemapPosition_));
                     GetTransform().SetPosition(tilemap_->LocalToWorld(localTilemapPosition_));
                     timer_ -= 1.0f;
                 }
@@ -110,9 +125,34 @@ EnemyController* EnemyController::SetMineController(Ref<MineController> mineCont
     return this;
 }
 
+EightWayDirection EnemyController::GetRandomDirection()
+{
+    auto directions = GetPossibleDirections();
+
+    uint32_t directionCount = 0;
+    EightWayDirection setBitDirections[8] {};
+
+    for (int i = static_cast<int>(EightWayDirectionFlags::Up); 
+        i <= (static_cast<int>(EightWayDirectionFlags::Up_Left) << 1); i <<= 1)
+    {
+        if (static_cast<bool>(directions & 
+            static_cast<EightWayDirectionFlags>(i))) 
+        {
+            setBitDirections[directionCount] = 
+                static_cast<EightWayDirection>(i);
+            ++directionCount;
+        }
+    }
+
+    return directionCount == 0 ? EightWayDirection::None :
+        setBitDirections[static_cast<uint32_t>(Random::Range(0,
+        static_cast<int>(directionCount - 1)))];
+
+}
+
 EightWayDirectionFlags EnemyController::GetPossibleDirections()
 {
-    EightWayDirectionFlags flags;
+    EightWayDirectionFlags flags = static_cast<EightWayDirectionFlags>(0);
 
     bool upPossible = Tilemap::InBounds(localTilemapPosition_.x, 
         localTilemapPosition_.y + 1); 

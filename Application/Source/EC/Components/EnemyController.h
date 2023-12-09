@@ -35,6 +35,7 @@ private:
     glm::ivec2 localTilemapPosition_;
     glm::ivec2 targetTilemapPosition_;
 
+    EightWayDirection GetRandomDirection();
     EightWayDirectionFlags GetPossibleDirections();
     EightWayDirectionFlags GetNextTargetDirections();
      

@@ -79,6 +79,7 @@ set(Header_Files
     "Source/Utils/Util.h"
     "Source/Utils/Singleton.h"
     "Source/Utils/Heuristic.h"
+    "Source/Utils/Random.h"
 
     "Source/Physics/PhysicsWorld.h"
     "Source/Physics/Bounds.h"
