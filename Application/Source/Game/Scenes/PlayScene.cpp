@@ -1,6 +1,7 @@
 #include "PlayScene.h"
 
 #include "EC/Components/SpriteRenderer.h"
+#include "EC/Components/TriggerCallback.h"
 #include "EC/Components/Tilemap.h"
 #include "EC/Components/TilemapRenderer.h"
 #include "EC/Components/EnemyController.h"
@@ -55,11 +56,13 @@ void PlayScene::SetupMiners()
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
     auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
 
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
                 enemyIdleSpritesheet, glm::vec2(0, 1), enemyCellSize));
+        
+        enemySpriteRenderer->GetGameObject().SetTag("Miner");
         enemySpriteRenderer->SetNativeSize();
         // if (i)
         // {
@@ -87,16 +90,27 @@ void PlayScene::CreateMines()
     // MineController game object
     auto gameObject = CreateGameObject();
     mineController_ = gameObject->AddComponent<MineController>();
+    mineController_->SetRespawnTime(18.0f);
 
-    for (auto& oreObject : CreateOrePile(51, 36))
+    for (auto oreObject : CreateOrePile(5, 5))
     {
         mineController_->AddObject(oreObject);
     }
 
-    for (auto& oreObject : CreateOrePile(76, 36))
+    for (auto oreObject : CreateOrePile(7, 5))
     {
         mineController_->AddObject(oreObject);
     }
+
+    for (auto oreObject : CreateOrePile(9, 5))
+    {
+        mineController_->AddObject(oreObject);
+    }
+
+    // for (auto& oreObject : CreateOrePile(76, 36))
+    // {
+    //     mineController_->AddObject(oreObject);
+    // }
 
 }
 
@@ -117,13 +131,26 @@ std::vector<Ref<GameObject>> PlayScene::CreateOrePile(uint32_t x, uint32_t y)
     {
         auto gameObject = CreateGameObject();
         gameObject->AddComponent<SpriteRenderer>(ironOreSprite_);
+        gameObject->SetTag("Ore");
 
-        gameObject->GetTransform().SetScale(glm::vec3(glm::vec2(16, 16) * ppiMultiplier_, 0));
+        gameObject->GetTransform().SetScale(glm::vec3(
+            glm::vec2(16, 16) * ppiMultiplier_, 0));
         gameObject->GetTransform().SetPosition(
             tilemapGameObject_ 
                 ->GetComponent<Tilemap>()
                 ->LocalToWorld(x, y));
         gameObject->GetTransform().Translate(translations[i]);
+
+        auto boxCollider = gameObject->AddComponent<BoxCollider2D>();
+        boxCollider->GetBounds().SetLocalExtents(glm::vec3(ppiMultiplier_, 1));
+
+        // auto triggerCallback = gameObject->AddComponent<TriggerCallback>();
+        // triggerCallback->SetTagCondition("Miner");
+        // triggerCallback->SetCallback([triggerCallback](Collider2D* other)
+        // {
+        //     other->enabled = false;
+        //     triggerCallback->GetGameObject().SetActive(false);
+        // });
 
         orePileGameObjects.push_back(gameObject);
     }

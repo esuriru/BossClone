@@ -31,7 +31,10 @@ void Scene::Update(Timestep ts)
 {
     for (auto& gameObject : sceneObjects_)
     {
-        gameObject->Update(ts);
+        if (gameObject->ActiveSelf())
+        {
+            gameObject->Update(ts);
+        }
     }
 }
 
@@ -39,7 +42,10 @@ void Scene::FixedUpdate(float fixedStep)
 {
     for (auto& gameObject : sceneObjects_)
     {
-        gameObject->FixedUpdate(fixedStep);
+        if (gameObject->ActiveSelf())
+        {
+            gameObject->FixedUpdate(fixedStep);
+        }
     }
 }
 
@@ -47,7 +53,11 @@ void Scene::Render()
 {
     for (auto& rendererPair : rendererMap_)
     {
-        rendererPair.second->Render();
+        if (rendererPair.second->enabled && 
+            rendererPair.second->GetGameObject().ActiveSelf())
+        {
+            rendererPair.second->Render();
+        }
     }
 }
 
@@ -55,7 +65,10 @@ void Scene::OnDestroy()
 {
     for (auto& gameObject : sceneObjects_)
     {
-        gameObject->OnDestroy();
+        if (gameObject->ActiveSelf())
+        {
+            gameObject->OnDestroy();
+        }
     }
 }
 

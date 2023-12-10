@@ -14,6 +14,8 @@
 
 #include <glm/glm.hpp>
 
+class BoxCollider2D;
+
 class EnemyController : public Component
 {
 public:
@@ -31,11 +33,21 @@ private:
 
     Ref<Tilemap> tilemap_;
     Ref<MineController> mineController_;
+    Ref<BoxCollider2D> collider_;
 
     glm::ivec2 localTilemapPosition_;
     glm::ivec2 targetTilemapPosition_;
+    glm::vec3 currentTargetPosition_;
 
-    EightWayDirection GetRandomDirection();
+    GameObject* currentChosenOre_;
+
+    void GenerateNewLocation();
+
+    bool reachedOre_;
+    float timer_ = 0.0f;
+    float scanTimer_ = 0.0f;
+
+    EightWayDirection GetRandomDirection(EightWayDirectionFlags flags);
     EightWayDirectionFlags GetPossibleDirections();
     EightWayDirectionFlags GetNextTargetDirections();
      

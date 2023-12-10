@@ -18,6 +18,7 @@ set(Header_Files
 
     "Source/EC/Components/MineController.h"
     "Source/EC/Components/EnemyController.h"
+    "Source/EC/Components/TriggerCallback.h"
 
     "Source/Core/Application.h"
     "Source/Core/Core.h"
@@ -108,6 +109,7 @@ set(Source_Files
 
     "Source/EC/Components/MineController.cpp"
     "Source/EC/Components/EnemyController.cpp"
+    "Source/EC/Components/TriggerCallback.cpp"
 
     "Source/Core/Application.cpp"
     "Source/Core/Layer.cpp"

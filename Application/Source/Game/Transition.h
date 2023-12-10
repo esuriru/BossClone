@@ -32,6 +32,18 @@ public:
                 AddCondition(std::forward<Args>(args))), 0)... });
     }
 
+    template <class... Args>
+    Transition(function<void()> callback, T fromID, T toID, Args&& ... args)
+        : fromID_(fromID)
+        , toID_(toID)
+        , callback_(callback)
+    {
+		using pack_expander = int[];
+		static_cast<void>(pack_expander{ 0, 
+            (static_cast<void>(
+                AddCondition(std::forward<Args>(args))), 0)... });
+    }
+
     void AddCondition() {}
     void AddCondition(predicate condition)
     {

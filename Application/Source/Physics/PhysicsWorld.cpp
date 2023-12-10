@@ -35,9 +35,20 @@ void PhysicsWorld::FixedUpdate(float fixedDeltaTime)
     {
         Collider2D* colliderX = colliders_[i];
 
+        if (!colliderX->enabled || !colliderX->GetGameObject().ActiveSelf())
+        {
+            continue;
+        }
+
         for (uint32_t j = i + 1; j < colliders_.size(); ++j)
         {
             Collider2D* colliderY = colliders_[j];
+
+            if (!colliderY->enabled || !colliderY->GetGameObject().ActiveSelf())
+            {
+                continue;
+            }
+
             if (colliderX->GetBounds().Intersects(colliderY->GetBounds()))
             {
                 colliderX->GetGameObject().OnTriggerEnter2D(colliderY);
