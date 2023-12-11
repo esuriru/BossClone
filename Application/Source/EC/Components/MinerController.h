@@ -32,11 +32,19 @@ public:
     MinerController* SetMineController(Ref<MineController> mineController);
 
     void GenerateNewLocation() override;
+    void Reset() override;
+
+    inline bool IsGuarded()
+    {
+        return isGuarded_;
+    }
 
 private:
     Ref<MineController> mineController_;
 
     GameObject* currentChosenOre_;
+
+    bool isGuarded_;
 
     bool reachedOre_;
     bool runMessage_ = false;

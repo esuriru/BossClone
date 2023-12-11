@@ -21,6 +21,8 @@ public:
         maxFollowDistance_ = maxFollowDistance;
     }
 
+    void Reset() override;
+
 protected:
     float scanRadius_ = 20.0f;
     float tetherDistance_ = 30.0f;

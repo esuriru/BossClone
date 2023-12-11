@@ -15,8 +15,9 @@
 #include <glm/glm.hpp>
 
 class BoxCollider2D;
+class EnemyPool;
 
-class EnemyController : public Component
+class EnemyController : public Component, public std::enable_shared_from_this<EnemyController>
 {
 public:
     EnemyController(GameObject& gameObject);
@@ -24,6 +25,8 @@ public:
     void Start() override;
     void Update(Timestep ts) override;
     void FixedUpdate(float fixedDeltaTime) override;
+
+    virtual void Reset();
 
     virtual void Move();
 
@@ -46,6 +49,8 @@ public:
         currentHealth_ = health;
     }
 
+    void SetPool(Ref<EnemyPool> pool);
+
     std::string GetCurrentStateName();
 protected:
     Scope<StateMachine<>> stateMachine_;
@@ -54,6 +59,8 @@ protected:
 
     Ref<Tilemap> tilemap_;
     Ref<BoxCollider2D> collider_;
+
+    Ref<EnemyPool> pool_;
 
     float timer_ = 0.0f;
     float currentHealth_ = 100.0f;

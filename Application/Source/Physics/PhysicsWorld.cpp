@@ -111,7 +111,8 @@ std::vector<Collider2D *> PhysicsWorld::CircleCast(glm::vec3 position, float rad
     {
         if (includeInactive)
         {
-            if (glm::distance(collider->GetBounds().GetCenter(), position) <= radius)
+            if (collider->GetGameObject().ActiveSelf() &&
+                glm::distance(collider->GetBounds().GetCenter(), position) <= radius)
             {
                 colliders.push_back(collider);
             }

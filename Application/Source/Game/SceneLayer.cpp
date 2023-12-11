@@ -50,6 +50,8 @@ void SceneLayer::OnUpdate(Timestep ts)
     activeScene_->Render();
 
     Renderer2D::EndScene();
+
+    activeScene_->FlushCreationQueue();
 }
 
 void SceneLayer::OnEvent(Event &e)

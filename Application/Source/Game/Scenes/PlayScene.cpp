@@ -11,12 +11,15 @@
 #include "EC/Components/BoxCollider2D.h"
 #include "EC/Components/Pathfinder.h"
 
+#include "Scene/SceneManager.h"
+
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
 #include <array>
+#include "Scene/Scene.h"
 
 PlayScene::PlayScene()
     : Scene("PlayScene")
@@ -61,9 +64,10 @@ void PlayScene::SetupTilemap()
 void PlayScene::SetupMiners()
 {
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
-    auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
+    minerSprite_ = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
+    auto& enemyIdleSpritesheet = minerSprite_;
 
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 0; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
@@ -194,7 +198,52 @@ void PlayScene::CreateMines()
 void PlayScene::SetupDisplay()
 {
     auto gameObject = CreateGameObject();
-    gameObject->AddComponent<EnemyDisplay>();
+    auto enemyDisplay = gameObject->AddComponent<EnemyDisplay>();
+    enemyDisplay->Init(
+        tilemapGameObject_->GetComponent<Tilemap>(),
+        CreateRef<EnemyPool>([&]()
+        {
+            auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
+                ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
+                    minerSprite_, glm::vec2(0, 1), glm::vec2(126, 39)));
+            
+            enemySpriteRenderer->GetGameObject().SetTag("Miner");
+            enemySpriteRenderer->SetNativeSize();
+            // if (i)
+            // {
+            Ref<GameObject> arrow = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.25f));
+            auto arrowSpriteRenderer = arrow->AddComponent<SpriteRenderer>(arrowSprite_);
+            arrowSpriteRenderer->SetNativeSize();
+            arrowSpriteRenderer->GetTransform().SetScale(
+                arrowSpriteRenderer->GetTransform().GetScale()
+                * glm::vec3(8, 8, 1));
+            arrowSpriteRenderer->SetSortingOrder(50);
+            arrow->SetActive(false);
+
+            auto controller = enemySpriteRenderer->GetGameObject().AddComponent<MinerController>();
+            controller->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>())
+                ->SetMineController(mineController_)
+                ->SetArrowObject(arrow);
+            // }
+
+            SceneManager::Instance()->GetActiveScene()->UpdateRenderer(arrowSpriteRenderer.get());
+
+            enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(39.0f/126.0f, 1, 1) 
+                * glm::vec3(ppiMultiplier_, 1));
+            enemySpriteRenderer->GetTransform().SetScale(
+                enemySpriteRenderer->GetTransform().GetScale()
+                * glm::vec3(ppiMultiplier_, 1));
+            enemySpriteRenderer->SetSortingOrder(10);
+
+            SceneManager::Instance()->GetActiveScene()->UpdateRenderer(enemySpriteRenderer.get());
+            // enemySpriteRenderer->GetTransform().SetPosition(
+            //     tilemapGameObject_
+            //         ->GetComponent<Tilemap>()
+            //         ->LocalToWorld(glm::ivec2(0)));
+
+            return controller;
+        }
+    ));
 }
 
 void PlayScene::SetupKnights()

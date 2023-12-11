@@ -19,6 +19,7 @@ class StateMachine
 protected:
     T id_;
     bool handleTransitionsAfter_;
+    T initialID_;
 
     std::unordered_map<S, Scope<State<S>>> states_;
     std::unordered_map<S, vector<Scope<Transition<S>>>> transitions_;
@@ -114,6 +115,11 @@ public:
 
     }
 
+    void Reset()
+    {
+        SwitchState(initialID_, nullptr);
+    }
+
     string GetCurrentStateName()
     {
         return currentState_ ? currentState_->GetID() : "No current state";
@@ -194,6 +200,8 @@ public:
     {
         CC_ASSERT(states_.find(ID) != states_.end(), "Starting state" 
             "could not be found.");
+
+        initialID_ = ID;
 
         currentState_ = states_[ID].get();
         currentState_->Enter();

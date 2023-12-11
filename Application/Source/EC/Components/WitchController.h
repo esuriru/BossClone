@@ -23,6 +23,8 @@ public:
 
     void Message(std::string message) override;
 
+    void Reset() override;
+
 protected:
     float scanRadius_ = 25.0f;
     float attackDistance_ = 10.0f;

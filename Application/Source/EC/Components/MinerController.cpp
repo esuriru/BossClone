@@ -18,6 +18,7 @@
 #include "Utils/Random.h"
 
 #include "Game/EightWayDirectionFlags.h"
+#include "Game/EnemyPool.h"
 
 #include "Tilemap.h"
 
@@ -267,6 +268,7 @@ void MinerController::Start()
     localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
     currentTargetPosition_ = GetTransform().GetPosition();
     collider_ = GetGameObject().GetComponent<BoxCollider2D>(); 
+    isGuarded_ = false;
 }
 
 void MinerController::Update(Timestep ts)
@@ -276,14 +278,23 @@ void MinerController::Update(Timestep ts)
 
 void MinerController::Message(std::string message)
 {
-    if (message == "Run")
+    if (message == "Run" && gameObject_.ActiveSelf())
     {
-        currentHealth_ -= 10.0f;
+        currentHealth_ -= 50.0f;
         if (currentHealth_ <= 0.0f)
         {
             gameObject_.SetActive(false);
+            arrowObject_->SetActive(false);
+            if (pool_)
+            {
+                pool_->Release(shared_from_this());
+            }
         }
         runMessage_ = true;
+    }
+    else if (message == "Guard")
+    {
+        isGuarded_ = true;
     }
 }
 
@@ -315,4 +326,11 @@ void MinerController::GenerateNewLocation()
 {
     EnemyController::GenerateNewLocation();
 
+}
+
+void MinerController::Reset()
+{
+    EnemyController::Reset();
+    isGuarded_ = false;
+    currentChosenOre_ = nullptr;
 }

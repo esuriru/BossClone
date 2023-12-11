@@ -127,6 +127,7 @@ public:
 
 private:
     std::unordered_map<std::type_index, Ref<Component>> components_;
+    Ref<Transform> transformInternal_;
     Transform* const transform_;
     Renderer* renderer_;
 

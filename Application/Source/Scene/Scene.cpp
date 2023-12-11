@@ -9,6 +9,7 @@ static Coordinator* s_Coordinator_ = Coordinator::Instance();
 Scene::Scene(const std::string &name)
     : name_(name)
     , camera_(nullptr)
+    , hasStarted_(false)
 {
     // SceneManager::Instance()->AddScene(name, shared_from_this());
 }
@@ -28,6 +29,8 @@ void Scene::Start()
         if (!renderer) continue;
         rendererMap_.insert(std::make_pair(renderer->GetSortingOrder(), renderer));
     }
+
+    hasStarted_ = true;
 }
 
 void Scene::Update(Timestep ts)
@@ -94,7 +97,14 @@ void Scene::SetCamera(OrthographicCamera* camera)
 Ref<GameObject> Scene::CreateGameObject()
 {
     Ref<GameObject> gameObject = CreateRef<GameObject>();
-    sceneObjects_.emplace_back(gameObject);
+    if (hasStarted_)
+    {
+        objectCreations_.push_back(gameObject);
+    }
+    else
+    {
+        sceneObjects_.emplace_back(gameObject);
+    }
     return gameObject;
 }
 
@@ -111,4 +121,20 @@ Ref<GameObject> Scene::FindGameObjectByTag(const std::string & tag)
     return nullptr;
 }
 
+void Scene::UpdateRenderer(Renderer *renderer)
+{
+    if (hasStarted_)
+    {
+        rendererMap_.insert(std::make_pair(renderer->GetSortingOrder(), renderer));
+    }
+}
 
+void Scene::FlushCreationQueue()
+{
+    for (uint32_t i = 0; i < objectCreations_.size(); ++i)
+    {
+        sceneObjects_.push_back(objectCreations_[i]);
+        objectCreations_[i]->Start();
+    }
+    objectCreations_.clear();
+}

@@ -54,6 +54,12 @@ void EnemyController::FixedUpdate(float fixedDeltaTime)
     stateMachine_->FixedUpdate(fixedDeltaTime);
 }
 
+void EnemyController::Reset()
+{
+    timer_ = 0.0f;
+    stateMachine_->Reset();
+}
+
 void EnemyController::Move()
 {
     timer_ += stateMachine_->currentTimestep;
@@ -103,6 +109,11 @@ void EnemyController::SetBounds(glm::ivec2 min, glm::ivec2 max)
 {
     boundsMin_ = min;
     boundsMax_ = max;
+}
+
+void EnemyController::SetPool(Ref<EnemyPool> pool)
+{
+    pool_ = pool;
 }
 
 std::string EnemyController::GetCurrentStateName()

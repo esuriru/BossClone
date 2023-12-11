@@ -1,6 +1,7 @@
 #include "WitchController.h"
 
 #include "EC/Components/Collider2D.h"
+#include "EC/Components/MinerController.h"
 #include "Physics/PhysicsWorld.h"
 
 WitchController::WitchController(GameObject &gameObject)
@@ -307,6 +308,12 @@ void WitchController::Message(std::string message)
     }
 }
 
+void WitchController::Reset()
+{
+    EnemyController::Reset();
+    targetCollider_ = nullptr; 
+}
+
 void WitchController::Scan()
 {
     auto colliders = 
@@ -314,7 +321,7 @@ void WitchController::Scan()
     
     for (auto collider : colliders)
     {
-        if (collider->GetGameObject().CompareTag("Miner") && !targetCollider_)
+        if (collider->GetGameObject().CompareTag("Miner") && !targetCollider_ )
         {
             targetCollider_ = collider;
         }

@@ -5,8 +5,11 @@
 
 #include "EC/Components/MinerController.h"
 #include "EC/Components/WitchController.h"
+#include "Game/EnemyPool.h"
 
 #include "EC/GameObject.h"
+
+#include "Core/KeyCodes.h"
 
 #include <imgui.h>
 #include "KnightController.h"
@@ -59,6 +62,16 @@ void EnemyDisplay::Update(Timestep ts)
             }
         }
     }
+
+    if (Input::Instance()->IsKeyPressed(Key::D1))
+    {
+        CC_TRACE("Spawn Miner");
+        auto miner = minerPool_->Get();
+        if (tilemap_)
+        {
+            miner->GetTransform().SetPosition(tilemap_->LocalToWorld(0, 0));
+        }
+    }
 }
 
 void EnemyDisplay::OnImGuiRender()
@@ -82,6 +95,20 @@ void EnemyDisplay::OnImGuiRender()
     TextCentred("Current State: " + enemyCurrentState_);
     ImGui::End();
    
+}
+
+void EnemyDisplay::Init(Ref<Tilemap> tilemap, Ref<EnemyPool> minerPool)
+{
+    tilemap_ = tilemap;
+    minerPool_ = minerPool;
+}
+
+void EnemyDisplay::AddMinerToPool(Ref<EnemyController> miner)
+{
+    if (minerPool_)
+    {
+        minerPool_->Add(miner);
+    }
 }
 
 void EnemyDisplay::TextCentred(std::string text)

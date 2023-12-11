@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <queue>
 
 #include "EC/GameObject.h"
 
@@ -42,7 +43,19 @@ public:
     Ref<GameObject> CreateGameObject(Args&&... args)
     {
         Ref<GameObject> gameObject = CreateRef<GameObject>(std::forward<Args>(args)...);
-        sceneObjects_.emplace_back(gameObject);
+        if (hasStarted_)
+        {
+            objectCreations_.push_back(gameObject);
+            // objectCreationQueue_.push([&]()
+            // {
+            //     sceneObjects_.emplace_back(gameObject);
+            //     gameObject->Start();
+            // });
+        }
+        else
+        {
+            sceneObjects_.emplace_back(gameObject);
+        }
         return gameObject;
     }
 
@@ -50,11 +63,16 @@ public:
 
     Ref<GameObject> FindGameObjectByTag(const std::string& tag);
 
+    void UpdateRenderer(Renderer* renderer);
+    void FlushCreationQueue();
 protected:
     std::vector<Ref<GameObject>> sceneObjects_;
     std::multimap<int, Renderer*, std::less<int>> rendererMap_;
     std::string name_;
+    std::queue<std::function<void()>> objectCreationQueue_;
+    std::vector<Ref<GameObject>> objectCreations_;
 
     OrthographicCamera* camera_;
+    bool hasStarted_;
 };
 

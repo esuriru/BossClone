@@ -1,7 +1,8 @@
 #include "GameObject.h"
 
 GameObject::GameObject()
-    : transform_(AddComponent<Transform>().get())
+    : transformInternal_(AddComponent<Transform>())
+    , transform_(transformInternal_.get())
     , renderer_(nullptr)
     , enabled_(true)
 {
@@ -9,7 +10,8 @@ GameObject::GameObject()
 }
 
 GameObject::GameObject(const glm::vec3 &position)
-    : transform_(AddComponent<Transform>(position).get())
+    : transformInternal_(AddComponent<Transform>(position))
+    , transform_(transformInternal_.get())
     , renderer_(nullptr)
     , enabled_(true)
 {
@@ -17,7 +19,8 @@ GameObject::GameObject(const glm::vec3 &position)
 }
 
 GameObject::GameObject(const glm::vec3 &position, const glm::quat &rotation, const glm::vec3 &scale)
-    : transform_(AddComponent<Transform>(position, rotation, scale).get())
+    : transformInternal_(AddComponent<Transform>(position, rotation, scale))
+    , transform_(transformInternal_.get())
     , renderer_(nullptr)
     , enabled_(true)
 {

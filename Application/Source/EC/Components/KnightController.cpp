@@ -2,6 +2,7 @@
 
 #include "EC/Components/Collider2D.h"
 #include "Physics/PhysicsWorld.h"
+#include "MinerController.h"
 
 KnightController::KnightController(GameObject &gameObject)
     : EnemyController(gameObject)
@@ -162,6 +163,7 @@ KnightController::KnightController(GameObject &gameObject)
                         targetCollider_->GetGameObject().ActiveSelf() &&
                         glm::distance(targetCollider_->GetTransform().GetPosition(), 
                             GetTransform().GetPosition()) <= maxFollowDistance_ && 
+                        minerCollider_ &&
                         glm::distance(minerCollider_->GetTransform().GetPosition(), 
                             GetTransform().GetPosition()) <= tetherDistance_)
                     {
@@ -223,10 +225,17 @@ KnightController::KnightController(GameObject &gameObject)
                     localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
                     targetTilemapPosition_ = tilemap_->WorldToLocal(
                         targetCollider_->GetTransform().GetPosition());
-                    if (minerCollider_ && glm::distance(minerCollider_->GetTransform().GetPosition(),
-                        GetTransform().GetPosition()) > tetherDistance_)
+                    if (minerCollider_ && (glm::distance(minerCollider_->GetTransform().GetPosition(),
+                        GetTransform().GetPosition()) > tetherDistance_))
                     {
+                        if (!minerCollider_->GetGameObject()
+                            .ActiveSelf())
+                        {
+                            minerCollider_ = nullptr;
+                            timer_ = 0.0f;
+                        }
                         transitionBack_ = true;
+                        return false;
                     }
 
                     if (localTilemapPosition_ == targetTilemapPosition_)
@@ -253,7 +262,22 @@ KnightController::KnightController(GameObject &gameObject)
             std::string("Guard State"),
             [&]()
             {
-                return transitionBack_;
+                return transitionBack_ && minerCollider_;
+            } 
+        )
+    );
+
+    stateMachine_->AddTransition(
+        CreateScope<Transition<>>(
+            [&]()
+            {
+                transitionBack_ = false;
+            },
+            std::string("Chase State"),
+            std::string("Idle State"),
+            [&]()
+            {
+                return transitionBack_ && !minerCollider_;
             } 
         )
     );
@@ -371,6 +395,14 @@ void KnightController::Move()
 
 }
 
+void KnightController::Reset()
+{
+    EnemyController::Reset();
+    minerCollider_ = nullptr;
+    targetCollider_ = nullptr;
+}
+
+
 void KnightController::Scan()
 {
     auto colliders = 
@@ -378,9 +410,11 @@ void KnightController::Scan()
     
     for (auto collider : colliders)
     {
-        if (collider->GetGameObject().CompareTag("Miner") && !minerCollider_)
+        if (collider->GetGameObject().CompareTag("Miner") && !minerCollider_ &&
+            !collider->GetGameObject().GetComponent<MinerController>()->IsGuarded())
         {
             minerCollider_ = collider;
+            collider->GetGameObject().Message("Guard");
         }
         if (collider->GetGameObject().CompareTag("Witch") && !targetCollider_)
         {

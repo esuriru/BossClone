@@ -52,6 +52,7 @@ set(Header_Files
 
     # "Source/Game/MainLayer.h"
     "Source/Game/MenuLayer.h"
+    "Source/Game/EnemyPool.h"
     "Source/Game/OrthographicCameraController.h"
     # "Source/Game/Tilemap.h"
     "Source/Game/GameManager.h"
@@ -146,6 +147,7 @@ set(Source_Files
     # "Source/Game/MainLayer.cpp"
     "Source/Game/OrthographicCameraController.cpp"
     # "Source/Game/Tilemap.cpp"
+    "Source/Game/EnemyPool.cpp"
     "Source/Game/GameManager.cpp"
     "Source/Game/SceneLayer.cpp"
     "Source/Game/StateMachine.cpp"

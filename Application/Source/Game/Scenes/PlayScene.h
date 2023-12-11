@@ -22,6 +22,7 @@ private:
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> ironOreSprite_;
     Ref<Texture2D> arrowSprite_;
+    Ref<Texture2D> minerSprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
