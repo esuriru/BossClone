@@ -4,7 +4,10 @@
 #include "EC/Components/TriggerCallback.h"
 #include "EC/Components/Tilemap.h"
 #include "EC/Components/TilemapRenderer.h"
-#include "EC/Components/EnemyController.h"
+#include "EC/Components/MinerController.h"
+#include "EC/Components/KnightController.h"
+#include "EC/Components/WitchController.h"
+#include "EC/Components/EnemyDisplay.h"
 #include "EC/Components/BoxCollider2D.h"
 #include "EC/Components/Pathfinder.h"
 
@@ -19,10 +22,14 @@ PlayScene::PlayScene()
     : Scene("PlayScene")
     , ppiMultiplier_(glm::vec2(8, 8) / 32.0f)
     , ironOreSprite_(CreateRef<Texture2D>("Assets/Images/Ore2.png"))
+    , arrowSprite_(CreateRef<Texture2D>("Assets/Images/60934.png"))
 {
     SetupTilemap();
     CreateMines();
     SetupMiners();
+    SetupWitches();
+    SetupDisplay();
+    SetupKnights();
 }
 
 void PlayScene::SetupTilemap()
@@ -56,7 +63,7 @@ void PlayScene::SetupMiners()
     constexpr glm::vec2 enemyCellSize = glm::vec2(126, 39);
     auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
 
-    for (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 5; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
@@ -66,9 +73,19 @@ void PlayScene::SetupMiners()
         enemySpriteRenderer->SetNativeSize();
         // if (i)
         // {
-            enemySpriteRenderer->GetGameObject().AddComponent<EnemyController>()
-                ->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>())
-                ->SetMineController(mineController_);
+        Ref<GameObject> arrow = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.25f));
+        auto arrowSpriteRenderer = arrow->AddComponent<SpriteRenderer>(arrowSprite_);
+        arrowSpriteRenderer->SetNativeSize();
+        arrowSpriteRenderer->GetTransform().SetScale(
+            arrowSpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(8, 8, 1));
+        arrowSpriteRenderer->SetSortingOrder(50);
+        arrow->SetActive(false);
+
+        enemySpriteRenderer->GetGameObject().AddComponent<MinerController>()
+            ->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>())
+            ->SetMineController(mineController_)
+            ->SetArrowObject(arrow);
         // }
 
         enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(39.0f/126.0f, 1, 1) 
@@ -85,6 +102,51 @@ void PlayScene::SetupMiners()
 
 }
 
+void PlayScene::SetupWitches()
+{
+    constexpr glm::vec2 enemyCellSize = glm::vec2(32, 48);
+    auto enemyIdleSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Blue_witch/B_witch_idle.png");
+
+    for (int i = 0; i < 2; ++i)
+    {
+        auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
+            ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
+                enemyIdleSpritesheet, glm::vec2(0, 0), enemyCellSize));
+
+        // auto arrowSpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(0.25f))
+        //     ->AddComponent<SpriteRenderer>(arrowSprite_);
+
+        enemySpriteRenderer->GetGameObject().SetTag("Witch");
+        enemySpriteRenderer->SetNativeSize();
+
+        Ref<GameObject> arrow = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.25f));
+        auto arrowSpriteRenderer = arrow->AddComponent<SpriteRenderer>(arrowSprite_);
+        arrowSpriteRenderer->SetNativeSize();
+        arrowSpriteRenderer->GetTransform().SetScale(
+            arrowSpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(8, 8, 1));
+        arrowSpriteRenderer->SetSortingOrder(50);
+        arrow->SetActive(false);
+
+        auto controller = enemySpriteRenderer->GetGameObject().AddComponent<WitchController>();
+        controller->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>());
+        controller->SetBounds({ 0, 11 }, { 24, 13 });
+        controller->SetArrowObject(arrow);
+
+        enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(5, 32.0f/48.0f * 5, 5) 
+            * glm::vec3(ppiMultiplier_, 1));
+        enemySpriteRenderer->GetTransform().SetScale(
+            enemySpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(ppiMultiplier_ * glm::vec2(0.75f), 1));
+        enemySpriteRenderer->SetSortingOrder(10);
+        enemySpriteRenderer->GetTransform().SetPosition(
+            tilemapGameObject_
+                ->GetComponent<Tilemap>()
+                ->LocalToWorld(glm::ivec2(5 + 12 * i, 12)));
+    }
+
+}
+
 void PlayScene::CreateMines()
 {
     // MineController game object
@@ -92,17 +154,32 @@ void PlayScene::CreateMines()
     mineController_ = gameObject->AddComponent<MineController>();
     mineController_->SetRespawnTime(18.0f);
 
-    for (auto oreObject : CreateOrePile(5, 5))
+    for (auto oreObject : CreateOrePile(1, 12))
     {
         mineController_->AddObject(oreObject);
     }
 
-    for (auto oreObject : CreateOrePile(7, 5))
+    for (auto oreObject : CreateOrePile(3, 12))
     {
         mineController_->AddObject(oreObject);
     }
 
-    for (auto oreObject : CreateOrePile(9, 5))
+    for (auto oreObject : CreateOrePile(5, 12))
+    {
+        mineController_->AddObject(oreObject);
+    }
+
+    for (auto oreObject : CreateOrePile(23, 12))
+    {
+        mineController_->AddObject(oreObject);
+    }
+
+    for (auto oreObject : CreateOrePile(21, 12))
+    {
+        mineController_->AddObject(oreObject);
+    }
+
+    for (auto oreObject : CreateOrePile(19, 12))
     {
         mineController_->AddObject(oreObject);
     }
@@ -112,6 +189,58 @@ void PlayScene::CreateMines()
     //     mineController_->AddObject(oreObject);
     // }
 
+}
+
+void PlayScene::SetupDisplay()
+{
+    auto gameObject = CreateGameObject();
+    gameObject->AddComponent<EnemyDisplay>();
+}
+
+void PlayScene::SetupKnights()
+{
+
+    constexpr glm::vec2 enemyCellSize = glm::vec2(100, 64);
+    auto enemyIdleSpritesheet = CreateRef<Texture2D>(
+        "Assets/Spritesheets/Idle_KG_1.png");
+
+    for (int i = 0; i < 3; ++i)
+    {
+        auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.00f))
+            ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
+                enemyIdleSpritesheet, glm::vec2(0, 0), enemyCellSize));
+
+        // auto arrowSpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(0.25f))
+        //     ->AddComponent<SpriteRenderer>(arrowSprite_);
+
+        enemySpriteRenderer->GetGameObject().SetTag("Knight");
+        enemySpriteRenderer->SetNativeSize();
+
+        Ref<GameObject> arrow = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.25f));
+        auto arrowSpriteRenderer = arrow->AddComponent<SpriteRenderer>(arrowSprite_);
+        arrowSpriteRenderer->SetNativeSize();
+        arrowSpriteRenderer->GetTransform().SetScale(
+            arrowSpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(8, 8, 1));
+        arrowSpriteRenderer->SetSortingOrder(50);
+        arrow->SetActive(false);
+
+        auto controller = enemySpriteRenderer->GetGameObject().AddComponent<KnightController>();
+        controller->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>());
+        // controller->SetBounds({ 0, 11 }, { 24, 13 });
+        controller->SetArrowObject(arrow);
+
+        enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(64.0f/100.0f, 1, 1) 
+            * glm::vec3(ppiMultiplier_, 1));
+        enemySpriteRenderer->GetTransform().SetScale(
+            enemySpriteRenderer->GetTransform().GetScale()
+            * glm::vec3(ppiMultiplier_ * glm::vec2(0.35f), 1));
+        enemySpriteRenderer->SetSortingOrder(10);
+        enemySpriteRenderer->GetTransform().SetPosition(
+            tilemapGameObject_
+                ->GetComponent<Tilemap>()
+                ->LocalToWorld(glm::ivec2(3 + i * 3, 3)));
+    }
 }
 
 std::vector<Ref<GameObject>> PlayScene::CreateOrePile(uint32_t x, uint32_t y)

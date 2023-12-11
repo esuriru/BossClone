@@ -30,6 +30,9 @@ public:
     virtual void OnDestroy() {}
     virtual void OnTriggerEnter2D(Collider2D* other) {}
 
+    virtual void Message(std::string message) {}
+    virtual void OnImGuiRender() {}
+
     inline GameObject& GetGameObject()
     {
         return gameObject_;

@@ -39,4 +39,5 @@ public:
     void UpdateScale(const glm::vec3& scale);
 
     bool Intersects(const Bounds& other) const;
+    bool IsPointInside(const glm::vec3& point) const;
 };

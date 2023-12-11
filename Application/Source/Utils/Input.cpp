@@ -30,6 +30,12 @@ bool Input::GetMouseButtonDown(int button)
 	return action != _buttonActionMap.end() ? action->second == GLFW_PRESS : false;
 }
 
+bool Input::GetMouseButtonUp(int button)
+{
+	const auto& action = _buttonActionMap.find(button);
+	return action != _buttonActionMap.end() ? action->second == GLFW_RELEASE : false;
+}
+
 void Input::UpdateMouseCoords(glm::vec2 coords)
 {
 	mouseCoords_ = coords;

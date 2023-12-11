@@ -17,7 +17,11 @@ set(Header_Files
     "Source/EC/Components/Pathfinder.h"
 
     "Source/EC/Components/MineController.h"
+    "Source/EC/Components/MinerController.h"
+    "Source/EC/Components/WitchController.h"
+    "Source/EC/Components/KnightController.h"
     "Source/EC/Components/EnemyController.h"
+    "Source/EC/Components/EnemyDisplay.h"
     "Source/EC/Components/TriggerCallback.h"
 
     "Source/Core/Application.h"
@@ -108,7 +112,11 @@ set(Source_Files
     "Source/EC/Components/Pathfinder.cpp"
 
     "Source/EC/Components/MineController.cpp"
+    "Source/EC/Components/MinerController.cpp"
     "Source/EC/Components/EnemyController.cpp"
+    "Source/EC/Components/EnemyDisplay.cpp"
+    "Source/EC/Components/WitchController.cpp"
+    "Source/EC/Components/KnightController.cpp"
     "Source/EC/Components/TriggerCallback.cpp"
 
     "Source/Core/Application.cpp"

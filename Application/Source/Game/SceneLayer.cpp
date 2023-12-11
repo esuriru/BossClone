@@ -11,6 +11,7 @@ SceneLayer::SceneLayer()
     , cameraController_(1280.0f/ 720.0f)
 {
     activeScene_ = SceneManager::Instance()->CreateScene<PlayScene>();
+    activeScene_->SetCamera(&cameraController_.GetCamera());
     SceneManager::Instance()->SetActiveScene(activeScene_);
 }
 
@@ -58,4 +59,8 @@ void SceneLayer::OnEvent(Event &e)
 
 void SceneLayer::OnImGuiRender()
 {
+    if (activeScene_)
+    {
+        activeScene_->OnImGuiRender();
+    }
 }

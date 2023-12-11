@@ -10,6 +10,7 @@ public:
 #pragma region MOUSE
 	glm::vec2 GetMouseOffset();
 	bool GetMouseButtonDown(int button);
+	bool GetMouseButtonUp(int button);
 
 	void UpdateMouseCoords(glm::vec2 coords);
 	void UpdateMouseButtonMap(int button, int action);

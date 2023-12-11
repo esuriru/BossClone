@@ -36,6 +36,8 @@ public:
     void FixedUpdate(float fixedStep);
     void OnDestroy();
     void OnTriggerEnter2D(Collider2D* other);
+    void OnImGuiRender();
+    void Message(string message);
 
     inline Transform& GetTransform()
     {

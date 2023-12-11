@@ -114,6 +114,12 @@ public:
 
     }
 
+    string GetCurrentStateName()
+    {
+        return currentState_ ? currentState_->GetID() : "No current state";
+    }
+
+
     StateMachine* AddState(Scope<State<S>> state)
     {
         states_.insert({ state->GetID(), std::move(state) });

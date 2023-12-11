@@ -77,3 +77,25 @@ void GameObject::OnTriggerEnter2D(Collider2D *other)
         }
     }
 }
+
+void GameObject::OnImGuiRender()
+{
+    for (auto& component : components_)
+    {
+        if (component.second->enabled)
+        {
+            component.second->OnImGuiRender();
+        }
+    }
+}
+
+void GameObject::Message(string message)
+{
+    for (auto& component : components_)
+    {
+        if (component.second->enabled)
+        {
+            component.second->Message(message);
+        }
+    }
+}

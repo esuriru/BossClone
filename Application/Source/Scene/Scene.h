@@ -9,6 +9,7 @@
 #include "EC/GameObject.h"
 
 class Camera;
+class OrthographicCamera;
 
 class Scene : public std::enable_shared_from_this<Scene>
 {
@@ -25,6 +26,15 @@ public:
     virtual void Render();
 
     virtual void OnDestroy();
+
+    virtual void OnImGuiRender();
+
+    void SetCamera(OrthographicCamera* camera);
+
+    inline OrthographicCamera* GetCamera()
+    {
+        return camera_;
+    }
 
     virtual Ref<GameObject> CreateGameObject();
 
@@ -44,5 +54,7 @@ protected:
     std::vector<Ref<GameObject>> sceneObjects_;
     std::multimap<int, Renderer*, std::less<int>> rendererMap_;
     std::string name_;
+
+    OrthographicCamera* camera_;
 };
 

@@ -82,6 +82,7 @@
         "numbers": "cpp",
         "*.tcc": "cpp",
         "mutex": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "*.rh": "cpp"
     },
 }

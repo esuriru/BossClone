@@ -21,6 +21,7 @@ private:
     Ref<Texture2D> nareLogoTexture_;
     Ref<Texture2D> terrainSpritesheet_;
     Ref<Texture2D> ironOreSprite_;
+    Ref<Texture2D> arrowSprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
@@ -28,6 +29,10 @@ private:
 
     void SetupTilemap();
     void SetupMiners();
+    void SetupWitches();
     void CreateMines();
+    void SetupDisplay();
+    void SetupKnights();
+
     std::vector<Ref<GameObject>> CreateOrePile(uint32_t x, uint32_t y);
 };

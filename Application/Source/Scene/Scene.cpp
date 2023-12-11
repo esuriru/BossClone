@@ -2,10 +2,13 @@
 #include "ECS/Coordinator.h"
 #include "SceneManager.h"
 
+#include "Renderer/OrthographicCamera.h"
+
 static Coordinator* s_Coordinator_ = Coordinator::Instance();
 
 Scene::Scene(const std::string &name)
     : name_(name)
+    , camera_(nullptr)
 {
     // SceneManager::Instance()->AddScene(name, shared_from_this());
 }
@@ -70,6 +73,22 @@ void Scene::OnDestroy()
             gameObject->OnDestroy();
         }
     }
+}
+
+void Scene::OnImGuiRender()
+{
+    for (auto& gameObject : sceneObjects_)
+    {
+        if (gameObject->ActiveSelf())
+        {
+            gameObject->OnImGuiRender();
+        }
+    }
+}
+
+void Scene::SetCamera(OrthographicCamera* camera)
+{
+    camera_ = camera;
 }
 
 Ref<GameObject> Scene::CreateGameObject()

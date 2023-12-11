@@ -63,7 +63,7 @@ public:
         CallMessageMethod(MessageMethod::Update);
     }
 
-    virtual void FixedUpdate(float fixedDeltaTime) 
+    virtual void FixedUpdate() 
     {
         CallMessageMethod(MessageMethod::FixedUpdate);
     }

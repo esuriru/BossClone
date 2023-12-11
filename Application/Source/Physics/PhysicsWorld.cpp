@@ -5,7 +5,16 @@
 #include "Physics/Bounds.h"
 #include "EC/GameObject.h"
 
+#include "Core/Application.h"
+
+#include "Renderer/OrthographicCamera.h"
+
+#include "Scene/SceneManager.h"
+
 #include <algorithm>
+#include "Core/Log.h"
+
+#include <glm/gtx/string_cast.hpp>
 
 uint32_t PhysicsWorld::AddCollider(Collider2D *collider)
 {
@@ -56,4 +65,62 @@ void PhysicsWorld::FixedUpdate(float fixedDeltaTime)
             }
         }
     }
+}
+
+std::vector<Collider2D *> PhysicsWorld::RaycastScreen(glm::vec2 mousePosition, bool includeInactive)
+{
+    std::vector<Collider2D*> colliders;
+    auto camera = SceneManager::Instance()->GetActiveScene()->GetCamera();
+    if (!camera)
+    {
+        return colliders;
+    }
+
+    float halfScreenWidth = static_cast<float>(Application::Instance()->GetWindowWidth()) *
+        0.5f;
+    float halfScreenHeight = static_cast<float>(Application::Instance()->GetWindowHeight()) *
+        0.5f;
+    glm::vec4 worldSpaceMouse = glm::inverse(camera->GetViewProjectionMatrix()) * 
+        glm::vec4((mousePosition.x - halfScreenWidth) / halfScreenWidth, 
+        (mousePosition.x - halfScreenHeight) / halfScreenHeight, -1, 1);
+
+    // CC_TRACE("Mouse position: " + glm::to_string(mousePosition));
+    // CC_TRACE(glm::to_string(worldSpaceMouse));
+    for (Collider2D* collider : colliders_)
+    {
+        if (includeInactive)
+        {
+            if (collider->GetBounds().IsPointInside(worldSpaceMouse))
+            {
+                colliders.push_back(collider);
+            }
+        }
+        else if (collider->enabled && collider->GetGameObject().ActiveSelf() && 
+            collider->GetBounds().IsPointInside(worldSpaceMouse))
+        {
+            colliders.push_back(collider);
+        }
+    }
+    return colliders;
+}
+
+std::vector<Collider2D *> PhysicsWorld::CircleCast(glm::vec3 position, float radius, bool includeInactive)
+{
+    std::vector<Collider2D*> colliders;
+    for (Collider2D* collider : colliders_)
+    {
+        if (includeInactive)
+        {
+            if (glm::distance(collider->GetBounds().GetCenter(), position) <= radius)
+            {
+                colliders.push_back(collider);
+            }
+        }
+        else if (collider->enabled && collider->GetGameObject().ActiveSelf() && 
+            glm::distance(collider->GetBounds().GetCenter(), position) <= radius)
+        {
+            colliders.push_back(collider);
+        }
+    }
+    return colliders;
 }
