@@ -13,6 +13,8 @@
 
 #include <imgui.h>
 #include "KnightController.h"
+#include "Scene/SceneManager.h"
+#include "Core/Application.h"
 
 EnemyDisplay::EnemyDisplay(GameObject &gameObject)
     : Component(gameObject)
@@ -22,6 +24,7 @@ EnemyDisplay::EnemyDisplay(GameObject &gameObject)
 void EnemyDisplay::Update(Timestep ts)
 {
     static bool mouseDown = false;
+    auto mouseCoords = Input::Instance()->GetMouseCoords();
     if (Input::Instance()->GetMouseButtonUp(0))
     {
         mouseDown = false;
@@ -30,7 +33,7 @@ void EnemyDisplay::Update(Timestep ts)
     if (Input::Instance()->GetMouseButtonDown(0) && !mouseDown)
     {
         mouseDown = true;
-        auto colliders = PhysicsWorld::Instance()->RaycastScreen(Input::Instance()->GetMouseCoords());
+        auto colliders = PhysicsWorld::Instance()->RaycastScreen(mouseCoords);
         for (auto collider : colliders)
         {
             if (collider->GetGameObject().CompareTag("Miner"))
@@ -71,6 +74,26 @@ void EnemyDisplay::Update(Timestep ts)
         {
             miner->GetTransform().SetPosition(tilemap_->LocalToWorld(0, 0));
         }
+    }
+
+    auto camera = SceneManager::Instance()->GetActiveScene()->GetCamera();
+    if (!camera)
+    {
+        return;
+    }
+
+    float halfScreenWidth = static_cast<float>(Application::Instance()->GetWindowWidth()) *
+        0.5f;
+    float halfScreenHeight = static_cast<float>(Application::Instance()->GetWindowHeight()) *
+        0.5f;
+    glm::vec4 worldSpaceMouse = glm::inverse(camera->GetViewProjectionMatrix()) * 
+        glm::vec4((mouseCoords.x - halfScreenWidth) / halfScreenWidth, 
+        (mouseCoords.x - halfScreenHeight) / halfScreenHeight, -1, 1);
+    glm::vec3 worldMousePos = worldSpaceMouse;
+    
+    if (tilemap_)
+    {
+        auto coords = tilemap_->WorldToLocal(worldMousePos);
     }
 }
 
