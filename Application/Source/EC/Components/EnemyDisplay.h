@@ -15,15 +15,16 @@ public:
     void Update(Timestep ts) override;
     void OnImGuiRender() override;
 
-    void Init(Ref<Tilemap> tilemap, Ref<EnemyPool> minerPool);
+    void Init(Ref<Tilemap> tilemap, Ref<EnemyPool> minerPool, Ref<EnemyPool> knightPool);
     void AddMinerToPool(Ref<EnemyController> miner);
+    void AddKnightToPool(Ref<EnemyController> knight);
 
 private:
     void TextCentred(std::string text);
 
     Ref<EnemyController> lastClickedEnemy_;
 
-    Ref<EnemyPool> minerPool_;
+    Ref<EnemyPool> minerPool_, knightPool_;
     Ref<Tilemap> tilemap_;
 
     std::string enemyName_;

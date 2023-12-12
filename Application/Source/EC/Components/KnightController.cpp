@@ -27,6 +27,7 @@ KnightController::KnightController(GameObject &gameObject)
             [&]()
             {
                 timer_ = 0.0f;
+                minerCollider_ = nullptr; 
                 localTilemapPosition_ = 
                     tilemap_->WorldToLocal(GetTransform().GetPosition());
                 GenerateNewLocation(GetPossibleDirections());
@@ -34,7 +35,10 @@ KnightController::KnightController(GameObject &gameObject)
             ActionEntry("Update", 
             [&]()
             {
-                Move();
+                if (timer_ < 1.0f)
+                {
+                    Move();
+                }
             }) 
         )
     );
@@ -225,15 +229,21 @@ KnightController::KnightController(GameObject &gameObject)
                     localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
                     targetTilemapPosition_ = tilemap_->WorldToLocal(
                         targetCollider_->GetTransform().GetPosition());
-                    if (minerCollider_ && (glm::distance(minerCollider_->GetTransform().GetPosition(),
-                        GetTransform().GetPosition()) > tetherDistance_))
+                    if (minerCollider_)
                     {
+                        if (glm::distance(minerCollider_->GetTransform().GetPosition(),
+                            GetTransform().GetPosition()) > tetherDistance_)
+                        {
+                            timer_ = 0.0f;
+                            transitionBack_ = true;
+                            return false;
+                        }
                         if (!minerCollider_->GetGameObject()
                             .ActiveSelf())
                         {
                             minerCollider_ = nullptr;
-                            timer_ = 0.0f;
                         }
+                        timer_ = 0.0f;
                         transitionBack_ = true;
                         return false;
                     }
@@ -277,6 +287,7 @@ KnightController::KnightController(GameObject &gameObject)
             std::string("Idle State"),
             [&]()
             {
+                localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
                 return transitionBack_ && !minerCollider_;
             } 
         )
@@ -290,12 +301,13 @@ KnightController::KnightController(GameObject &gameObject)
             {
                 if (timer_ >= 1.0f)
                 {
+                    localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
                     Scan();
-                    if (targetCollider_ == nullptr)
+                    if (minerCollider_ != nullptr)
                     {
-                        return true;
+                        return false;
                     }
-                    timer_ = 0.0f;
+                    return true;
                 } 
                 return false;
             } 

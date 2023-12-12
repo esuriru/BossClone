@@ -1,3 +1,4 @@
 - NOW:
-    - Lerp Walk
-    - If no ores left, don't go to move state  
+    - Object pool for knight
+    - Object pool for witch 
+    - Thief

@@ -28,10 +28,10 @@ PlayScene::PlayScene()
     , arrowSprite_(CreateRef<Texture2D>("Assets/Images/60934.png"))
 {
     SetupTilemap();
+    SetupDisplay();
     CreateMines();
     SetupMiners();
     SetupWitches();
-    SetupDisplay();
     SetupKnights();
 }
 
@@ -67,7 +67,7 @@ void PlayScene::SetupMiners()
     minerSprite_ = CreateRef<Texture2D>("Assets/Spritesheets/Ball and Chain Bot/idle.png");
     auto& enemyIdleSpritesheet = minerSprite_;
 
-    for (int i = 0; i < 0; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
@@ -198,8 +198,8 @@ void PlayScene::CreateMines()
 void PlayScene::SetupDisplay()
 {
     auto gameObject = CreateGameObject();
-    auto enemyDisplay = gameObject->AddComponent<EnemyDisplay>();
-    enemyDisplay->Init(
+    enemyDisplay_ = gameObject->AddComponent<EnemyDisplay>();
+    enemyDisplay_->Init(
         tilemapGameObject_->GetComponent<Tilemap>(),
         CreateRef<EnemyPool>([&]()
         {
@@ -236,28 +236,62 @@ void PlayScene::SetupDisplay()
             enemySpriteRenderer->SetSortingOrder(10);
 
             SceneManager::Instance()->GetActiveScene()->UpdateRenderer(enemySpriteRenderer.get());
-            // enemySpriteRenderer->GetTransform().SetPosition(
-            //     tilemapGameObject_
-            //         ->GetComponent<Tilemap>()
-            //         ->LocalToWorld(glm::ivec2(0)));
-
             return controller;
-        }
-    ));
+        }),
+        CreateRef<EnemyPool>([&]()
+        {
+            constexpr glm::vec2 enemyCellSize = glm::vec2(100, 64);
+            auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.00f))
+                ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
+                    knightSprite_, glm::vec2(0, 0), enemyCellSize));
+
+            // auto arrowSpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(0.25f))
+            //     ->AddComponent<SpriteRenderer>(arrowSprite_);
+
+            enemySpriteRenderer->GetGameObject().SetTag("Knight");
+            enemySpriteRenderer->SetNativeSize();
+
+            Ref<GameObject> arrow = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.25f));
+            auto arrowSpriteRenderer = arrow->AddComponent<SpriteRenderer>(arrowSprite_);
+            arrowSpriteRenderer->SetNativeSize();
+            arrowSpriteRenderer->GetTransform().SetScale(
+                arrowSpriteRenderer->GetTransform().GetScale()
+                * glm::vec3(8, 8, 1));
+            arrowSpriteRenderer->SetSortingOrder(50);
+            arrow->SetActive(false);
+
+            auto controller = enemySpriteRenderer->GetGameObject().AddComponent<KnightController>();
+            controller->SetTilemap(tilemapGameObject_->GetComponent<Tilemap>());
+            // controller->SetBounds({ 0, 11 }, { 24, 13 });
+            controller->SetArrowObject(arrow);
+
+            enemySpriteRenderer->GetGameObject().AddComponent<BoxCollider2D>()->GetBounds().SetLocalExtents(glm::vec3(64.0f/100.0f, 1, 1) 
+                * glm::vec3(ppiMultiplier_, 1));
+            enemySpriteRenderer->GetTransform().SetScale(
+                enemySpriteRenderer->GetTransform().GetScale()
+                * glm::vec3(ppiMultiplier_ * glm::vec2(0.35f), 1));
+            enemySpriteRenderer->SetSortingOrder(10);
+            enemySpriteRenderer->GetTransform().SetPosition(
+                tilemapGameObject_
+                    ->GetComponent<Tilemap>()
+                    ->LocalToWorld(glm::ivec2(3 + i * 3, 3)));
+            enemyDisplay_->AddKnightToPool(controller);
+        })
+    );
 }
 
 void PlayScene::SetupKnights()
 {
-
     constexpr glm::vec2 enemyCellSize = glm::vec2(100, 64);
-    auto enemyIdleSpritesheet = CreateRef<Texture2D>(
+    knightSprite_ = CreateRef<Texture2D>(
         "Assets/Spritesheets/Idle_KG_1.png");
+    auto& enemyIdleSpritesheet = knightSprite_;
 
     for (int i = 0; i < 3; ++i)
     {
         auto enemySpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(1.00f))
             ->AddComponent<SpriteRenderer>(SubTexture2D::CreateFromCoords(
-                enemyIdleSpritesheet, glm::vec2(0, 0), enemyCellSize));
+                knightSprite_, glm::vec2(0, 0), enemyCellSize));
 
         // auto arrowSpriteRenderer = CreateGameObject(glm::vec3(0, 0, 0), glm::identity<glm::quat>(), glm::vec3(0.25f))
         //     ->AddComponent<SpriteRenderer>(arrowSprite_);
@@ -289,6 +323,7 @@ void PlayScene::SetupKnights()
             tilemapGameObject_
                 ->GetComponent<Tilemap>()
                 ->LocalToWorld(glm::ivec2(3 + i * 3, 3)));
+        enemyDisplay_->AddKnightToPool(controller);
     }
 }
 

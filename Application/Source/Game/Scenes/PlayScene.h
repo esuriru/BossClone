@@ -4,6 +4,7 @@
 #include "Renderer/Texture.h"
 
 #include "EC/Components/MineController.h"
+#include "EC/Components/EnemyDisplay.h"
 
 #include <vector>
 
@@ -23,9 +24,11 @@ private:
     Ref<Texture2D> ironOreSprite_;
     Ref<Texture2D> arrowSprite_;
     Ref<Texture2D> minerSprite_;
+    Ref<Texture2D> knightSprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
+    Ref<EnemyDisplay> enemyDisplay_;
     Ref<MineController> mineController_;
 
     void SetupTilemap();

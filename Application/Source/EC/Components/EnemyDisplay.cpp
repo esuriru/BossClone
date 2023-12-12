@@ -97,7 +97,7 @@ void EnemyDisplay::OnImGuiRender()
    
 }
 
-void EnemyDisplay::Init(Ref<Tilemap> tilemap, Ref<EnemyPool> minerPool)
+void EnemyDisplay::Init(Ref<Tilemap> tilemap, Ref<EnemyPool> minerPool, Ref<EnemyPool> knightPool)
 {
     tilemap_ = tilemap;
     minerPool_ = minerPool;
@@ -108,6 +108,14 @@ void EnemyDisplay::AddMinerToPool(Ref<EnemyController> miner)
     if (minerPool_)
     {
         minerPool_->Add(miner);
+    }
+}
+
+void EnemyDisplay::AddKnightToPool(Ref<EnemyController> knight)
+{
+    if (knightPool_)
+    {
+        knightPool_->Add(knight);
     }
 }
 

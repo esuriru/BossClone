@@ -90,7 +90,8 @@ std::vector<Collider2D *> PhysicsWorld::RaycastScreen(glm::vec2 mousePosition, b
     {
         if (includeInactive)
         {
-            if (collider->GetBounds().IsPointInside(worldSpaceMouse))
+            if (collider->GetGameObject().ActiveSelf() &&
+                collider->GetBounds().IsPointInside(worldSpaceMouse))
             {
                 colliders.push_back(collider);
             }
