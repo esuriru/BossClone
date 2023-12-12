@@ -125,11 +125,22 @@ public:
         return tag_ == rhs;
     }
 
+    inline void SetLayer(int layer)
+    {
+        layer_ = layer;
+    }
+
+    inline int GetLayer()
+    {
+        return layer_;
+    }
+
 private:
     std::unordered_map<std::type_index, Ref<Component>> components_;
     Ref<Transform> transformInternal_;
     Transform* const transform_;
     Renderer* renderer_;
+    int layer_;
 
     bool enabled_;
     string tag_;

@@ -37,5 +37,5 @@ bool Bounds::IsPointInside(const glm::vec3 &point) const
 {
     glm::vec3 min = center_ - extents_;
     glm::vec3 max = center_ + extents_;
-    return (min.x <= point.x && point.x <= max.x && min.y <= point.y && min.y <= max.y);
+    return (min.x <= point.x && point.x <= max.x && min.y <= point.y && point.y <= max.y);
 }

@@ -20,6 +20,7 @@ set(Header_Files
     "Source/EC/Components/MinerController.h"
     "Source/EC/Components/WitchController.h"
     "Source/EC/Components/KnightController.h"
+    "Source/EC/Components/BanditController.h"
     "Source/EC/Components/EnemyController.h"
     "Source/EC/Components/EnemyDisplay.h"
     "Source/EC/Components/TriggerCallback.h"
@@ -117,6 +118,7 @@ set(Source_Files
     "Source/EC/Components/EnemyController.cpp"
     "Source/EC/Components/EnemyDisplay.cpp"
     "Source/EC/Components/WitchController.cpp"
+    "Source/EC/Components/BanditController.cpp"
     "Source/EC/Components/KnightController.cpp"
     "Source/EC/Components/TriggerCallback.cpp"
 

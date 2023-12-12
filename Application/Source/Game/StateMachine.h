@@ -118,6 +118,7 @@ public:
     void Reset()
     {
         SwitchState(initialID_, nullptr);
+        ResetTimedTransitions(initialID_);
     }
 
     string GetCurrentStateName()

@@ -21,6 +21,8 @@
 
 #include "Tilemap.h"
 
+#include "Game/EnemyPool.h"
+
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/compatibility.hpp>
@@ -57,7 +59,15 @@ void EnemyController::FixedUpdate(float fixedDeltaTime)
 void EnemyController::Reset()
 {
     timer_ = 0.0f;
+    currentHealth_ = initialHealth_;
     stateMachine_->Reset();
+}
+
+void EnemyController::Init()
+{
+    localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
+    currentTargetPosition_ = GetTransform().GetPosition();
+    gameObject_.SetActive(true);
 }
 
 void EnemyController::Move()
@@ -86,6 +96,16 @@ void EnemyController::Move()
     }
 }
 
+void EnemyController::OnDeath()
+{
+    gameObject_.SetActive(false);
+    arrowObject_->SetActive(false);
+    if (pool_)
+    {
+        pool_->Release(shared_from_this());
+    }
+}
+
 EnemyController* EnemyController::SetTilemap(Ref<Tilemap> tilemap)
 {
     tilemap_ = tilemap;
@@ -109,6 +129,12 @@ void EnemyController::SetBounds(glm::ivec2 min, glm::ivec2 max)
 {
     boundsMin_ = min;
     boundsMax_ = max;
+}
+
+void EnemyController::SetTeam(int team)
+{
+    team_ = team;
+    gameObject_.SetLayer(team);
 }
 
 void EnemyController::SetPool(Ref<EnemyPool> pool)

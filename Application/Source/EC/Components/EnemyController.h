@@ -27,8 +27,11 @@ public:
     void FixedUpdate(float fixedDeltaTime) override;
 
     virtual void Reset();
+    virtual void Init();
 
     virtual void Move();
+
+    virtual void OnDeath();
 
     virtual EnemyController* SetTilemap(Ref<Tilemap> tilemap);
 
@@ -47,6 +50,14 @@ public:
     void SetStartingHealth(float health)
     {
         currentHealth_ = health;
+        initialHealth_ = health;
+    }
+
+    void SetTeam(int team);
+
+    int GetTeam()
+    {
+        return team_;
     }
 
     void SetPool(Ref<EnemyPool> pool);
@@ -63,9 +74,12 @@ protected:
     Ref<EnemyPool> pool_;
 
     float timer_ = 0.0f;
+    float initialHealth_;
     float currentHealth_ = 100.0f;
 
     bool isMoving_ = false;
+
+    int team_ = 0;
 
     glm::ivec2 localTilemapPosition_;
     glm::ivec2 targetTilemapPosition_;

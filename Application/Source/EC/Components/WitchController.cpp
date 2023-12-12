@@ -4,6 +4,8 @@
 #include "EC/Components/MinerController.h"
 #include "Physics/PhysicsWorld.h"
 
+#include "Game/GameManager.h"
+
 WitchController::WitchController(GameObject &gameObject)
     : EnemyController(gameObject)
     , targetCollider_(nullptr)
@@ -303,7 +305,20 @@ void WitchController::Message(std::string message)
         currentHealth_ -= 20.0f;
         if (currentHealth_ <= 0.0f)
         {
-            gameObject_.SetActive(false);
+            OnDeath();
+            if (team_ == 1)
+            {
+                GameManager::Instance()->SetTeamOneWitches(
+                    GameManager::Instance()->GetTeamOneWitches() - 1
+                );
+            }
+            else
+            {
+                GameManager::Instance()->SetTeamTwoWitches(
+                    GameManager::Instance()->GetTeamTwoWitches() - 1
+                );
+            }
+            
         }
     }
 }
@@ -311,6 +326,8 @@ void WitchController::Message(std::string message)
 void WitchController::Reset()
 {
     EnemyController::Reset();
+    timer_ = 0.0f;
+    cooldownTimer_ = 0.0f;
     targetCollider_ = nullptr; 
 }
 
@@ -321,6 +338,11 @@ void WitchController::Scan()
     
     for (auto collider : colliders)
     {
+        if (collider->GetGameObject().GetLayer() == gameObject_.GetLayer())
+        {
+            continue;
+        }
+
         if (collider->GetGameObject().CompareTag("Miner") && !targetCollider_ )
         {
             targetCollider_ = collider;

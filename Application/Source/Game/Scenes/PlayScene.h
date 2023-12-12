@@ -25,6 +25,8 @@ private:
     Ref<Texture2D> arrowSprite_;
     Ref<Texture2D> minerSprite_;
     Ref<Texture2D> knightSprite_;
+    Ref<Texture2D> witchSprite_;
+    Ref<Texture2D> banditSprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
@@ -37,6 +39,7 @@ private:
     void CreateMines();
     void SetupDisplay();
     void SetupKnights();
+    void SetupBandits();
 
     std::vector<Ref<GameObject>> CreateOrePile(uint32_t x, uint32_t y);
 };

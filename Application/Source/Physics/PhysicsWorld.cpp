@@ -82,10 +82,10 @@ std::vector<Collider2D *> PhysicsWorld::RaycastScreen(glm::vec2 mousePosition, b
         0.5f;
     glm::vec4 worldSpaceMouse = glm::inverse(camera->GetViewProjectionMatrix()) * 
         glm::vec4((mousePosition.x - halfScreenWidth) / halfScreenWidth, 
-        (mousePosition.x - halfScreenHeight) / halfScreenHeight, -1, 1);
+        -(mousePosition.y - halfScreenHeight) / halfScreenHeight, -1, 1);
 
     // CC_TRACE("Mouse position: " + glm::to_string(mousePosition));
-    // CC_TRACE(glm::to_string(worldSpaceMouse));
+    CC_TRACE(glm::to_string(worldSpaceMouse));
     for (Collider2D* collider : colliders_)
     {
         if (includeInactive)

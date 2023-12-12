@@ -24,6 +24,7 @@
 
 #include <string>
 #include <glm/gtx/string_cast.hpp>
+#include "Game/GameManager.h"
 
 MinerController::MinerController(GameObject &gameObject)
     : EnemyController(gameObject)
@@ -42,6 +43,19 @@ MinerController::MinerController(GameObject &gameObject)
                 if (arrowObject_)
                 {
                     arrowObject_->SetActive(false);
+                }
+
+                if (team_ == 1)
+                {
+                    GameManager::Instance()->SetTeamOneMoney(
+                        GameManager::Instance()->GetTeamOneMoney() +
+                        timeSpentMining_ * 10.0f);
+                }
+                else
+                {
+                    GameManager::Instance()->SetTeamTwoMoney(
+                        GameManager::Instance()->GetTeamTwoMoney() +
+                        timeSpentMining_ * 10.0f);
                 }
             }),
             ActionEntry("Update",
@@ -84,8 +98,8 @@ MinerController::MinerController(GameObject &gameObject)
             [&]()
             {
                 timer_ = 0.0f;
-                targetTilemapPosition_ = { 0, 0 };
-
+                targetTilemapPosition_ = team_ == 1 ? glm::ivec2(0, 0) : 
+                    glm::ivec2(Tilemap::MaxHorizontalLength - 1, Tilemap::MaxVerticalLength - 1);
             })
         )
     );
@@ -100,6 +114,12 @@ MinerController::MinerController(GameObject &gameObject)
                 {
                     arrowObject_->SetActive(false);
                 }
+                timeSpentMining_ = 0.0f;
+            }),
+            ActionEntry("Update",
+            [&]()
+            {
+                timeSpentMining_ += stateMachine_->currentTimestep;
             })
         )
     );
@@ -156,7 +176,8 @@ MinerController::MinerController(GameObject &gameObject)
                         return false;
                     } 
                     currentChosenOre_ = nullptr;
-                    targetTilemapPosition_ = { 0, 0 };
+                    targetTilemapPosition_ = team_ == 1 ? glm::ivec2(0, 0) : 
+                        glm::ivec2(Tilemap::MaxHorizontalLength - 1, Tilemap::MaxVerticalLength - 1);
                     return true;
                 }
                 return false;
@@ -171,16 +192,6 @@ MinerController::MinerController(GameObject &gameObject)
             {
                 return localTilemapPosition_ == targetTilemapPosition_
                     && reachedOre_;
-            })
-    );
-
-    stateMachine_->AddTransition(
-        CreateScope<Transition<>>(
-            std::string("Idle State"),
-            std::string("Move State"),
-            [&]()
-            {
-                return Input::Instance()->IsKeyPressed(Key::B);
             })
     );
 
@@ -220,16 +231,6 @@ MinerController::MinerController(GameObject &gameObject)
             std::string("Return State"),
             5.0f 
         )
-    );
-
-    stateMachine_->AddTransition(
-        CreateScope<Transition<>>(
-            std::string("Move State"),
-            std::string("Idle State"),
-            [&]()
-            {
-                return Input::Instance()->IsKeyPressed(Key::V);
-            })
     );
     
     stateMachine_->AddTransition(
@@ -280,21 +281,47 @@ void MinerController::Message(std::string message)
 {
     if (message == "Run" && gameObject_.ActiveSelf())
     {
-        currentHealth_ -= 50.0f;
+        currentHealth_ -= 20.0f;
         if (currentHealth_ <= 0.0f)
         {
-            gameObject_.SetActive(false);
-            arrowObject_->SetActive(false);
-            if (pool_)
-            {
-                pool_->Release(shared_from_this());
-            }
+            OnDeath();
         }
         runMessage_ = true;
     }
     else if (message == "Guard")
     {
         isGuarded_ = true;
+    }
+    else if (message == "Bandit Shoot")
+    {
+        currentHealth_ -= 10.0f;
+        if (currentHealth_ <= 0.0f)
+        {
+            OnDeath();
+        }
+        runMessage_ = true;
+    }
+}
+
+void MinerController::OnDeath()
+{
+    EnemyController::OnDeath();
+    if (team_ == 1)
+    {
+        GameManager::Instance()->SetTeamOneMiners(
+            GameManager::Instance()->GetTeamOneMiners() - 1
+        );
+    }
+    else
+    {
+        GameManager::Instance()->SetTeamTwoMiners(
+            GameManager::Instance()->GetTeamTwoMiners() - 1
+        );
+    }
+    if (currentChosenOre_ && reachedOre_)
+    {
+        mineController_->ReleaseOreObject(&GetGameObject());
+        currentChosenOre_ = nullptr;
     }
 }
 
@@ -331,6 +358,12 @@ void MinerController::GenerateNewLocation()
 void MinerController::Reset()
 {
     EnemyController::Reset();
+    timer_ = 0.0f;
     isGuarded_ = false;
     currentChosenOre_ = nullptr;
+}
+
+void MinerController::SetRestPlace(const glm::ivec2& location)
+{
+    restPlace_ = location;
 }

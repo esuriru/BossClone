@@ -10,6 +10,7 @@ public:
     void OnTriggerEnter2D(Collider2D* other) override;
 
     void Move() override;
+    void Message(std::string message);
 
     inline void SetTetherDistance(float tetherDistance)
     {
@@ -25,7 +26,7 @@ public:
 
 protected:
     float scanRadius_ = 20.0f;
-    float tetherDistance_ = 30.0f;
+    float tetherDistance_ = 32.5f;
     float maxFollowDistance_ = 20.0f;
     float cooldownTime_ = 2.0f;
     float cooldownTimer_;

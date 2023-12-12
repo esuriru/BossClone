@@ -4,6 +4,8 @@
 #include "Physics/PhysicsWorld.h"
 #include "MinerController.h"
 
+#include "Game/GameManager.h"
+
 KnightController::KnightController(GameObject &gameObject)
     : EnemyController(gameObject)
     , targetCollider_(nullptr)
@@ -12,6 +14,14 @@ KnightController::KnightController(GameObject &gameObject)
     stateMachine_->AddState(
         CreateScope<State<>>(
             std::string("Idle State"),
+            ActionEntry("Enter", 
+            [&]()
+            {
+                if (arrowObject_)
+                {
+                    arrowObject_->SetActive(false);
+                }
+            }),
             ActionEntry("FixedUpdate", 
             [&]()
             {
@@ -30,6 +40,10 @@ KnightController::KnightController(GameObject &gameObject)
                 minerCollider_ = nullptr; 
                 localTilemapPosition_ = 
                     tilemap_->WorldToLocal(GetTransform().GetPosition());
+                if (arrowObject_)
+                {
+                    arrowObject_->SetActive(false);
+                }
                 GenerateNewLocation(GetPossibleDirections());
             }),
             ActionEntry("Update", 
@@ -61,12 +75,27 @@ KnightController::KnightController(GameObject &gameObject)
                     GetPossibleDirections(
                         position
                     )));
+                if (arrowObject_)
+                {
+                    arrowObject_->SetActive(true);
+                }
                 GenerateNewLocation(GetNextTargetDirections());
             }),
             ActionEntry("Update", 
             [&]()
             {
                 Move();
+                if (arrowObject_)
+                {
+                    auto direction = minerCollider_->GetTransform().GetPosition() -
+                        GetTransform().GetPosition();
+                    if (glm::length(direction) > 0.05f)
+                    {
+                        arrowObject_->GetTransform().SetRotation(glm::quat(
+                            glm::vec3(0, 0, std::atan2(direction.y, direction.x))
+                        ));
+                    }
+                }
                 if (timer_ >= 1.0f)
                 {
                     timer_ = 0.0f;
@@ -113,12 +142,27 @@ KnightController::KnightController(GameObject &gameObject)
                     timer_ = 0.0f;
                     targetTilemapPosition_ = tilemap_->WorldToLocal(
                         targetCollider_->GetTransform().GetPosition());
+                if (arrowObject_)
+                {
+                    arrowObject_->SetActive(true);
+                }
                 // }
             }),
             ActionEntry("Update", 
             [&]()
             {
                 Move();
+                if (arrowObject_)
+                {
+                    auto direction = targetCollider_->GetTransform().GetPosition() -
+                        GetTransform().GetPosition();
+                    if (glm::length(direction) > 0.05f)
+                    {
+                        arrowObject_->GetTransform().SetRotation(glm::quat(
+                            glm::vec3(0, 0, std::atan2(direction.y, direction.x))
+                        ));
+                    }
+                }
             }) 
         )
     );
@@ -129,6 +173,10 @@ KnightController::KnightController(GameObject &gameObject)
             ActionEntry("Enter", 
             [&]()
             {
+                if (arrowObject_)
+                {
+                    arrowObject_->SetActive(false);
+                }
                 CC_TRACE("Attack");
             }),
             ActionEntry("Exit", 
@@ -242,16 +290,17 @@ KnightController::KnightController(GameObject &gameObject)
                             .ActiveSelf())
                         {
                             minerCollider_ = nullptr;
+                            timer_ = 0.0f;
+                            transitionBack_ = true;
+                            return false;
                         }
-                        timer_ = 0.0f;
-                        transitionBack_ = true;
-                        return false;
-                    }
 
-                    if (localTilemapPosition_ == targetTilemapPosition_)
-                    {
-                        // Transition to attack if we are close enough
-                        return true;
+                        if (localTilemapPosition_ == targetTilemapPosition_)
+                        {
+                            // Transition to attack if we are close enough
+                            return true;
+                        }
+
                     }
 
                     GenerateNewLocation(GetNextTargetDirections());
@@ -407,9 +456,35 @@ void KnightController::Move()
 
 }
 
+void KnightController::Message(std::string message)
+{
+    if (message == "Bandit Shoot")
+    {
+        currentHealth_ -= 10.0f;
+        if (currentHealth_ <= 0.0f)
+        {
+            OnDeath();
+            if (team_ == 1)
+            {
+                GameManager::Instance()->SetTeamOneKnights(
+                    GameManager::Instance()->GetTeamOneKnights() - 1
+                );
+            }
+            else
+            {
+                GameManager::Instance()->SetTeamTwoKnights(
+                    GameManager::Instance()->GetTeamTwoKnights() - 1
+                );
+            }
+        }
+    }
+}
+
 void KnightController::Reset()
 {
     EnemyController::Reset();
+    cooldownTimer_ = 0.0f;
+    timer_ = 0.0f;
     minerCollider_ = nullptr;
     targetCollider_ = nullptr;
 }
@@ -422,13 +497,18 @@ void KnightController::Scan()
     
     for (auto collider : colliders)
     {
-        if (collider->GetGameObject().CompareTag("Miner") && !minerCollider_ &&
-            !collider->GetGameObject().GetComponent<MinerController>()->IsGuarded())
+        if (collider->GetGameObject().GetLayer() == gameObject_.GetLayer())
         {
-            minerCollider_ = collider;
-            collider->GetGameObject().Message("Guard");
+            if (collider->GetGameObject().CompareTag("Miner") && !minerCollider_ &&
+                !collider->GetGameObject().GetComponent<MinerController>()->IsGuarded())
+            {
+                minerCollider_ = collider;
+                collider->GetGameObject().Message("Guard");
+            }
         }
-        if (collider->GetGameObject().CompareTag("Witch") && !targetCollider_)
+        else if ((collider->GetGameObject().CompareTag("Witch") ||
+            collider->GetGameObject().CompareTag("Bandit"))
+            && !targetCollider_)
         {
             targetCollider_ = collider;
         }
