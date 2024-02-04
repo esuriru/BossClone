@@ -2,6 +2,7 @@
 #include "EC/GameObject.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <stack>
 #include <vector>
@@ -48,11 +49,13 @@ void MazeController::Generate(const glm::ivec2& startPoint)
     stack.push(startPoint);
     SetTileEmpty(tilemap_->GetTile(startPoint));
 
+    glm::ivec2 exitLocation{}; 
+    bool exitFound = false;
+
     while (!stack.empty())
     {
         glm::ivec2 currentPoint = stack.top();
         stack.pop();
-        CC_TRACE(stack.size());
 
         auto neighbours = GetUnvisitedNeighbours(currentPoint);
         if (!neighbours.empty())
@@ -64,6 +67,11 @@ void MazeController::Generate(const glm::ivec2& startPoint)
 
             SetTileEmpty(tilemap_->GetTile(chosenNeighbour));
 
+            if (!exitFound)
+            {
+                exitFound = TestForExit(chosenNeighbour, exitLocation);
+            }
+
             glm::ivec2 middlePoint = glm::ivec2(
                 (currentPoint.x + chosenNeighbour.x) / 2,
                 (currentPoint.y + chosenNeighbour.y) / 2);
@@ -72,11 +80,43 @@ void MazeController::Generate(const glm::ivec2& startPoint)
             stack.push(chosenNeighbour);
         }
     }
+    
+    // CC_ASSERT(exitLocation == glm::ivec2{}, "test");
+    SetTileEmpty(tilemap_->GetTile(exitLocation));
+    CC_TRACE(glm::to_string(exitLocation));
 }
 
 void MazeController::Start()
 {
-    tilemap_ = GetGameObject().GetComponent<Tilemap>();
+    if (!tilemap_)
+    {
+        tilemap_ = GetGameObject().GetComponent<Tilemap>();
+    }
+}
+
+bool MazeController::TestForExit(const glm::ivec2 &location, glm::ivec2& exitLocation)
+{
+    if (location.x == 1)
+    {
+        exitLocation = glm::ivec2(0, location.y);
+        return true;
+    }
+    else if (location.x == Tilemap::MaxHorizontalLength - 2)
+    {
+        exitLocation = glm::ivec2(Tilemap::MaxHorizontalLength - 1, location.y);
+        return true;
+    }
+    else if (location.y == 1)
+    {
+        exitLocation = glm::ivec2(location.x, 0);
+        return true;
+    }
+    else if (location.x == Tilemap::MaxVerticalLength - 2)
+    {
+        exitLocation = glm::ivec2(location.x, Tilemap::MaxVerticalLength - 1);
+        return true;
+    }
+    return false;
 }
 
 void MazeController::SetTileEmpty(Tile &tile)

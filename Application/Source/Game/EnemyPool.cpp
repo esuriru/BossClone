@@ -7,7 +7,7 @@ EnemyPool::EnemyPool(std::function<Ref<EnemyController>()> createFunc)
 
 void EnemyPool::Add(Ref<EnemyController> enemy)
 {
-    enemy->SetPool(shared_from_this());
+    // enemy->SetPool(shared_from_this());
 }
 
 Ref<EnemyController> EnemyPool::Get()
@@ -15,7 +15,7 @@ Ref<EnemyController> EnemyPool::Get()
     if (_enemies.empty())
     {
         auto c = _createFunc(); 
-        c->SetPool(shared_from_this());
+        // c->SetPool(shared_from_this());
         return c;
     }
     else

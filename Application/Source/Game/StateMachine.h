@@ -197,7 +197,7 @@ public:
         }, nullptr);
     }
 
-    void InitateStartState(S ID)
+    void InitiateStartState(S ID)
     {
         CC_ASSERT(states_.find(ID) != states_.end(), "Starting state" 
             "could not be found.");

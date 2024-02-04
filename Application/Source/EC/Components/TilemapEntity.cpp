@@ -6,6 +6,7 @@
 TilemapEntity::TilemapEntity(GameObject &gameObject)
     : Component(gameObject)
     , isMoving_(false)
+    , isCurrentTurn_(false)
     , moveCallback_(nullptr)
 {
 
@@ -14,6 +15,7 @@ TilemapEntity::TilemapEntity(GameObject &gameObject)
 void TilemapEntity::Start()
 {
     FixTilemapPosition();
+    UpdateNearbyTilesVisibility();
 }
 
 void TilemapEntity::Update(Timestep ts)
@@ -32,6 +34,11 @@ void TilemapEntity::Update(Timestep ts)
             isMoving_ = false;
         }
     }
+}
+
+void TilemapEntity::StartTurn()
+{
+    isCurrentTurn_ = true;
 }
 
 void TilemapEntity::FixTilemapPosition()
@@ -59,4 +66,42 @@ void TilemapEntity::QueueMove(glm::vec3 targetPosition, float seconds,
     moveTime_ = seconds;
     isMoving_ = true;
     moveCallback_ = callback;
+}
+
+void TilemapEntity::UpdateNearbyTilesVisibility()
+{
+    SetNearbyTilesVisible(tilemapPosition_);
+}
+
+void TilemapEntity::SetNearbyTilesVisible(
+    const glm::ivec2 &location, bool visible)
+{
+    auto tiles = GetNearbyTiles(location, visibilityRange_);
+    for (auto& tile : tiles)
+    {
+        tile.get().textureIndex = static_cast<int>(!visible);
+    }
+}
+
+std::vector<std::reference_wrapper<Tile>> TilemapEntity::GetNearbyTiles(
+    const glm::ivec2 &location, uint8_t range)
+{
+    std::vector<std::reference_wrapper<Tile>> tiles;
+
+    for (int i = -range; i <= range; ++i)
+    {
+        for (int j = -range + glm::abs(i); 
+            j <= range - glm::abs(i); ++j)
+        {
+            auto newPosition = location + glm::ivec2(i, j);
+
+            if (visibilityTilemap_->InBounds(newPosition))
+            {
+                tiles.emplace_back(
+                    visibilityTilemap_->GetTile(newPosition));
+            }
+        }
+    }
+
+    return tiles;
 }

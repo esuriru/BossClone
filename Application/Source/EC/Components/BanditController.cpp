@@ -1,11 +1,3 @@
-#include "BanditController.h"
-
-#include "EC/Components/Collider2D.h"
-#include "EC/Components/MinerController.h"
-#include "Physics/PhysicsWorld.h"
-
-#include "Game/GameManager.h"
-
 BanditController::BanditController(GameObject &gameObject)
     : EnemyController(gameObject)
     , targetCollider_(nullptr)

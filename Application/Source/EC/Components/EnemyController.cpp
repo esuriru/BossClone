@@ -22,32 +22,43 @@
 #include "Tilemap.h"
 
 #include "Game/EnemyPool.h"
+#include "Game/GameManager.h"
 
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/compatibility.hpp>
 
 EnemyController::EnemyController(GameObject &gameObject)
-    : Component(gameObject)
+    : TilemapEntity(gameObject)
     , stateMachine_(CreateScope<StateMachine<>>("Default"))
 {
+    stateMachine_->AddState(CreateScope<State<>>(std::string("Patrol"),
+        ActionEntry("Enter",
+        [&]()
+        {
+
+        }),
+        ActionEntry("Update",
+        [&]()
+        {
+            if (isCurrentTurn_ && !isMoving_)
+            {
+                MoveInRandomAvailableDirection();
+            }
+        })
+    ));
+
+    stateMachine_->InitiateStartState("Patrol");
 }
 
 void EnemyController::Start()
 {
-    localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
-    currentTargetPosition_ = GetTransform().GetPosition();
-    collider_ = GetGameObject().GetComponent<BoxCollider2D>(); 
-
-    if (arrowObject_)
-    {
-        arrowObject_->GetTransform().SetPosition(
-            GetTransform().GetPosition());
-    }
+    TilemapEntity::Start();
 }
 
 void EnemyController::Update(Timestep ts)
 {
+    TilemapEntity::Update(ts);
     stateMachine_->Update(ts);
 }
 
@@ -63,219 +74,40 @@ void EnemyController::Reset()
     stateMachine_->Reset();
 }
 
-void EnemyController::Init()
+void EnemyController::MoveInRandomAvailableDirection()
 {
-    localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
-    currentTargetPosition_ = GetTransform().GetPosition();
-    gameObject_.SetActive(true);
-}
-
-void EnemyController::Move()
-{
-    timer_ += stateMachine_->currentTimestep;
-
-    GetTransform().SetPosition(
-        Utility::Lerp(GetTransform().GetPosition(),
-        currentTargetPosition_,
-        timer_));
-    if (arrowObject_)
+    constexpr std::array<glm::ivec2, 4> Directions
     {
-        arrowObject_->GetTransform().SetPosition(
-            GetTransform().GetPosition());
-    }
-    if (timer_ >= 1.0f)
-    {
-        localTilemapPosition_ = tilemap_->WorldToLocal(GetTransform().GetPosition());
-        if (localTilemapPosition_ == targetTilemapPosition_)
         {
-            return;
-        }
-
-        GenerateNewLocation();
-        timer_ = 0.0f;
-    }
-}
-
-void EnemyController::OnDeath()
-{
-    gameObject_.SetActive(false);
-    arrowObject_->SetActive(false);
-    if (pool_)
-    {
-        pool_->Release(shared_from_this());
-    }
-}
-
-EnemyController* EnemyController::SetTilemap(Ref<Tilemap> tilemap)
-{
-    tilemap_ = tilemap;
-    return this;
-}
-
-void EnemyController::GenerateNewLocation()
-{
-    auto randomDirection = GetRandomDirection(GetNextTargetDirections());
-    if (randomDirection == EightWayDirection::None)
-    {
-        CC_ERROR("Direction None");
-        return;
-    }
-    currentTargetPosition_ = tilemap_->LocalToWorld(localTilemapPosition_
-        + Utility::ConvertDirection(randomDirection));
-
-}
-
-void EnemyController::SetBounds(glm::ivec2 min, glm::ivec2 max)
-{
-    boundsMin_ = min;
-    boundsMax_ = max;
-}
-
-void EnemyController::SetTeam(int team)
-{
-    team_ = team;
-    gameObject_.SetLayer(team);
-}
-
-void EnemyController::SetPool(Ref<EnemyPool> pool)
-{
-    pool_ = pool;
-}
-
-std::string EnemyController::GetCurrentStateName()
-{
-    return stateMachine_->GetCurrentStateName(); 
-}
-
-bool EnemyController::InBounds(glm::ivec2 coords) const
-{
-    return (coords.x >= boundsMin_.x && 
-        coords.y >= boundsMin_.y && 
-        coords.x < boundsMax_.x &&
-        coords.y < boundsMax_.y);
-}
-
-bool EnemyController::InBounds(int x, int y) const
-{
-    return (x >= boundsMin_.x && 
-        y >= boundsMin_.y && 
-        x < boundsMax_.x &&
-        y < boundsMax_.y);
-}
-
-EightWayDirection EnemyController::GetRandomDirection(EightWayDirectionFlags flags)
-{
-    auto directions = flags; 
-
-    uint32_t directionCount = 0;
-    EightWayDirection setBitDirections[8] {};
-
-    for (int i = static_cast<int>(EightWayDirectionFlags::Up); 
-        i <= (static_cast<int>(EightWayDirectionFlags::Up_Left) << 1); i <<= 1)
-    {
-        if (static_cast<bool>(directions & 
-            static_cast<EightWayDirectionFlags>(i))) 
-        {
-            setBitDirections[directionCount] = 
-                static_cast<EightWayDirection>(i);
-            ++directionCount;
-        }
-    }
-
-    return directionCount == 0 ? EightWayDirection::None :
-        setBitDirections[static_cast<uint32_t>(Random::Range(0,
-        static_cast<int>(directionCount - 1)))];
-
-}
-
-EightWayDirectionFlags EnemyController::GetPossibleDirections()
-{
-    return GetPossibleDirections(localTilemapPosition_);
-}
-
-EightWayDirectionFlags EnemyController::GetPossibleDirections(glm::ivec2 position)
-{
-    EightWayDirectionFlags flags = static_cast<EightWayDirectionFlags>(0);
-
-    bool upPossible = InBounds(position.x, 
-        position.y + 1); 
-    bool rightPossible = InBounds(position.x + 1, 
-        position.y); 
-    bool downPossible = InBounds(position.x, 
-        position.y - 1); 
-    bool leftPossible = InBounds(position.x - 1, 
-        position.y); 
-
-    std::array<std::pair<EightWayDirectionFlags, bool>, 8> conditions
-    {
-        { 
-            { EightWayDirectionFlags::Up, upPossible },
-            { EightWayDirectionFlags::Up_Right, upPossible && rightPossible },
-            { EightWayDirectionFlags::Right, rightPossible },
-            { EightWayDirectionFlags::Down_Right, downPossible && rightPossible },
-            { EightWayDirectionFlags::Down, downPossible },
-            { EightWayDirectionFlags::Down_Left, downPossible && leftPossible },
-            { EightWayDirectionFlags::Left, leftPossible },
-            { EightWayDirectionFlags::Up_Left, upPossible && leftPossible },
+            { 0, 1 },
+            { 1, 0 },
+            { 0,-1 },
+            { -1,0 },
         }
     };
 
-    for (auto& pair : conditions)
+    std::vector<glm::ivec2> possiblePositions;
+    for (int i = 0; i < 4; ++i)
     {
-        if (pair.second)
+        auto newPosition = tilemapPosition_ + Directions[i];
+        if (tilemap_->InBounds(newPosition) &&
+            tilemap_->GetTile(newPosition).weight >= 1)
         {
-            flags |= pair.first;
+            possiblePositions.emplace_back(newPosition);     
         }
     }
 
-    return flags;
-}
+    auto newTilemapPosition = possiblePositions[
+        rand() % possiblePositions.size()];
+    QueueMove(tilemap_->LocalToWorld(newTilemapPosition),
+        movementTime_,
+        [=]()
+        {
+            SetNearbyTilesVisible(tilemapPosition_, false);
+            tilemapPosition_ = newTilemapPosition; 
 
-EightWayDirectionFlags EnemyController::GetNextTargetDirections()
-{
-    auto flags = GetPossibleDirections();
-    auto delta = targetTilemapPosition_ - localTilemapPosition_;
-
-    EightWayDirectionFlags deltaFlags = static_cast<EightWayDirectionFlags>(0);
-
-    if (delta.x > 0)
-    {
-        if (delta.y > 0)
-        {
-            deltaFlags |= EightWayDirectionFlags::Up | EightWayDirectionFlags::Right | 
-                EightWayDirectionFlags::Up_Right;
-        }
-        else if (delta.y < 0)
-        {
-            deltaFlags |= EightWayDirectionFlags::Down | EightWayDirectionFlags::Right | 
-                EightWayDirectionFlags::Down_Right;
-        }
-        else
-        {
-            deltaFlags |= EightWayDirectionFlags::Right;
-        }
-    }
-    else if (delta.x < 0)
-    {
-        if (delta.y > 0)
-        {
-            deltaFlags |= EightWayDirectionFlags::Up | EightWayDirectionFlags::Left | 
-                EightWayDirectionFlags::Up_Left;
-        }
-        else if (delta.y < 0)
-        {
-            deltaFlags |= EightWayDirectionFlags::Down | EightWayDirectionFlags::Left | 
-                EightWayDirectionFlags::Down_Left;
-        }
-        else
-        {
-            deltaFlags |= EightWayDirectionFlags::Left;
-        }
-    }
-    else if (delta.y != 0)
-    {
-        deltaFlags |= delta.y > 0 ? EightWayDirectionFlags::Up : 
-            EightWayDirectionFlags::Down;
-    }
-    return flags & deltaFlags;
+            isCurrentTurn_ = false;
+            GameManager::Instance()->OnTurnFinish();
+            // CC_TRACE(glm::to_string(tilemapPosition_));
+        });
 }

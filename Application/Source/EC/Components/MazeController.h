@@ -30,7 +30,12 @@ public:
         emptyIndex_ = index;
         return this;
     }
+
 private:
+    void AddExit();
+    void AddExit(int seed, int callCount = 0);
+    
+    bool TestForExit(const glm::ivec2& location, glm::ivec2& exitLocation);
     Ref<Tilemap> tilemap_;
 
     uint8_t wallIndex_ = 0, 

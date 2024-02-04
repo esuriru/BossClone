@@ -46,12 +46,5 @@ private:
     void SetupEnemies();
     void SetupVisiblityTilemap();
     void SetupTilemap();
-    void SetupMiners();
-    void SetupWitches();
-    void CreateMines();
     void SetupDisplay();
-    void SetupKnights();
-    void SetupBandits();
-
-    std::vector<Ref<GameObject>> CreateOrePile(uint32_t x, uint32_t y);
 };

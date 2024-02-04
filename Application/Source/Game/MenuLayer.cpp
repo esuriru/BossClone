@@ -59,7 +59,7 @@ auto MenuLayer::OnImGuiRender() -> void
 
     if (!firstTime_)
     {
-        ImGui::Text("Best timing: %.2fs", GameManager::Instance()->GetBestTime());
+        // ImGui::Text("Best timing: %.2fs", GameManager::Instance()->GetBestTime());
     }
     else
     {

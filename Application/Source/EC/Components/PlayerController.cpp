@@ -4,6 +4,7 @@
 #include "Core/KeyCodes.h"
 
 #include <glm/gtx/string_cast.hpp>
+#include "Game/GameManager.h"
 
 PlayerController::PlayerController(GameObject &gameObject)
     : TilemapEntity(gameObject)
@@ -14,13 +15,10 @@ PlayerController::PlayerController(GameObject &gameObject)
 void PlayerController::Start()
 {
     TilemapEntity::Start();
-    SetNearbyTilesVisible(tilemapPosition_);
 }
 
 void PlayerController::Update(Timestep ts)
 {
-    TilemapEntity::Update(ts);
-    
     static Input* input = Input::Instance();
 
     constexpr uint32_t directionCount = 4;
@@ -44,6 +42,13 @@ void PlayerController::Update(Timestep ts)
             glm::ivec2(1, 0)
         }
     };
+
+    if (!isCurrentTurn_)
+    {
+        return;
+    }
+
+    TilemapEntity::Update(ts);
 
     if (isMoving_)
     {
@@ -69,43 +74,13 @@ void PlayerController::Update(Timestep ts)
                 {
                     SetNearbyTilesVisible(tilemapPosition_, false);
                     tilemapPosition_ = newTilemapPosition; 
-                    SetNearbyTilesVisible(tilemapPosition_, true);
+                    // SetNearbyTilesVisible(tilemapPosition_, true);
+
+                    isCurrentTurn_ = false;
+                    GameManager::Instance()->OnTurnFinish();
                     // CC_TRACE(glm::to_string(tilemapPosition_));
                 });
             break;
         }
     }
-}
-
-void PlayerController::SetNearbyTilesVisible(
-    const glm::ivec2 &location, bool visible)
-{
-    auto tiles = GetNearbyTiles(location, visibilityRange_);
-    for (auto& tile : tiles)
-    {
-        tile.get().textureIndex = static_cast<int>(!visible);
-    }
-}
-
-std::vector<std::reference_wrapper<Tile>> PlayerController::GetNearbyTiles(
-    const glm::ivec2 &location, uint8_t range)
-{
-    std::vector<std::reference_wrapper<Tile>> tiles;
-
-    for (int i = -range; i <= range; ++i)
-    {
-        for (int j = -range + glm::abs(i); 
-            j <= range - glm::abs(i); ++j)
-        {
-            auto newPosition = location + glm::ivec2(i, j);
-
-            if (visibilityTilemap_->InBounds(newPosition))
-            {
-                tiles.emplace_back(
-                    visibilityTilemap_->GetTile(newPosition));
-            }
-        }
-    }
-
-    return tiles;
 }
