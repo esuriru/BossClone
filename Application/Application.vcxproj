@@ -107,9 +107,10 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)vendor\imgui\imgui;$(SolutionDir)vendor\rapidcsv;$(SolutionDir)vendor\glad\include;$(ProjectDir)\Source\;$(SolutionDir)vendor\glm;$(SolutionDir)vendor\stb_image;$(SolutionDir)vendor\assimp\include;$(SolutionDir)vendor\glfw\include;$(SolutionDir)\Common\Source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,10 +183,11 @@
     <ClCompile Include="Source\EC\GameObject.cpp" />
     <ClCompile Include="Source\Game\EnemyPool.cpp" />
     <ClCompile Include="Source\Game\GameManager.cpp" />
+    <ClCompile Include="Source\Game\MenuLayer.cpp" />
     <ClCompile Include="Source\Game\OrthographicCameraController.cpp" />
     <ClCompile Include="Source\Game\SceneLayer.cpp" />
+    <ClCompile Include="Source\Game\Scenes\PlayScene.cpp" />
     <ClCompile Include="Source\Game\StateMachine.cpp" />
-    <ClCompile Include="Source\Game\Tilemap.cpp" />
     <ClCompile Include="Source\glad.c" />
     <ClCompile Include="Source\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="Source\main.cpp" />
@@ -248,9 +250,11 @@
     <ClInclude Include="Source\Game\EightWayDirectionFlags.h" />
     <ClInclude Include="Source\Game\EnemyPool.h" />
     <ClInclude Include="Source\Game\GameManager.h" />
+    <ClInclude Include="Source\Game\MenuLayer.h" />
     <ClInclude Include="Source\Game\MessageMethod.h" />
     <ClInclude Include="Source\Game\OrthographicCameraController.h" />
     <ClInclude Include="Source\Game\SceneLayer.h" />
+    <ClInclude Include="Source\Game\Scenes\PlayScene.h" />
     <ClInclude Include="Source\Game\State.h" />
     <ClInclude Include="Source\Game\StateMachine.h" />
     <ClInclude Include="Source\Game\Tilemap.h" />

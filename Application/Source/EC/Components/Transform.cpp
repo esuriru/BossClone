@@ -71,6 +71,12 @@ void Transform::Translate(const glm::vec3 & trans)
     isDirty = true;
 }
 
+void Transform::Scale(float scalar)
+{
+    scale_ *= scalar;
+    isDirty = true;
+}
+
 const glm::mat4 &Transform::GetWorldMatrix() 
 {
     InternalCheckDirty();

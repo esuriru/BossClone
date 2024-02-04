@@ -6,6 +6,7 @@ set(PROJECT_NAME Application)
 set(Header_Files
     "Source/EC/GameObject.h"
     "Source/EC/Component.h"
+
     "Source/EC/Components/Transform.h"
     "Source/EC/Components/Renderer.h"
     "Source/EC/Components/SpriteRenderer.h"
@@ -16,6 +17,9 @@ set(Header_Files
     "Source/EC/Components/Rigidbody2D.h"
     "Source/EC/Components/Pathfinder.h"
 
+    "Source/EC/Components/TilemapEntity.h"
+    "Source/EC/Components/MazeController.h"
+    "Source/EC/Components/PlayerController.h"
     "Source/EC/Components/MineController.h"
     "Source/EC/Components/MinerController.h"
     "Source/EC/Components/WitchController.h"
@@ -113,6 +117,9 @@ set(Source_Files
     "Source/EC/Components/Rigidbody2D.cpp"
     "Source/EC/Components/Pathfinder.cpp"
 
+    "Source/EC/Components/TilemapEntity.cpp"
+    "Source/EC/Components/MazeController.cpp"
+    "Source/EC/Components/PlayerController.cpp"
     "Source/EC/Components/MineController.cpp"
     "Source/EC/Components/MinerController.cpp"
     "Source/EC/Components/EnemyController.cpp"
@@ -374,22 +381,26 @@ endif()
 
 get_target_property(output_dir ${PROJECT_NAME} OUTPUT_DIRECTORY_DEBUG)
 
-# Symlinks
-set (ASSET_SOURCE "${CMAKE_CURRENT_LIST_DIR}/Assets")
-set (ASSET_DEST "${output_dir}/Assets")
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${ASSET_SOURCE} ${ASSET_DEST} 
-    DEPENDS ${ASSET_DEST}
-    COMMENT "symbolic link assets folder from ${ASSET_SOURCE} => ${ASSET_DEST}"
-)
+set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY
+    "${CMAKE_CURRENT_SOURCE_DIR}")
+# message ("${CMAKE_CURRENT_SOURCE_DIR}")
 
-set (SHADER_SOURCE "${CMAKE_CURRENT_LIST_DIR}/Shader")
-set (SHADER_DEST "${output_dir}/Shader")
-# execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST})
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST} 
-    DEPENDS ${SHADER_DEST}
-    COMMENT "symbolic link shader folder from ${SHADER_SOURCE} => ${SHADER_DEST}"
-)
+# # Symlinks
+# set (ASSET_SOURCE "${CMAKE_CURRENT_LIST_DIR}/Assets")
+# set (ASSET_DEST "${output_dir}/Assets")
+# add_custom_command(
+#     TARGET ${PROJECT_NAME} POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E create_symlink ${ASSET_SOURCE} ${ASSET_DEST} 
+#     DEPENDS ${ASSET_DEST}
+#     COMMENT "symbolic link assets folder from ${ASSET_SOURCE} => ${ASSET_DEST}"
+# )
+
+# set (SHADER_SOURCE "${CMAKE_CURRENT_LIST_DIR}/Shader")
+# set (SHADER_DEST "${output_dir}/Shader")
+# # execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST})
+# add_custom_command(
+#     TARGET ${PROJECT_NAME} POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E create_symlink ${SHADER_SOURCE} ${SHADER_DEST} 
+#     DEPENDS ${SHADER_DEST}
+#     COMMENT "symbolic link shader folder from ${SHADER_SOURCE} => ${SHADER_DEST}"
+# )

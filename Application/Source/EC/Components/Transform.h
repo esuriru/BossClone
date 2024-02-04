@@ -26,6 +26,7 @@ public:
     void SetScale(const glm::vec3& scl);
 
     void Translate(const glm::vec3& trans);
+    void Scale(float scalar);
 
     const glm::mat4& GetWorldMatrix();
 

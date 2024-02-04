@@ -1,5 +1,6 @@
 #include "PlayScene.h"
 
+#include "EC/Components/MazeController.h"
 #include "EC/Components/SpriteRenderer.h"
 #include "EC/Components/TriggerCallback.h"
 #include "EC/Components/Tilemap.h"
@@ -24,6 +25,7 @@
 
 #include <array>
 #include "Scene/Scene.h"
+#include "EC/Components/PlayerController.h"
 
 PlayScene::PlayScene()
     : Scene("PlayScene")
@@ -32,14 +34,91 @@ PlayScene::PlayScene()
     , arrowSprite_(CreateRef<Texture2D>("Assets/Images/60934.png"))
     , witchSprite_(CreateRef<Texture2D>("Assets/Spritesheets/Blue_witch/B_witch_idle.png"))
     , banditSprite_(CreateRef<Texture2D>("Assets/Spritesheets/Idle.png"))
+    , playerSprite_(CreateRef<Texture2D>("Assets/Images/rockett-young-pixel-lulu.png"))
+    , enemySprite_(CreateRef<Texture2D>("Assets/Images/RemovedBGandShadows.png"))
 {
     SetupTilemap();
-    SetupDisplay();
-    CreateMines();
-    SetupMiners();
-    SetupWitches();
-    SetupKnights();
-    SetupBandits();
+    SetupVisiblityTilemap();
+    SetupPlayer();
+    SetupEnemies();
+
+    GenerateMaze();
+    // SetupDisplay();
+    // CreateMines();
+    // SetupMiners();
+    // SetupWitches();
+    // SetupKnights();
+    // SetupBandits();
+}
+
+void PlayScene::GenerateMaze()
+{
+    tilemapGameObject_->GetComponent<MazeController>()
+        ->Generate(tilemap_->WorldToLocal(
+            playerGameObject_->GetTransform().GetPosition()));
+}
+
+void PlayScene::SetupPlayer()
+{
+    const float multiplier = 6.0f / playerSprite_->GetWidth();
+
+    playerGameObject_ = CreateGameObject();
+
+    auto playerSpriteRenderer = 
+        playerGameObject_->AddComponent<SpriteRenderer>();
+    playerSpriteRenderer->SetTexture(playerSprite_);
+    playerSpriteRenderer->SetNativeSize();
+
+    playerGameObject_->GetTransform().Scale(multiplier);
+
+    auto playerController = 
+        playerGameObject_->AddComponent<PlayerController>();
+    playerController->SetTilemap(tilemap_);
+    playerController->SetVisibilityTilemap(visibilityTilemap_);
+    playerController->SetVisibilityRange(2); 
+}
+
+void PlayScene::SetupEnemies()
+{
+    const float multiplier = 8.0f / enemySprite_->GetWidth();
+
+    auto enemyGameObject = CreateGameObject();
+
+    auto enemySpriteRenderer = 
+        enemyGameObject->AddComponent<SpriteRenderer>();
+    enemySpriteRenderer->SetTexture(enemySprite_);
+    enemySpriteRenderer->SetNativeSize();
+    enemySpriteRenderer->SetSortingOrder(3);
+
+    enemyGameObject->GetTransform().Scale(multiplier);
+
+    enemyGameObject->GetTransform().SetPosition(
+        tilemap_->LocalToWorld(glm::ivec2(1, 1)));
+
+    // auto enemyController =
+    //     enemyGameObject->AddComponent<>();
+}
+
+void PlayScene::SetupVisiblityTilemap()
+{
+    // TODO - Change tilemapGameObject_ to visiblityTilemapObject_
+    auto blackTile = CreateRef<Texture2D>("Assets/Images/Untitled.png");
+    constexpr glm::vec2 tilemapTileSize = glm::vec2(32, 32);
+
+    visibilityTilemapGameObject_ = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f));
+    visibilityTilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/VisibilityMap.csv", 
+        "Assets/Maps/FillerMap.csv")
+        ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
+            glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
+        ->GetGameObject().GetComponent<TilemapRenderer>()
+        ->SetSortingOrder(1);
+
+    visibilityTilemap_ = visibilityTilemapGameObject_->GetComponent<Tilemap>();
+    visibilityTilemap_->tileSize = glm::vec2(8, 8);
+    auto bounds = visibilityTilemap_->GetBounds();
+    visibilityTilemapGameObject_->GetTransform().SetPosition(
+        glm::vec3(bounds.x * -0.5f, bounds.y * -0.5f, 0));
+    visibilityTilemap_->ResetAllTiles(1);
 }
 
 void PlayScene::SetupTilemap()
@@ -60,12 +139,17 @@ void PlayScene::SetupTilemap()
         ->PushTexture(flowerTileTopLeft)
         ->PushTexture(fullStoneGrassTile)
         ->GetGameObject().GetComponent<TilemapRenderer>()
-        ->SetSortingOrder(-1);
+        ->SetSortingOrder(-2);
 
-    tilemapGameObject_->GetComponent<Tilemap>()->tileSize = glm::vec2(8, 8);
+    tilemap_ = tilemapGameObject_->GetComponent<Tilemap>();
+    tilemap_->tileSize = glm::vec2(8, 8);
     // tilemapGameObject_->GetComponent<Tilemap>()->SetDataBounds({0, 0}, {25, 25});
-    auto bounds = tilemapGameObject_->GetComponent<Tilemap>()->GetBounds();
+    auto bounds = tilemap_->GetBounds();
     tilemapGameObject_->GetTransform().SetPosition(glm::vec3(bounds.x * -0.5f, bounds.y * -0.5f, 0));
+    tilemapGameObject_->AddComponent<MazeController>()
+        ->SetTilemap(tilemap_)
+        ->SetWallTextureIndex(4)
+        ->SetEmptyTextureIndex(2);
     // tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->SetTag("Pathfinder");
 }

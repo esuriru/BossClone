@@ -11,21 +11,15 @@
 
 struct Tile
 {
-    enum 
-    {
-        Empty = 0,
-        OneWay, 
-        Solid
-    } tileType = Empty;
-
-    Tile() : tileType(Empty), position({0, 0}), parent({-1, -1}), F(0), G(0), H(0) {}
+    Tile() : weight(0), position({0, 0}), parent({-1, -1}), F(0), G(0), H(0) {}
     Tile(const glm::vec2& pos, unsigned int f) : 
-        tileType(Empty), position(pos), parent(-1, 1), F(f) , G(0), H(0) {}
+        weight(0), position(pos), parent(-1, 1), F(f) , G(0), H(0) {}
     Tile(glm::vec2& pos, const glm::vec2& parent, 
         unsigned int f, unsigned int g, unsigned int h) 
-        : tileType(Empty), position(pos), parent(parent), F(f), G(g), H(h) {}
+        : weight(0), position(pos), parent(parent), F(f), G(g), H(h) {}
 
     uint8_t textureIndex = 0;
+    uint8_t weight = 0;
 
     glm::vec2 position;
     glm::vec2 parent;
@@ -58,9 +52,12 @@ public:
     glm::vec4 colour;
     glm::vec2 tileSize;
     float tilingFactor;
+
+    void ResetAllTiles(const int textureIndex = 0);
     void LoadCSV(const std::string& textureCsvFilePath, const std::string& typeCsvFilePath);
 
     Tile& GetTile(uint32_t x, uint32_t y); 
+    Tile& GetTile(glm::ivec2 vec); 
 
     Ref<SubTexture2D>& GetTexture(uint32_t index);
     Ref<Tilemap> SetTexture(uint32_t index, Ref<SubTexture2D> subtexture);

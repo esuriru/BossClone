@@ -27,12 +27,24 @@ private:
     Ref<Texture2D> knightSprite_;
     Ref<Texture2D> witchSprite_;
     Ref<Texture2D> banditSprite_;
+    Ref<Texture2D> playerSprite_;
+    Ref<Texture2D> enemySprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
+    Ref<GameObject> visibilityTilemapGameObject_;
     Ref<EnemyDisplay> enemyDisplay_;
     Ref<MineController> mineController_;
+    Ref<Tilemap> tilemap_;
+    Ref<Tilemap> visibilityTilemap_;
 
+    Ref<GameObject> playerGameObject_;
+
+    void GenerateMaze();
+
+    void SetupPlayer();
+    void SetupEnemies();
+    void SetupVisiblityTilemap();
     void SetupTilemap();
     void SetupMiners();
     void SetupWitches();

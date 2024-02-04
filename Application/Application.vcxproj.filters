@@ -18,7 +18,6 @@
     <ClCompile Include="Source\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="Source\Game\GameManager.cpp" />
     <ClCompile Include="Source\Game\OrthographicCameraController.cpp" />
-    <ClCompile Include="Source\Game\Tilemap.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Core\Layer.cpp" />
     <ClCompile Include="Source\Core\LayerStack.cpp" />
@@ -67,6 +66,8 @@
     <ClCompile Include="Source\Physics\Bounds.cpp" />
     <ClCompile Include="Source\Physics\PhysicsWorld.cpp" />
     <ClCompile Include="Source\Utils\Util.cpp" />
+    <ClCompile Include="Source\Game\Scenes\PlayScene.cpp" />
+    <ClCompile Include="Source\Game\MenuLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Scene\SceneManager.h" />
@@ -159,5 +160,7 @@
     <ClInclude Include="Source\Physics\PhysicsWorld.h" />
     <ClInclude Include="Source\Utils\Heuristic.h" />
     <ClInclude Include="Source\Utils\Random.h" />
+    <ClInclude Include="Source\Game\Scenes\PlayScene.h" />
+    <ClInclude Include="Source\Game\MenuLayer.h" />
   </ItemGroup>
 </Project>

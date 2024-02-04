@@ -66,7 +66,7 @@ bool Pathfinder::IsValid(const glm::vec2 &pos) const
 
 bool Pathfinder::IsBlocked(const unsigned int row, const unsigned int column) const
 {
-    return tilemap_->GetTile(row, column).tileType == Tile::Solid;
+    return tilemap_->GetTile(row, column).weight <= 0;
 }
 
 void Pathfinder::ResetData()

@@ -3,7 +3,7 @@
 #include <limits>
 
 GameManager::GameManager()
-    : state_(GameState::MenuLevel)
+    : state_(GameState::PlayerTurn)
     , bestTime_(std::numeric_limits<float>::max())
 {
 
@@ -91,6 +91,11 @@ void GameManager::PollPurchases()
             ttK_++;
         }
     }
+}
+
+void GameManager::OnPlayerTurnFinish()
+{
+    ChangeState(GameState::EnemyTurn);
 }
 
 void GameManager::SetTeamOneMiners(int miners)

@@ -5,6 +5,8 @@
 
 enum GameState
 {
+    PlayerTurn,
+    EnemyTurn,
     PlayingLevel,
     MenuLevel,
 };
@@ -15,6 +17,7 @@ public:
     GameManager();
 
     void PollPurchases();
+    void OnPlayerTurnFinish();
 
     inline void SetTeamOneMoney(float money)
     {

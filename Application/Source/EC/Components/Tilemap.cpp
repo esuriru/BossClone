@@ -107,18 +107,19 @@ glm::ivec2 Tilemap::WorldToLocal(glm::vec3 worldPosition)
         tileSize.y * 0.5f) / tileSize.y));
 }
 
-auto CharToTileType(char csv_input) -> decltype(Tile::Empty) 
+void Tilemap::ResetAllTiles(const int textureIndex)
 {
-    switch (csv_input)
+    for (auto& x : tileData_)
     {
-        case 'S': return Tile::Solid;
-        case 'P': return Tile::OneWay;
-        default: break;
+        for (auto& y : x)
+        {
+            y.weight = 0;
+            y.textureIndex = textureIndex;
+        }
     }
-    return Tile::Empty;
 }
 
-void Tilemap::LoadCSV(const std::string& textureCsvFilePath, const std::string& typeCsvFilePath)
+void Tilemap::LoadCSV(const std::string &textureCsvFilePath, const std::string &typeCsvFilePath)
 {
     rapidcsv::Document tilemapDoc(textureCsvFilePath);
     rapidcsv::Document tilemapTypesDoc(typeCsvFilePath);
@@ -137,14 +138,14 @@ void Tilemap::LoadCSV(const std::string& textureCsvFilePath, const std::string& 
     for (int i = 0; i < MaxVerticalLength; ++i)
     {
         std::vector<int> mapRow = tilemapDoc.GetRow<int>(i);
-        std::vector<char> typeRow = tilemapTypesDoc.GetRow<char>(i);
+        std::vector<int> typeRow = tilemapTypesDoc.GetRow<int>(i);
 
         for (int j = 0; j < MaxHorizontalLength; ++j)
         {
             const size_t index_x = (MaxVerticalLength - 1) - i;
 
             tileData_[index_x][j].textureIndex = static_cast<uint8_t>(mapRow[j]);
-            tileData_[index_x][j].tileType = CharToTileType(typeRow[j]);
+            tileData_[index_x][j].weight = static_cast<uint8_t>(typeRow[j]);
         }
     }
     
@@ -155,6 +156,14 @@ void Tilemap::LoadCSV(const std::string& textureCsvFilePath, const std::string& 
 Tile &Tilemap::GetTile(uint32_t x, uint32_t y)
 {
     return tileData_[x][y];
+}
+
+Tile &Tilemap::GetTile(glm::ivec2 vec)
+{
+    CC_ASSERT(glm::all(glm::greaterThanEqual(vec, glm::ivec2())), 
+        "Vector had negative components");
+    return GetTile(static_cast<uint32_t>(vec.y), 
+        static_cast<uint32_t>(vec.x));
 }
 
 Ref<SubTexture2D> &Tilemap::GetTexture(uint32_t index)
