@@ -112,8 +112,8 @@ void PlayScene::SetupVisiblityTilemap()
     visibilityTilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/VisibilityMap.csv", 
         "Assets/Maps/FillerMap.csv")
         // NOTE - Comment this PushTexture call to see visibility
-        ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
-            glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
+        // ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
+        //     glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(1);
 

@@ -49,6 +49,7 @@ void MazeController::Generate(const glm::ivec2& startPoint)
     stack.push(startPoint);
     SetTileEmpty(tilemap_->GetTile(startPoint));
 
+    std::vector<glm::ivec2> possibleExitLocations{};
     glm::ivec2 exitLocation{}; 
     bool exitFound = false;
 
@@ -67,9 +68,10 @@ void MazeController::Generate(const glm::ivec2& startPoint)
 
             SetTileEmpty(tilemap_->GetTile(chosenNeighbour));
 
-            if (!exitFound)
+            
+            if (TestForExit(chosenNeighbour, exitLocation))
             {
-                exitFound = TestForExit(chosenNeighbour, exitLocation);
+                possibleExitLocations.emplace_back(exitLocation);
             }
 
             glm::ivec2 middlePoint = glm::ivec2(
@@ -80,7 +82,8 @@ void MazeController::Generate(const glm::ivec2& startPoint)
             stack.push(chosenNeighbour);
         }
     }
-    
+
+    exitLocation = possibleExitLocations[rand() % possibleExitLocations.size()];
     // CC_ASSERT(exitLocation == glm::ivec2{}, "test");
     SetTileEmpty(tilemap_->GetTile(exitLocation));
     CC_TRACE(glm::to_string(exitLocation));
