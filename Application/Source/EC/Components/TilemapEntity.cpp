@@ -16,6 +16,7 @@ void TilemapEntity::Start()
 {
     FixTilemapPosition();
     UpdateNearbyTilesVisibility();
+    currentHealth_ = initialHealth_;
 }
 
 void TilemapEntity::Update(Timestep ts)
@@ -73,6 +74,11 @@ void TilemapEntity::UpdateNearbyTilesVisibility()
     SetNearbyTilesVisible(tilemapPosition_);
 }
 
+void TilemapEntity::TakeDamage(float amount)
+{
+    currentHealth_ -= amount;
+}
+
 void TilemapEntity::SetNearbyTilesVisible(
     const glm::ivec2 &location, bool visible)
 {
@@ -99,6 +105,28 @@ std::vector<std::reference_wrapper<Tile>> TilemapEntity::GetNearbyTiles(
             {
                 tiles.emplace_back(
                     visibilityTilemap_->GetTile(newPosition));
+            }
+        }
+    }
+
+    return tiles;
+}
+
+std::vector<glm::ivec2> TilemapEntity::GetNearbyTileLocations(
+    const glm::ivec2 &location, uint8_t range)
+{
+    std::vector<glm::ivec2> tiles;
+
+    for (int i = -range; i <= range; ++i)
+    {
+        for (int j = -range + glm::abs(i); 
+            j <= range - glm::abs(i); ++j)
+        {
+            auto newPosition = location + glm::ivec2(i, j);
+
+            if (visibilityTilemap_->InBounds(newPosition))
+            {
+                tiles.emplace_back(newPosition);
             }
         }
     }

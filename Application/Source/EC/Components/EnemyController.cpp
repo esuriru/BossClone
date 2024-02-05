@@ -52,16 +52,90 @@ EnemyController::EnemyController(GameObject &gameObject)
         ActionEntry("Enter",
         [&]()
         {
-
         }),
         ActionEntry("Update",
         [&]()
         {
             if (isCurrentTurn_ && !isMoving_)
             {
-                MoveInRandomAvailableDirection();
+                CC_TRACE("Move");
+                auto path = pathfinder_->Pathfind(tilemapPosition_, 
+                    entityChasing_->GetTilemapPosition());
+
+                if (!path.empty())
+                {
+                    if (path.size() == 1)
+                    {
+                        // Attack
+
+                    }
+                    else
+                    {
+                        // Keep chasing
+                        QueueMove(tilemap_->LocalToWorld(path.front()),
+                            movementTime_,
+                            [=]()
+                            {
+                                SetNearbyTilesVisible(tilemapPosition_, false);
+                                tilemapPosition_ = path.front(); 
+
+                                isCurrentTurn_ = false;
+                                GameManager::Instance()->OnTurnFinish();
+                            });
+                    }
+                }
             }
         })
+    ));
+
+    stateMachine_->AddTransition(CreateScope<Transition<>>(
+        std::string("Patrol"),
+        std::string("Chase"),
+        [&]()
+        {
+            if (!isCurrentTurn_)
+            {
+                return false;
+            }
+
+            auto surroundingEntities = 
+                GameManager::Instance()->QueryTiles(
+                    GetNearbyTileLocations(tilemapPosition_, visibilityRange_));
+
+            for (auto& entity : surroundingEntities)
+            {
+                if (entity->GetGameObject().CompareTag("Player"))
+                {
+                    entityChasing_ = entity;
+                    return true;
+                }
+            }    
+
+            return false;
+        }
+    ));
+
+    stateMachine_->AddTransition(CreateScope<Transition<>>(
+        std::string("Chase"),
+        std::string("Patrol"),
+        [&]()
+        {
+            if (!isCurrentTurn_)
+            {
+                return false;
+            }
+
+            auto surroundingEntities = 
+                GameManager::Instance()->QueryTiles(
+                    GetNearbyTileLocations(tilemapPosition_, visibilityRange_));
+
+            if (!Utility::Contains(surroundingEntities, entityChasing_))
+            {
+                entityChasing_ = nullptr;
+                return true;
+            }
+            return false;
+        }
     ));
 
     stateMachine_->InitiateStartState("Patrol");
@@ -70,6 +144,7 @@ EnemyController::EnemyController(GameObject &gameObject)
 void EnemyController::Start()
 {
     TilemapEntity::Start();
+    pathfinder_ = tilemap_->GetGameObject().GetComponent<Pathfinder>();
 }
 
 void EnemyController::Update(Timestep ts)

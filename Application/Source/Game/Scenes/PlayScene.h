@@ -5,6 +5,8 @@
 
 #include "EC/Components/MineController.h"
 #include "EC/Components/EnemyDisplay.h"
+#include "EC/Components/TilemapEntity.h"
+#include "EC/Components/TilemapEntityColor.h"
 
 #include <vector>
 
@@ -42,6 +44,7 @@ private:
 
     void GenerateMaze();
 
+    void InjectTilemapEntityColor(Ref<TilemapEntity> tilemapEntity);
     void SetupPlayer();
     void SetupEnemies();
     void SetupVisiblityTilemap();

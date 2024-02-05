@@ -29,6 +29,13 @@ public:
     void OnTurnFinish();
     void StartGame();
 
+    std::vector<Ref<TilemapEntity>> QueryTiles(
+        const std::vector<glm::ivec2>& tilemapLocations);
+    inline const std::deque<Ref<TilemapEntity>>& GetAllEntities()
+    {
+        return entityQueue_ ;
+    }
+
 private:
     GameState state_;
     EventCallback eventCallback_;

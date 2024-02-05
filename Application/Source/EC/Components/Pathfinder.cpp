@@ -4,6 +4,7 @@
 
 Pathfinder::Pathfinder(GameObject &gameObject)
     : Component(gameObject)
+    , directionsCount_(4)
 {
     cameFrom_.resize(Tilemap::MaxSize);
     closed_.resize(Tilemap::MaxSize, false);
@@ -14,9 +15,9 @@ void Pathfinder::Start()
     tilemap_ = gameObject_.GetComponent<Tilemap>();
 }
 
-std::vector<glm::vec2> Pathfinder::BuildPath() const
+std::vector<glm::ivec2> Pathfinder::BuildPath() const
 {
-    std::vector<glm::vec2> path;
+    std::vector<glm::ivec2> path;
     auto currentPosition = target_;
     auto index = ConvertTo1D(currentPosition);
 
@@ -56,12 +57,9 @@ std::vector<glm::vec2> Pathfinder::BuildPath() const
     return path;
 }
 
-bool Pathfinder::IsValid(const glm::vec2 &pos) const
+bool Pathfinder::IsValid(const glm::ivec2 &pos) const
 {
-    return pos.x >= 0 && 
-        pos.x < static_cast<float>(Tilemap::MaxHorizontalLength) &&
-        pos.y >= 0 && 
-        pos.y < static_cast<float>(Tilemap::MaxVerticalLength);
+    return tilemap_->InBounds(pos);
 }
 
 bool Pathfinder::IsBlocked(const unsigned int row, const unsigned int column) const
@@ -78,8 +76,8 @@ void Pathfinder::ResetData()
 
     for (uint32_t i = 0; i < cameFrom_.size(); ++i)
     {
-        cameFrom_[i].position = glm::vec2(0.0f);
-        cameFrom_[i].parent = glm::vec2(0.0f);
+        cameFrom_[i].position = glm::ivec2();
+        cameFrom_[i].parent = glm::ivec2();
         cameFrom_[i].F = 0; 
         cameFrom_[i].G = 0; 
         cameFrom_[i].H = 0; 
@@ -91,18 +89,19 @@ void Pathfinder::ResetData()
     }
 }
 
-int Pathfinder::ConvertTo1D(const glm::vec2 &pos) const
+int Pathfinder::ConvertTo1D(const glm::ivec2 &pos) const
 {
     return static_cast<int>(pos.y * Tilemap::MaxHorizontalLength + pos.x);
 }
 
-std::vector<glm::vec2> Pathfinder::Pathfind(const glm::vec2 &start, const glm::vec2 &target, HeuristicFunction func, const int weight)
+std::vector<glm::ivec2> Pathfinder::Pathfind(const glm::ivec2 &start, 
+    const glm::ivec2 &target, HeuristicFunction func, const int weight)
 {
-    if (IsBlocked(static_cast<uint32_t>(start.y), static_cast<uint32_t>(start.x)) || 
-        IsBlocked(static_cast<uint32_t>(target.y), static_cast<uint32_t>(target.x)))
+    if (IsBlocked(start.y, start.x) || 
+        IsBlocked(target.y, target.x))
     {
         CC_ERROR("Invalid start or target");
-        return std::vector<glm::vec2>();
+        return std::vector<glm::ivec2>();
     }
 
     start_ = start;
@@ -117,7 +116,7 @@ std::vector<glm::vec2> Pathfinder::Pathfind(const glm::vec2 &start, const glm::v
     open_.push(Tile(start_, 0));
 
     uint32_t newF, newG, newH;
-    glm::vec2 currentPosition;
+    glm::ivec2 currentPosition;
 
     while (!open_.empty())
     {
@@ -131,32 +130,41 @@ std::vector<glm::vec2> Pathfinder::Pathfind(const glm::vec2 &start, const glm::v
             }
             break;
         }
-    }
 
-    open_.pop();
-    closed_[ConvertTo1D(currentPosition)] = true;
+        open_.pop();
+        closed_[ConvertTo1D(currentPosition)] = true;
 
-    for (uint32_t i = 0; i < directionsCount_; ++i)
-    {
-        glm::vec2 newPosition = currentPosition + Tilemap::Directions[i];
-        const uint32_t newIndex = ConvertTo1D(newPosition);
-
-        if (!IsValid(newPosition) || IsBlocked(static_cast<uint32_t>(newPosition.y), 
-            static_cast<uint32_t>(newPosition.x))
-            || closed_[newIndex])
+        for (uint32_t i = 0; i < directionsCount_; ++i)
         {
-            continue;
-        }
+            constexpr std::array<glm::ivec2, 4> Directions
+            {
+                {
+                    { 0, 1 },
+                    { 1, 0 },
+                    { 0,-1 },
+                    { -1,0 },
+                }
+            };
 
-        newG = cameFrom_[ConvertTo1D(currentPosition)].G + 1;
-        newH = heuristic_(newPosition, target_, weight_);
-        newF = newG + newH;
+            glm::ivec2 newPosition = currentPosition + Directions[i];
+            const uint32_t newIndex = ConvertTo1D(newPosition);
 
-        if (cameFrom_[newIndex].F == 0 || newF < cameFrom_[newIndex].F)
-        {
-            open_.push(Tile(newPosition, newF));
-            cameFrom_[newIndex] = Tile(newPosition, 
-                currentPosition, newF, newG, newH);
+            if (!IsValid(newPosition) || IsBlocked(newPosition.y, 
+                newPosition.x) || closed_[newIndex])
+            {
+                continue;
+            }
+
+            newG = cameFrom_[ConvertTo1D(currentPosition)].G + 1;
+            newH = heuristic_(newPosition, target_, weight_);
+            newF = newG + newH;
+
+            if (cameFrom_[newIndex].F == 0 || newF < cameFrom_[newIndex].F)
+            {
+                open_.push(Tile(newPosition, newF));
+                cameFrom_[newIndex] = Tile(newPosition, 
+                    currentPosition, newF, newG, newH);
+            }
         }
     }
     return BuildPath();

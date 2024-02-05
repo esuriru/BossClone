@@ -9,11 +9,13 @@
 #include "EC/Components/Tilemap.h"
 #include "EC/Components/MineController.h"
 #include "EC/Components/Pathfinder.h"
+#include "EC/Components/TilemapEntity.h"
+#include "EC/Components/Pathfinder.h"
 
 #include "Game/EightWayDirectionFlags.h"
 
 #include <glm/glm.hpp>
-#include "TilemapEntity.h"
+
 
 class BoxCollider2D;
 class EnemyPool;
@@ -48,9 +50,10 @@ public:
     }
 private:
     void MoveInRandomAvailableDirection();
-protected:
-    Scope<StateMachine<>> stateMachine_;
 
-    float initialHealth_;
-    float currentHealth_ = 100.0f;
+    Ref<Pathfinder> pathfinder_ = nullptr;
+
+protected:
+    Ref<TilemapEntity> entityChasing_ = nullptr;
+    Scope<StateMachine<>> stateMachine_;
 };

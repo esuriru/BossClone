@@ -48,7 +48,33 @@ void GameManager::StartGame()
     entityQueue_.front()->StartTurn();
 }
 
+std::vector<Ref<TilemapEntity>> GameManager::QueryTiles(
+    const std::vector<glm::ivec2>& tilemapLocations)
+{
+    std::vector<Ref<TilemapEntity>> entities;
+    for (auto& location : tilemapLocations)
+    {
+        for (auto& entity : entityQueue_)
+        {
+            if (entity->GetTilemapPosition() == location)
+            {
+                entities.push_back(entity);
+            }
+        }
+    }
+
+    return entities;
+}
+
 void GameManager::AddTilemapEntity(Ref<TilemapEntity> tilemapEntity)
 {
+    glm::vec4 randomColor{};
+    for (int i = 0; i < 3; ++i)
+    {
+        randomColor[i] = (rand() % 256) / 255.0f;
+    }
+    randomColor.a = 1.0f;
+
+    tilemapEntity->SetColorRepresentation(randomColor);
     entityQueue_.push_back(tilemapEntity);
 }

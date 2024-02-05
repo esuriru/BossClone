@@ -7,6 +7,7 @@
 
 #include <functional>
 #include <vector>
+#include "TilemapEntityColor.h"
 
 class TilemapEntity : public Component
 {
@@ -38,16 +39,52 @@ public:
         visibilityRange_ = range;
         return this;
     }
+
+    inline virtual TilemapEntity* SetStartHealth(float health)
+    {
+        initialHealth_ = currentHealth_ = health;
+        return this;
+    }
+
+    inline virtual TilemapEntity* SetColorRepresentation(const glm::vec4& color)
+    {
+        colorRepresentation_ = color;
+        colorObject_->SetColor(color);
+        return this;
+    }
+
+    inline virtual TilemapEntity* SetColorObject(Ref<TilemapEntityColor> color)
+    {
+        colorObject_ = color;
+        return this;
+    }
+
+    inline virtual const glm::ivec2& GetTilemapPosition() const
+    {
+        return tilemapPosition_;
+    }
+
+    inline float GetHealth() const
+    {
+        return currentHealth_;
+    }
+
+    inline const glm::vec4& GetColourRepresentation() const
+    {
+        return colorRepresentation_;
+    }
+
     void UpdateNearbyTilesVisibility();
+    void TakeDamage(float amount);
 
 private:
     glm::vec3 targetPosition_;
     glm::vec3 originalPosition_;
+    glm::vec4 colorRepresentation_;
 
 protected:
-    void SetNearbyTilesVisible(const glm::ivec2& location, bool visible = true);
-    std::vector<std::reference_wrapper<Tile>> GetNearbyTiles(
-        const glm::ivec2& location, uint8_t range);
+    float initialHealth_ = 100.0f;
+    float currentHealth_ = 100.0f;
 
     glm::ivec2 tilemapPosition_;
     uint8_t visibilityRange_ = 3;
@@ -60,8 +97,15 @@ protected:
     bool isCurrentTurn_;
 
     Ref<Tilemap> tilemap_ = nullptr;
+    Ref<TilemapEntityColor> colorObject_ = nullptr;
     float timer_;
     float moveTime_;
     float inverseMoveTime_;
 
+    void SetNearbyTilesVisible(const glm::ivec2& location, bool visible = true);
+
+    std::vector<std::reference_wrapper<Tile>> GetNearbyTiles(
+        const glm::ivec2& location, uint8_t range);
+    std::vector<glm::ivec2> GetNearbyTileLocations(
+        const glm::ivec2& location, uint8_t range);
 };

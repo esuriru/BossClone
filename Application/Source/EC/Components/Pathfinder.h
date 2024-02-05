@@ -8,15 +8,31 @@
 #include "EC/Component.h"
 #include "EC/Components/Tilemap.h"
 
-using HeuristicFunction = std::function<unsigned int(const glm::vec2&,
-    const glm::vec2&, int)>;
+#include "Utils/Heuristic.h"
+
+using HeuristicFunction = std::function<unsigned int(const glm::ivec2&,
+    const glm::ivec2&, int)>;
 
 class Pathfinder : public Component
 {
+public:
+    Pathfinder(GameObject& gameObject);
+
+    std::vector<glm::ivec2> Pathfind(const glm::ivec2& start,
+        const glm::ivec2& target, HeuristicFunction func = Heuristic::Euclidean,
+        const int weight = 10);
+    
+    inline Ref<Tilemap> GetReferenceTilemap() const
+    {
+        return tilemap_;
+    }
+
+    void Start() override;
+
 private:
     Ref<Tilemap> tilemap_;
 
-    glm::vec2 start_, target_;
+    glm::ivec2 start_, target_;
     HeuristicFunction heuristic_;
     int weight_;
 
@@ -25,25 +41,11 @@ private:
     std::vector<Tile> cameFrom_;
     uint32_t directionsCount_;
 
-    std::vector<glm::vec2> BuildPath() const;
-    bool IsValid(const glm::vec2& pos) const;
+    std::vector<glm::ivec2> BuildPath() const;
+    bool IsValid(const glm::ivec2& pos) const;
     bool IsBlocked(const unsigned int row,
         const unsigned int column) const;
     
     void ResetData();
-    int ConvertTo1D(const glm::vec2& pos) const;
-
-public:
-    Pathfinder(GameObject& gameObject);
-
-    std::vector<glm::vec2> Pathfind(const glm::vec2& start,
-        const glm::vec2& target, HeuristicFunction func,
-        const int weight);
-    
-    inline Ref<Tilemap> GetReferenceTilemap() const
-    {
-        return tilemap_;
-    }
-
-    void Start() override;
+    int ConvertTo1D(const glm::ivec2& pos) const;
 };

@@ -10,7 +10,6 @@
 MazeController::MazeController(GameObject &gameObject)
     : Component(gameObject)
 {
-    srand(static_cast<unsigned>(time(nullptr)));
 }
 
 std::vector<glm::ivec2> MazeController::GetUnvisitedNeighbours(

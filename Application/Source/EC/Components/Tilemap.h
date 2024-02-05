@@ -12,17 +12,17 @@
 struct Tile
 {
     Tile() : weight(0), position({0, 0}), parent({-1, -1}), F(0), G(0), H(0) {}
-    Tile(const glm::vec2& pos, unsigned int f) : 
+    Tile(const glm::ivec2& pos, unsigned int f) : 
         weight(0), position(pos), parent(-1, 1), F(f) , G(0), H(0) {}
-    Tile(glm::vec2& pos, const glm::vec2& parent, 
+    Tile(glm::ivec2& pos, const glm::ivec2& parent, 
         unsigned int f, unsigned int g, unsigned int h) 
         : weight(0), position(pos), parent(parent), F(f), G(g), H(h) {}
 
     uint8_t textureIndex = 0;
     uint8_t weight = 0;
 
-    glm::vec2 position;
-    glm::vec2 parent;
+    glm::ivec2 position;
+    glm::ivec2 parent;
     unsigned int F = 0, G = 0, H = 0;
 };
 

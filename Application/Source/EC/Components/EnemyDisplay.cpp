@@ -131,28 +131,52 @@ void EnemyDisplay::OnImGuiRender()
     ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x - 300, io.DisplaySize.y * 0.5f - 150));
     ImGui::SetNextWindowBgAlpha(0.2f);
 
+
     ImGui::Begin("Display", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoSavedSettings);
-    TextCentred("Name: " + enemyName_);
-    TextCentred("Team: " + enemyTeam_);
-    TextCentred("Current Health: " + enemyCurrentHealth_);
-    TextCentred("Current State: " + enemyCurrentState_);
-    ImGui::Spacing();
-
-    if (ImGui::Button(currentSelectedTeam_ == 1 ? "Team 1" : "Team 2")) 
+    ImDrawList* drawList = ImGui::GetWindowDrawList();
+    static GameManager* gameManager = GameManager::Instance();
+    auto& entities = gameManager->GetAllEntities();
+    const ImVec2 p = ImGui::GetCursorScreenPos(); 
+    static float sz = 36.0f; 
+    static float thickness = 4.0f; 
+    float x = p.x + 4.0f, 
+        y = p.y + 4.0f, 
+        spacing = 8.0f; 
+        
+    for (int i = 0; i < entities.size(); ++i)
     {
-        currentSelectedTeam_ = currentSelectedTeam_ == 1 ? 2 : 1;
-    }
+        auto entityColor = entities[i]->GetColourRepresentation();
 
-    ImGui::Spacing();
-    TextCentred("1 - Miner");
-    TextCentred("2 - Knight");
-    TextCentred("3 - Witch");
-    TextCentred("4 - Bandit");
-    ImGui::Spacing();
-    ImGui::Spacing();
-    ImGui::Spacing();
+        drawList->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), 
+            ImColor(entityColor.r, entityColor.g, entityColor.b, entityColor.a), 
+            10.0f, 
+            ImDrawCornerFlags_TopLeft | ImDrawCornerFlags_BotRight, 
+            4.0f); 
+        // x += sz+spacing;
+        x = p.x + 4; 
+        y += sz+spacing; 
+    }
+    // TextCentred("Name: " + enemyName_);
+    // TextCentred("Team: " + enemyTeam_);
+    // TextCentred("Current Health: " + enemyCurrentHealth_);
+    // TextCentred("Current State: " + enemyCurrentState_);
+    // ImGui::Spacing();
+
+    // if (ImGui::Button(currentSelectedTeam_ == 1 ? "Team 1" : "Team 2")) 
+    // {
+    //     currentSelectedTeam_ = currentSelectedTeam_ == 1 ? 2 : 1;
+    // }
+
+    // ImGui::Spacing();
+    // TextCentred("1 - Miner");
+    // TextCentred("2 - Knight");
+    // TextCentred("3 - Witch");
+    // TextCentred("4 - Bandit");
+    // ImGui::Spacing();
+    // ImGui::Spacing();
+    // ImGui::Spacing();
     // TextCentred("Team 1: $" + std::to_string(GameManager::Instance()->GetTeamOneMoney()));
     // TextCentred("Team 2: $" + std::to_string(GameManager::Instance()->GetTeamTwoMoney()));
     ImGui::End();

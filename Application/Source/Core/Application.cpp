@@ -207,6 +207,9 @@ Application::Application()
 	//Initialize GLFW
 	CC_ASSERT(glfwInit(), "GLFW could not be initialized.")
 
+    // Initiliaze random
+    srand(static_cast<unsigned>(time(nullptr)));
+
 	glfwWindowHint(GLFW_SAMPLES, 4); //Request 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); //Request a specific OpenGL version
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5); //Request a specific OpenGL version

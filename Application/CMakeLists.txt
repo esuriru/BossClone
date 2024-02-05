@@ -18,6 +18,7 @@ set(Header_Files
     "Source/EC/Components/Pathfinder.h"
 
     "Source/EC/Components/TilemapEntity.h"
+    "Source/EC/Components/TilemapEntityColor.h"
     "Source/EC/Components/MazeController.h"
     "Source/EC/Components/PlayerController.h"
     "Source/EC/Components/MineController.h"
@@ -114,6 +115,7 @@ set(Source_Files
     "Source/EC/Components/Pathfinder.cpp"
 
     "Source/EC/Components/TilemapEntity.cpp"
+    "Source/EC/Components/TilemapEntityColor.cpp"
     "Source/EC/Components/MazeController.cpp"
     "Source/EC/Components/PlayerController.cpp"
     "Source/EC/Components/MineController.cpp"

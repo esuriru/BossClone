@@ -36,12 +36,12 @@ PlayScene::PlayScene()
     SetupTilemap();
     SetupVisiblityTilemap();
     SetupPlayer();
+    SetupDisplay();
     SetupEnemies();
 
     GenerateMaze();
 
     GameManager::Instance()->StartGame();
-    // SetupDisplay();
     // CreateMines();
     // SetupMiners();
     // SetupWitches();
@@ -56,11 +56,22 @@ void PlayScene::GenerateMaze()
             playerGameObject_->GetTransform().GetPosition()));
 }
 
+void PlayScene::InjectTilemapEntityColor(Ref<TilemapEntity> tilemapEntity)
+{
+    auto gameObject = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(2.f));
+    gameObject->AddComponent<SpriteRenderer>();
+    auto tilemapEntityColor = gameObject->AddComponent<TilemapEntityColor>();
+    tilemapEntityColor->SetOffset({0, 6, 0});
+    tilemapEntity->SetColorObject(tilemapEntityColor);
+    tilemapEntityColor->SetTransformToFollow(&tilemapEntity->GetTransform());
+}
+
 void PlayScene::SetupPlayer()
 {
     const float multiplier = 6.0f / playerSprite_->GetWidth();
 
     playerGameObject_ = CreateGameObject();
+    playerGameObject_->SetTag("Player");
 
     auto playerSpriteRenderer = 
         playerGameObject_->AddComponent<SpriteRenderer>();
@@ -74,32 +85,46 @@ void PlayScene::SetupPlayer()
     playerController->SetTilemap(tilemap_);
     playerController->SetVisibilityTilemap(visibilityTilemap_);
     playerController->SetVisibilityRange(2); 
+    InjectTilemapEntityColor(playerController);
     GameManager::Instance()->AddTilemapEntity(playerController);
 }
 
 void PlayScene::SetupEnemies()
 {
-    const float multiplier = 8.0f / enemySprite_->GetWidth();
+    constexpr std::array<glm::ivec2, 2> enemySpawns
+    {
+        {
+            { 1, 1 },
+            { 23, 23 }
+        }
+    };
 
-    auto enemyGameObject = CreateGameObject();
+    for (int i = 0; i < 2; ++i)
+    {
+        const float multiplier = 8.0f / enemySprite_->GetWidth();
 
-    auto enemySpriteRenderer = 
-        enemyGameObject->AddComponent<SpriteRenderer>();
-    enemySpriteRenderer->SetTexture(enemySprite_);
-    enemySpriteRenderer->SetNativeSize();
-    enemySpriteRenderer->SetSortingOrder(3);
+        auto enemyGameObject = CreateGameObject();
 
-    enemyGameObject->GetTransform().Scale(multiplier);
+        auto enemySpriteRenderer = 
+            enemyGameObject->AddComponent<SpriteRenderer>();
+        enemySpriteRenderer->SetTexture(enemySprite_);
+        enemySpriteRenderer->SetNativeSize();
+        enemySpriteRenderer->SetSortingOrder(3);
 
-    enemyGameObject->GetTransform().SetPosition(
-        tilemap_->LocalToWorld(glm::ivec2(1, 1)));
+        enemyGameObject->GetTransform().Scale(multiplier);
 
-    auto enemyController =
-        enemyGameObject->AddComponent<EnemyController>();
-    enemyController->SetTilemap(tilemap_)
-        ->SetVisibilityTilemap(visibilityTilemap_)
-        ->SetVisibilityRange(3);
-    GameManager::Instance()->AddTilemapEntity(enemyController);
+        enemyGameObject->GetTransform().SetPosition(
+            tilemap_->LocalToWorld(enemySpawns[i]));
+
+        auto enemyController =
+            enemyGameObject->AddComponent<EnemyController>();
+        enemyController->SetTilemap(tilemap_)
+            ->SetVisibilityTilemap(visibilityTilemap_)
+            ->SetVisibilityRange(4)
+            ->SetStartHealth(50.0f);
+        InjectTilemapEntityColor(enemyController);
+        GameManager::Instance()->AddTilemapEntity(enemyController);
+    }
 }
 
 void PlayScene::SetupVisiblityTilemap()
@@ -154,6 +179,7 @@ void PlayScene::SetupTilemap()
         ->SetTilemap(tilemap_)
         ->SetWallTextureIndex(4)
         ->SetEmptyTextureIndex(2);
+    tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->SetTag("Pathfinder");
 }
@@ -162,11 +188,4 @@ void PlayScene::SetupDisplay()
 {
     auto gameObject = CreateGameObject();
     enemyDisplay_ = gameObject->AddComponent<EnemyDisplay>();
-    enemyDisplay_->SetMinerBounds({0, 0}, 
-        { Tilemap::MaxHorizontalLength, Tilemap::MaxVerticalLength });
-    enemyDisplay_->SetKnightBounds({0, 0}, 
-        { Tilemap::MaxHorizontalLength, Tilemap::MaxVerticalLength });
-    enemyDisplay_->SetWitchBounds({ 0, 11 }, { 24, 13 });
-    enemyDisplay_->SetBanditBounds({0, 0}, 
-        { Tilemap::MaxHorizontalLength, Tilemap::MaxVerticalLength });
 }
