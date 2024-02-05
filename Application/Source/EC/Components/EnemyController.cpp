@@ -30,9 +30,25 @@
 
 EnemyController::EnemyController(GameObject &gameObject)
     : TilemapEntity(gameObject)
-    , stateMachine_(CreateScope<StateMachine<>>("Default"))
+    , stateMachine_(CreateScope<StateMachine<>>("Default", false))
 {
     stateMachine_->AddState(CreateScope<State<>>(std::string("Patrol"),
+        ActionEntry("Enter",
+        [&]()
+        {
+
+        }),
+        ActionEntry("Update",
+        [&]()
+        {
+            if (isCurrentTurn_ && !isMoving_)
+            {
+                MoveInRandomAvailableDirection();
+            }
+        })
+    ));
+
+    stateMachine_->AddState(CreateScope<State<>>(std::string("Chase"),
         ActionEntry("Enter",
         [&]()
         {
