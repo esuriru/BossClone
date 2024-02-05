@@ -52,25 +52,32 @@ EnemyController::EnemyController(GameObject &gameObject)
         ActionEntry("Enter",
         [&]()
         {
+            turnsInChase_ = 3;
         }),
         ActionEntry("Update",
         [&]()
         {
             if (isCurrentTurn_ && !isMoving_)
             {
-                CC_TRACE("Move");
+                if (tilemapPosition_ == entityChasing_->GetTilemapPosition())
+                {
+                    Attack();
+                    return;
+                }
+
                 auto path = pathfinder_->Pathfind(tilemapPosition_, 
                     entityChasing_->GetTilemapPosition());
 
                 if (!path.empty())
                 {
-                    if (path.size() == 1)
+                    if (path.size() <= 1)
                     {
                         // Attack
-
+                        Attack();
                     }
                     else
                     {
+                        auto& tile = tilemap_->GetTile(path.front());
                         // Keep chasing
                         QueueMove(tilemap_->LocalToWorld(path.front()),
                             movementTime_,
@@ -81,7 +88,8 @@ EnemyController::EnemyController(GameObject &gameObject)
 
                                 isCurrentTurn_ = false;
                                 GameManager::Instance()->OnTurnFinish();
-                            });
+                            },
+                            tile.weightAffectsEnemies ? tile.weight - 1 : 0);
                     }
                 }
             }
@@ -120,7 +128,7 @@ EnemyController::EnemyController(GameObject &gameObject)
         std::string("Patrol"),
         [&]()
         {
-            if (!isCurrentTurn_)
+            if (!isCurrentTurn_ || isMoving_)
             {
                 return false;
             }
@@ -131,9 +139,22 @@ EnemyController::EnemyController(GameObject &gameObject)
 
             if (!Utility::Contains(surroundingEntities, entityChasing_))
             {
-                entityChasing_ = nullptr;
-                return true;
+                CC_TRACE("Turns minused. Current turns: ", turnsInChase_ - 1);
+                if (--turnsInChase_ <= 0)
+                {
+                    entityChasing_ = nullptr;
+                    CC_TRACE("Back to patrol");
+                    return true;
+                }
             }
+            else
+            {
+                CC_TRACE("Back in position");
+                // The player is in the surrounding entities, keep staying in
+                // chase for at least 3 turns
+                turnsInChase_ = 3;
+            }
+
             return false;
         }
     ));
@@ -190,6 +211,7 @@ void EnemyController::MoveInRandomAvailableDirection()
 
     auto newTilemapPosition = possiblePositions[
         rand() % possiblePositions.size()];
+    auto& tile = tilemap_->GetTile(newTilemapPosition);
     QueueMove(tilemap_->LocalToWorld(newTilemapPosition),
         movementTime_,
         [=]()
@@ -200,5 +222,13 @@ void EnemyController::MoveInRandomAvailableDirection()
             isCurrentTurn_ = false;
             GameManager::Instance()->OnTurnFinish();
             // CC_TRACE(glm::to_string(tilemapPosition_));
-        });
+        },
+        tile.weightAffectsEnemies ? tile.weight - 1 : 0);
+}
+
+void EnemyController::Attack()
+{
+    entityChasing_->TakeDamage(damage_);
+    isCurrentTurn_ = false;
+    GameManager::Instance()->OnTurnFinish();
 }

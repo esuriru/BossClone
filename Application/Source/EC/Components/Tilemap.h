@@ -4,6 +4,7 @@
 #include "Core/Core.h"
 
 #include <array>
+#include <vector>
 #include <limits>
 #include <glm/glm.hpp>
 #include <utility>
@@ -20,6 +21,9 @@ struct Tile
 
     uint8_t textureIndex = 0;
     uint8_t weight = 0;
+
+    bool weightAffectsPlayer = true;
+    bool weightAffectsEnemies = true;
 
     glm::ivec2 position;
     glm::ivec2 parent;
@@ -72,6 +76,9 @@ public:
 
     void SetDataBounds(glm::ivec2 dataBoundsMin, glm::ivec2 dataBoundsMax);
     bool InDataBounds(glm::ivec2 coordinates);
+
+    std::vector<std::reference_wrapper<Tile>> QueryTileWithWeight(int weight, 
+        bool ignoreEdge = true);
 
     glm::ivec2 WorldToLocal(glm::vec3 worldPosition);
 

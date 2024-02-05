@@ -66,7 +66,6 @@ void PlayerController::Update(Timestep ts)
             {
                 continue;
             }
-            CC_TRACE(tile.weight);
 
             QueueMove(tilemap_->LocalToWorld(newTilemapPosition),
                 movementTime_,
@@ -79,7 +78,8 @@ void PlayerController::Update(Timestep ts)
                     isCurrentTurn_ = false;
                     GameManager::Instance()->OnTurnFinish();
                     // CC_TRACE(glm::to_string(tilemapPosition_));
-                });
+                },
+                tile.weightAffectsPlayer ? tile.weight - 1 : 0);
             break;
         }
     }

@@ -40,7 +40,8 @@ std::vector<glm::ivec2> MazeController::GetUnvisitedNeighbours(
     return neighbours;
 }
 
-void MazeController::Generate(const glm::ivec2& startPoint)
+void MazeController::Generate(const glm::ivec2& startPoint, int percentageWater,
+    int percentageBrokenWall)
 {
     tilemap_->ResetAllTiles(wallIndex_);
     // Generate a maze using DFS
@@ -65,8 +66,15 @@ void MazeController::Generate(const glm::ivec2& startPoint)
             int randomIndex = rand() % neighbours.size();
             glm::ivec2 chosenNeighbour = neighbours[randomIndex];
 
-            SetTileEmpty(tilemap_->GetTile(chosenNeighbour));
-
+            int percentage = rand() % 100;
+            if (percentage >= percentageWater)
+            {
+                SetTileEmpty(tilemap_->GetTile(chosenNeighbour));
+            }
+            else
+            {
+                SetTileWater(tilemap_->GetTile(chosenNeighbour));
+            }
             
             if (TestForExit(chosenNeighbour, exitLocation))
             {
@@ -85,7 +93,16 @@ void MazeController::Generate(const glm::ivec2& startPoint)
     exitLocation = possibleExitLocations[rand() % possibleExitLocations.size()];
     // CC_ASSERT(exitLocation == glm::ivec2{}, "test");
     SetTileEmpty(tilemap_->GetTile(exitLocation));
-    CC_TRACE(glm::to_string(exitLocation));
+
+    for (auto& tile : tilemap_->QueryTileWithWeight(0))
+    {
+        int percentage = rand() % 100;
+        if (percentage < percentageBrokenWall)
+        {
+            SetTileBrokenWall(tile);
+        }
+    }
+    // CC_TRACE(glm::to_string(exitLocation));
 }
 
 void MazeController::Start()
@@ -131,4 +148,18 @@ void MazeController::SetTileWall(Tile &tile)
 {
     tile.weight = 0;
     tile.textureIndex = wallIndex_;
+}
+
+void MazeController::SetTileWater(Tile &tile)
+{
+    tile.weight = 2;
+    tile.textureIndex = waterIndex_;
+    tile.weightAffectsEnemies = false;
+}
+
+void MazeController::SetTileBrokenWall(Tile &tile)
+{
+    tile.weight = 2;
+    tile.textureIndex = brokenWallIndex_;
+    tile.weightAffectsPlayer = false;
 }

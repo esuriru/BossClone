@@ -3,6 +3,8 @@
 #include "Transform.h"
 #include "Utils/Util.h"
 
+#include "Game/GameManager.h"
+
 TilemapEntity::TilemapEntity(GameObject &gameObject)
     : Component(gameObject)
     , isMoving_(false)
@@ -39,7 +41,15 @@ void TilemapEntity::Update(Timestep ts)
 
 void TilemapEntity::StartTurn()
 {
-    isCurrentTurn_ = true;
+    if (turnsLocked_ <= 0)
+    {
+        isCurrentTurn_ = true;
+    }
+    else
+    {
+        turnsLocked_--;
+        GameManager::Instance()->OnTurnFinish();
+    }
 }
 
 void TilemapEntity::FixTilemapPosition()
@@ -53,7 +63,7 @@ void TilemapEntity::FixTilemapPosition()
 }
 
 void TilemapEntity::QueueMove(glm::vec3 targetPosition, float seconds,
-    std::function<void()> callback)
+    std::function<void()> callback, int turnsToLock)
 {
     if (isMoving_)
     {
@@ -67,6 +77,7 @@ void TilemapEntity::QueueMove(glm::vec3 targetPosition, float seconds,
     moveTime_ = seconds;
     isMoving_ = true;
     moveCallback_ = callback;
+    turnsLocked_ = turnsToLock;
 }
 
 void TilemapEntity::UpdateNearbyTilesVisibility()

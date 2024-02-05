@@ -53,13 +53,14 @@ void PlayScene::GenerateMaze()
 {
     tilemapGameObject_->GetComponent<MazeController>()
         ->Generate(tilemap_->WorldToLocal(
-            playerGameObject_->GetTransform().GetPosition()));
+            playerGameObject_->GetTransform().GetPosition()),
+            10);
 }
 
 void PlayScene::InjectTilemapEntityColor(Ref<TilemapEntity> tilemapEntity)
 {
     auto gameObject = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(2.f));
-    gameObject->AddComponent<SpriteRenderer>();
+    gameObject->AddComponent<SpriteRenderer>()->SetSortingOrder(15);
     auto tilemapEntityColor = gameObject->AddComponent<TilemapEntityColor>();
     tilemapEntityColor->SetOffset({0, 6, 0});
     tilemapEntity->SetColorObject(tilemapEntityColor);
@@ -71,6 +72,9 @@ void PlayScene::SetupPlayer()
     const float multiplier = 6.0f / playerSprite_->GetWidth();
 
     playerGameObject_ = CreateGameObject();
+    playerGameObject_->GetTransform().SetPosition(
+        tilemap_->LocalToWorld(glm::ivec2(5 + (rand() % 7) * 2, 
+        5 + (rand() % 7) * 2)));
     playerGameObject_->SetTag("Player");
 
     auto playerSpriteRenderer = 
@@ -84,22 +88,29 @@ void PlayScene::SetupPlayer()
         playerGameObject_->AddComponent<PlayerController>();
     playerController->SetTilemap(tilemap_);
     playerController->SetVisibilityTilemap(visibilityTilemap_);
-    playerController->SetVisibilityRange(2); 
+    playerController->SetVisibilityRange(4); 
     InjectTilemapEntityColor(playerController);
     GameManager::Instance()->AddTilemapEntity(playerController);
 }
 
 void PlayScene::SetupEnemies()
 {
-    constexpr std::array<glm::ivec2, 2> enemySpawns
+
+    std::array<glm::ivec2, 3> enemySpawns
     {
-        {
-            { 1, 1 },
-            { 23, 23 }
-        }
+        // {
+        //     { 1, 1 },
+        //     { 23, 23 },
+        //     { 11, 13 }
+        // }
     };
 
-    for (int i = 0; i < 2; ++i)
+    enemySpawns[0] = { 1 + (rand() % 12) * 2, 1 + (rand() % 2) * 2 };
+    enemySpawns[1] = { 1 + (rand() % 12) * 2, 
+        Tilemap::MaxVerticalLength - 2 - ((rand() % 2) * 2) };
+    enemySpawns[2] = { 1 + (rand() % 2) * 2, 1 + (rand() % 12) * 2 };
+
+    for (uint32_t i = 0; i < enemySpawns.size(); ++i)
     {
         const float multiplier = 8.0f / enemySprite_->GetWidth();
 
@@ -121,6 +132,7 @@ void PlayScene::SetupEnemies()
         enemyController->SetTilemap(tilemap_)
             ->SetVisibilityTilemap(visibilityTilemap_)
             ->SetVisibilityRange(4)
+            ->SetDamage(10.0f)
             ->SetStartHealth(50.0f);
         InjectTilemapEntityColor(enemyController);
         GameManager::Instance()->AddTilemapEntity(enemyController);
@@ -137,8 +149,8 @@ void PlayScene::SetupVisiblityTilemap()
     visibilityTilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/VisibilityMap.csv", 
         "Assets/Maps/FillerMap.csv")
         // NOTE - Comment this PushTexture call to see visibility
-        ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
-            glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
+        // ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
+        //     glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(1);
 
@@ -153,6 +165,7 @@ void PlayScene::SetupVisiblityTilemap()
 void PlayScene::SetupTilemap()
 {
     auto tilemapSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Tilemap/TX Tileset Grass.png");
+    auto waterSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ocean_SpriteSheet.png");
 
     constexpr glm::vec2 tilemapTileSize = glm::vec2(32, 32);
 
@@ -160,6 +173,9 @@ void PlayScene::SetupTilemap()
     auto grassTileTopMiddle = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(2, 7), tilemapTileSize);
     auto flowerTileTopLeft = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(4, 7), tilemapTileSize);
     auto fullStoneGrassTile = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(0, 3), tilemapTileSize);
+    auto halfStoneGrassTile = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(1, 0), tilemapTileSize);
+    auto waterTile = SubTexture2D::CreateFromCoords(
+        waterSpritesheet, glm::vec2(0, 0), tilemapTileSize);
 
     tilemapGameObject_ = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f));
         tilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/TwentyFiveMap.csv", "Assets/Maps/TwentyFiveMapTypes.csv")
@@ -167,6 +183,8 @@ void PlayScene::SetupTilemap()
         ->PushTexture(grassTileTopMiddle)
         ->PushTexture(flowerTileTopLeft)
         ->PushTexture(fullStoneGrassTile)
+        ->PushTexture(waterTile)
+        ->PushTexture(halfStoneGrassTile)
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(-2);
 
@@ -178,7 +196,9 @@ void PlayScene::SetupTilemap()
     tilemapGameObject_->AddComponent<MazeController>()
         ->SetTilemap(tilemap_)
         ->SetWallTextureIndex(4)
-        ->SetEmptyTextureIndex(2);
+        ->SetEmptyTextureIndex(2)
+        ->SetWaterTextureIndex(5)
+        ->SetBrokenWallTextureIndex(6);
     tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->SetTag("Pathfinder");

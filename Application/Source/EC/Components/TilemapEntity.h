@@ -26,7 +26,7 @@ public:
 
     void FixTilemapPosition();
     void QueueMove(glm::vec3 targetPosition, float seconds = 1.0f,
-        std::function<void()> callback = nullptr);
+        std::function<void()> callback = nullptr, int turnsToLock = 0);
 
     inline virtual TilemapEntity* SetVisibilityTilemap(Ref<Tilemap> tilemap)
     {
@@ -83,6 +83,8 @@ private:
     glm::vec4 colorRepresentation_;
 
 protected:
+    int turnsLocked_ = 0;
+
     float initialHealth_ = 100.0f;
     float currentHealth_ = 100.0f;
 

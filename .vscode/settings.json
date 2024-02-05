@@ -83,6 +83,7 @@
         "*.tcc": "cpp",
         "mutex": "cpp",
         "typeindex": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "random": "cpp"
     },
 }

@@ -38,6 +38,8 @@ void EnemyDisplay::Update(Timestep ts)
         lmbDown = false;
     }
     if (Input::Instance()->GetMouseButtonUp(1))
+
+
     {
         rmbDown = false;
     }
@@ -141,21 +143,36 @@ void EnemyDisplay::OnImGuiRender()
     const ImVec2 p = ImGui::GetCursorScreenPos(); 
     static float sz = 36.0f; 
     static float thickness = 4.0f; 
+
+    float oldSize = ImGui::GetFont()->Scale;
+    ImGui::GetFont()->Scale *= 2;
+    ImGui::PushFont(ImGui::GetFont());
+    auto textSize = ImGui::CalcTextSize("Entities");
+    TextCentred("Entities");
+
+    ImGui::GetFont()->Scale = oldSize; 
+    ImGui::PopFont();
+
     float x = p.x + 4.0f, 
-        y = p.y + 4.0f, 
+        y = p.y + 4.0f + textSize.y,  
         spacing = 8.0f; 
         
-    for (int i = 0; i < entities.size(); ++i)
+    for (size_t i = 0; i < entities.size(); ++i)
     {
         auto entityColor = entities[i]->GetColourRepresentation();
 
-        drawList->AddRect(ImVec2(x, y), ImVec2(x+sz, y+sz), 
+        drawList->AddRectFilled(ImVec2(x, y), ImVec2(x+sz, y+sz), 
             ImColor(entityColor.r, entityColor.g, entityColor.b, entityColor.a), 
             10.0f, 
-            ImDrawCornerFlags_TopLeft | ImDrawCornerFlags_BotRight, 
-            4.0f); 
-        // x += sz+spacing;
+            ImDrawCornerFlags_All); 
+        
+        x += sz+spacing;
+        y += 10; 
+        ImGui::SetCursorScreenPos(ImVec2(x, y));
+        ImGui::Text("HP : %.2f", entities[i]->GetHealth());
+        y -= 10; 
         x = p.x + 4; 
+
         y += sz+spacing; 
     }
     // TextCentred("Name: " + enemyName_);

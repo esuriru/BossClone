@@ -48,10 +48,20 @@ public:
         visibilityRange_ = range;
         return this;
     }
+    
+    inline EnemyController* SetDamage(float damage)
+    {
+        damage_ = damage;
+        return this;
+    }
+
 private:
     void MoveInRandomAvailableDirection();
+    void Attack();
 
     Ref<Pathfinder> pathfinder_ = nullptr;
+    float damage_ = 0.0f;
+    int turnsInChase_ = 0;
 
 protected:
     Ref<TilemapEntity> entityChasing_ = nullptr;

@@ -97,6 +97,41 @@ bool Tilemap::InDataBounds(glm::ivec2 coordinates)
         coordinates.y < dataBounds_.y);
 }
 
+std::vector<std::reference_wrapper<Tile>> Tilemap::QueryTileWithWeight(
+    int weight, bool ignoreEdge)
+{
+    std::vector<std::reference_wrapper<Tile>> tiles;
+
+    if (!ignoreEdge)
+    {
+        for (auto& x : tileData_)
+        {
+            for (auto& y : x)
+            {
+                if (y.weight == weight)
+                {
+                    tiles.push_back(y);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int i = 1; i < MaxHorizontalLength - 1; ++i)
+        {
+            for (int j = 1; j < MaxVerticalLength - 1; ++j)
+            {
+                if (tileData_[i][j].weight == weight)
+                {
+                    tiles.push_back(tileData_[i][j]);
+                }            
+            }
+        }
+    }
+
+    return tiles;
+}
+
 glm::ivec2 Tilemap::WorldToLocal(glm::vec3 worldPosition)
 {
     glm::vec3 tilemapWorldPosition = GetTransform().GetPosition(); 
@@ -115,6 +150,8 @@ void Tilemap::ResetAllTiles(const int textureIndex)
         {
             y.weight = 0;
             y.textureIndex = textureIndex;
+            y.weightAffectsEnemies = true;
+            y.weightAffectsPlayer = true;
         }
     }
 }
