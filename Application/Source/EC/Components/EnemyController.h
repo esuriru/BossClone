@@ -60,6 +60,8 @@ public:
         return this;
     }
 
+    void UpdateNearbyTilesVisibility() override;
+
 private:
     void MoveWithDFS();
     void MoveInRandomAvailableDirection();
@@ -75,4 +77,6 @@ protected:
     Scope<DFS> dfs_ = nullptr;
 
     void OnDeath() override;
+    void SetNearbyTilesVisible(const glm::ivec2& location, 
+        bool visible = true) override;
 };

@@ -29,10 +29,8 @@ void GameManager::OnTurnFinish()
         return;
     }
 
-    for (auto& entity : entityQueue_)
-    {
-        entity->UpdateNearbyTilesVisibility();
-    }
+    UpdateVision();
+    wantsToRevealVision_ = false;
 
     auto entity = entityQueue_.front();
     entityQueue_.pop_front();
@@ -59,6 +57,7 @@ void GameManager::NewGame()
     else
     {
         entityQueue_.clear();
+        playerEntity_ = nullptr;
         SceneManager::Instance()->RefreshActiveScene();
     }
 }
@@ -81,6 +80,15 @@ std::vector<Ref<TilemapEntity>> GameManager::QueryTiles(
     return entities;
 }
 
+void GameManager::UpdateVision()
+{
+    for (auto& entity : entityQueue_)
+    {
+        entity->UpdateNearbyTilesVisibility();
+    }
+    playerEntity_->UpdateNearbyTilesVisibility();
+}
+
 void GameManager::SetInUpdate(bool inUpdate)
 {
     inUpdate_ = inUpdate;
@@ -101,6 +109,11 @@ void GameManager::AddTilemapEntity(Ref<TilemapEntity> tilemapEntity)
     randomColor.a = 1.0f;
 
     tilemapEntity->SetColorRepresentation(randomColor);
+    if (tilemapEntity->GetGameObject().CompareTag("Player") &&
+        playerEntity_ == nullptr)
+    {
+        playerEntity_ = tilemapEntity;
+    }
     entityQueue_.push_back(tilemapEntity);
 }
 

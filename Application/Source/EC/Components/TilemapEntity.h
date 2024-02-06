@@ -79,7 +79,12 @@ public:
         return colorObject_;
     }
 
-    void UpdateNearbyTilesVisibility();
+    inline bool IsMoving() const
+    {
+        return isMoving_;
+    }
+
+    virtual void UpdateNearbyTilesVisibility();
     void TakeDamage(float amount);
 
 private:
@@ -111,7 +116,8 @@ protected:
 
     virtual void OnDeath() {}
 
-    void SetNearbyTilesVisible(const glm::ivec2& location, bool visible = true);
+    virtual void SetNearbyTilesVisible(const glm::ivec2& location, 
+        bool visible = true);
 
     std::vector<std::reference_wrapper<Tile>> GetNearbyTiles(
         const glm::ivec2& location, uint8_t range);

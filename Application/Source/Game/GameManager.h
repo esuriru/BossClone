@@ -30,6 +30,7 @@ public:
     void OnTurnFinish();
     void StartGame();
     void NewGame();
+    void UpdateVision();
 
     std::vector<Ref<TilemapEntity>> QueryTiles(
         const std::vector<glm::ivec2>& tilemapLocations);
@@ -40,11 +41,38 @@ public:
 
     void SetInUpdate(bool inUpdate);
 
+    inline bool GetEnemiesVisionEnabled() const
+    {
+        return enemiesVisionEnabled_;
+    }
+
+    inline void SetEnemiesVisionEnabled(bool enabled)
+    {
+        if (!wantsToRevealVision_)
+        {
+            enemiesVisionEnabled_ = enabled;
+            for (auto& entity : entityQueue_)
+            {
+                if (entity->IsMoving())
+                {
+                    wantsToRevealVision_ = true;
+                    return;
+                }
+            }
+
+            // Since there is nothing moving, there is nothing to worry about
+            UpdateVision();
+        }
+    } 
+
 private:
     GameState state_;
     EventCallback eventCallback_;
     bool inUpdate_ = false;
     bool wantToRestart_ = false;
+    bool enemiesVisionEnabled_ = false;
+    bool wantsToRevealVision_ = false;
 
+    Ref<TilemapEntity> playerEntity_ = nullptr;
     std::deque<Ref<TilemapEntity>> entityQueue_;
 };

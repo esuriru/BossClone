@@ -334,6 +334,12 @@ void EnemyController::Reset()
     stateMachine_->Reset();
 }
 
+void EnemyController::UpdateNearbyTilesVisibility()
+{
+    TilemapEntity::SetNearbyTilesVisible(tilemapPosition_, 
+        GameManager::Instance()->GetEnemiesVisionEnabled());
+}
+
 void EnemyController::MoveWithDFS()
 {
     // constexpr std::array<glm::ivec2, 4> Directions
@@ -424,4 +430,10 @@ void EnemyController::Attack()
 void EnemyController::OnDeath()
 {
     GameManager::Instance()->RemoveTilemapEntity(shared_from_this());
+}
+
+void EnemyController::SetNearbyTilesVisible(const glm::ivec2 &location, bool visible)
+{
+    TilemapEntity::SetNearbyTilesVisible(location, 
+        visible && GameManager::Instance()->GetEnemiesVisionEnabled());
 }

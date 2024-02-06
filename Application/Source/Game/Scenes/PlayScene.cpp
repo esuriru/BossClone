@@ -69,7 +69,13 @@ void PlayScene::Update(Timestep ts)
     static Input* input = Input::Instance();
     if (input->IsKeyPressed(Key::Enter))
     {
-        GameManager::Instance()->NewGame();
+        gameManager->NewGame();
+    }
+    else if (input->IsKeyPressed(Key::V))
+    {
+        gameManager->SetEnemiesVisionEnabled(
+            !gameManager->GetEnemiesVisionEnabled()
+        );
     }
 }
 
@@ -86,7 +92,7 @@ void PlayScene::GenerateMaze()
 void PlayScene::InjectTilemapEntityColor(Ref<TilemapEntity> tilemapEntity)
 {
     auto gameObject = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(2.f));
-    gameObject->AddComponent<SpriteRenderer>()->SetSortingOrder(15);
+    gameObject->AddComponent<SpriteRenderer>()->SetSortingOrder(10);
     auto tilemapEntityColor = gameObject->AddComponent<TilemapEntityColor>();
     tilemapEntityColor->SetOffset({0, 6, 0});
     tilemapEntity->SetColorObject(tilemapEntityColor);
@@ -179,7 +185,7 @@ void PlayScene::SetupVisiblityTilemap()
         ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
             glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
         ->GetGameObject().GetComponent<TilemapRenderer>()
-        ->SetSortingOrder(1);
+        ->SetSortingOrder(15);
 
     visibilityTilemap_ = visibilityTilemapGameObject_->GetComponent<Tilemap>();
     visibilityTilemap_->tileSize = glm::vec2(8, 8);
