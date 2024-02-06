@@ -44,13 +44,22 @@ public:
         return this;
     }
 
+    inline MazeController* SetLavaTextureIndex(uint8_t index)
+    {
+        lavaIndex_ = index;
+        return this;
+    }
+
+    void SpawnMeteor();
+
 private:
     Ref<Tilemap> tilemap_;
 
     uint8_t wallIndex_ = 0, 
         emptyIndex_ = 0,
         waterIndex_ = 0,
-        brokenWallIndex_ = 0;
+        brokenWallIndex_ = 0,
+        lavaIndex_ = 0;
 
     bool TestForExit(const glm::ivec2& location, glm::ivec2& exitLocation);
 
@@ -58,6 +67,7 @@ private:
     void SetTileWall(Tile& tile);
     void SetTileWater(Tile& tile);
     void SetTileBrokenWall(Tile& tile);
+    void SetTileLava(Tile& tile);
 
     std::vector<glm::ivec2> GetUnvisitedNeighbours(
         const glm::ivec2& point);

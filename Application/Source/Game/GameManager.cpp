@@ -31,6 +31,7 @@ void GameManager::OnTurnFinish()
 
     UpdateVision();
     wantsToRevealVision_ = false;
+    AttemptSpawnNewEvent();
 
     auto entity = entityQueue_.front();
     entityQueue_.pop_front();
@@ -45,6 +46,15 @@ void GameManager::StartGame()
         return;
     }
 
+    for (auto& entity : entityQueue_)
+    {
+        entity->FixTilemapPosition();
+    }
+
+    UpdateVision();
+    // playerEntity_->UpdateNearbyTilesVisibility();
+    // SetEnemiesVisionEnabled(true);
+    // SetEnemiesVisionEnabled(false);
     entityQueue_.front()->StartTurn();
 }
 
@@ -58,6 +68,8 @@ void GameManager::NewGame()
     {
         entityQueue_.clear();
         playerEntity_ = nullptr;
+        mazeController_ = nullptr;
+        meteorsSpawned = 0;
         SceneManager::Instance()->RefreshActiveScene();
     }
 }
@@ -87,6 +99,29 @@ void GameManager::UpdateVision()
         entity->UpdateNearbyTilesVisibility();
     }
     playerEntity_->UpdateNearbyTilesVisibility();
+}
+
+void GameManager::AttemptSpawnNewEvent(bool guaranteed)
+{
+    // NOTE: 1% chance to spawn a new event
+    int percentage = rand() % 100; 
+    if (percentage == 50 || guaranteed)
+    {
+        GameEvent event = GameEvent::Count == 1 ? static_cast<GameEvent>(0) :
+            static_cast<GameEvent>(rand() % GameEvent::Count);
+        
+        switch (event)
+        {
+            case Meteor:
+            {
+                if (mazeController_)
+                {
+                    mazeController_->SpawnMeteor();
+                    meteorsSpawned++;
+                }
+            }
+        }
+    }
 }
 
 void GameManager::SetInUpdate(bool inUpdate)

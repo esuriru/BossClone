@@ -98,15 +98,15 @@ protected:
     float initialHealth_ = 100.0f;
     float currentHealth_ = 100.0f;
 
-    glm::ivec2 tilemapPosition_;
+    glm::ivec2 tilemapPosition_{};
     uint8_t visibilityRange_ = 3;
     float movementTime_ = 0.35f;
     Ref<Tilemap> visibilityTilemap_;
 
     std::function<void()> moveCallback_;
 
-    bool isMoving_;
-    bool isCurrentTurn_;
+    bool isMoving_ = false;
+    bool isCurrentTurn_ = false;
 
     Ref<Tilemap> tilemap_ = nullptr;
     Ref<TilemapEntityColor> colorObject_ = nullptr;

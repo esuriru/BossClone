@@ -9,6 +9,7 @@
 #include "Renderer/Texture.h"
 #include "Renderer/SubTexture2D.h"
 #include "Game/EightWayDirectionFlags.h"
+#include "EC/Components/Tilemap.h"
 
 namespace Utility
 {
@@ -65,7 +66,7 @@ namespace Utility
     {
         if (delta.x == 0)
         {
-            return delta.y < 0 ? 
+            return delta.y > 0 ? 
                 EightWayDirection::Up : EightWayDirection::Down;
         }
         else
@@ -169,4 +170,25 @@ namespace Utility
         return { 0, 0 };
     }
 
+    inline std::vector<glm::ivec2> GetNearbyTileLocations(
+        const glm::ivec2 &location, uint8_t range)
+    {
+        std::vector<glm::ivec2> tiles;
+
+        for (int i = -range; i <= range; ++i)
+        {
+            for (int j = -range + glm::abs(i); 
+                j <= range - glm::abs(i); ++j)
+            {
+                auto newPosition = location + glm::ivec2(i, j);
+
+                if (Tilemap::InBounds(newPosition))
+                {
+                    tiles.emplace_back(newPosition);
+                }
+            }
+        }
+
+        return tiles;
+    }
 }

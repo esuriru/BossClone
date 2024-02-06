@@ -4,6 +4,7 @@
 #include "Core/Window.h"
 
 #include "EC/Components/TilemapEntity.h"
+#include "EC/Components/MazeController.h"
 
 #include <queue>
 #include <deque>
@@ -31,6 +32,7 @@ public:
     void StartGame();
     void NewGame();
     void UpdateVision();
+    void AttemptSpawnNewEvent(bool guaranteed = false);
 
     std::vector<Ref<TilemapEntity>> QueryTiles(
         const std::vector<glm::ivec2>& tilemapLocations);
@@ -65,7 +67,20 @@ public:
         }
     } 
 
+    inline void SetMazeController(Ref<MazeController> mazeController)
+    {
+        mazeController_ = mazeController;
+    }
+
+    int meteorsSpawned;
+
 private:
+    enum GameEvent
+    {
+        Meteor = 0,
+        Count
+    };
+
     GameState state_;
     EventCallback eventCallback_;
     bool inUpdate_ = false;
@@ -73,6 +88,7 @@ private:
     bool enemiesVisionEnabled_ = false;
     bool wantsToRevealVision_ = false;
 
+    Ref<MazeController> mazeController_ = nullptr;
     Ref<TilemapEntity> playerEntity_ = nullptr;
     std::deque<Ref<TilemapEntity>> entityQueue_;
 };

@@ -17,7 +17,7 @@ TilemapEntity::TilemapEntity(GameObject &gameObject)
 void TilemapEntity::Start()
 {
     FixTilemapPosition();
-    UpdateNearbyTilesVisibility();
+    // UpdateNearbyTilesVisibility();
     currentHealth_ = initialHealth_;
 }
 
@@ -41,6 +41,15 @@ void TilemapEntity::Update(Timestep ts)
 
 void TilemapEntity::StartTurn()
 {
+    if (tilemapPosition_ != glm::ivec2())
+    {
+        float dot = tilemap_->GetTile(tilemapPosition_).dot;
+        if (dot > 0.0f)
+        {
+            TakeDamage(dot);
+        }
+    }
+
     if (turnsLocked_ <= 0)
     {
         isCurrentTurn_ = true;

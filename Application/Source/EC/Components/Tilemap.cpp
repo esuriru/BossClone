@@ -152,6 +152,7 @@ void Tilemap::ResetAllTiles(const int textureIndex)
             y.textureIndex = textureIndex;
             y.weightAffectsEnemies = true;
             y.weightAffectsPlayer = true;
+            y.dot = 0.0f;
         }
     }
 }

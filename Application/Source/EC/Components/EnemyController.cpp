@@ -45,6 +45,16 @@ EnemyController::EnemyController(GameObject &gameObject)
         {
             if (isCurrentTurn_ && !isMoving_)
             {
+                if (currentHealth_ < initialHealth_ * 0.5f)
+                {
+                    if (rand() % 5 == 0)
+                    {
+                        currentHealth_ += static_cast<float>(rand() % 11);
+                        isCurrentTurn_ = false;
+                        GameManager::Instance()->OnTurnFinish();
+                    }
+                }
+
                 MoveWithDFS();
             }
         })
@@ -429,7 +439,10 @@ void EnemyController::Attack()
 
 void EnemyController::OnDeath()
 {
+    TilemapEntity::SetNearbyTilesVisible(tilemapPosition_, false);
     GameManager::Instance()->RemoveTilemapEntity(shared_from_this());
+    GameManager::Instance()->UpdateVision();
+    GameManager::Instance()->OnTurnFinish();
 }
 
 void EnemyController::SetNearbyTilesVisible(const glm::ivec2 &location, bool visible)

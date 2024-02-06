@@ -197,6 +197,29 @@ void EnemyDisplay::OnImGuiRender()
     // TextCentred("Team 1: $" + std::to_string(GameManager::Instance()->GetTeamOneMoney()));
     // TextCentred("Team 2: $" + std::to_string(GameManager::Instance()->GetTeamTwoMoney()));
     ImGui::End();
+
+    // ImGui::SetNextWindowSize(ImVec2(300, 300));
+    // ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f));
+    // ImGui::SetNextWindowBgAlpha(0.2f);
+
+    ImGui::Begin("Display", 0, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse |ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoSavedSettings);
+    for (int i = 0; i < 4; ++i)
+        ImGui::Spacing();
+    int meteors =  GameManager::Instance()->meteorsSpawned;
+    if (meteors > 0)
+    {
+        if (meteors == 1)
+        {
+            ImGui::Text("A meteor has spawned");
+        }
+        else
+        {
+            ImGui::Text("%i meteors have spawned", meteors);
+        }
+    }
+    ImGui::End();
    
 }
 

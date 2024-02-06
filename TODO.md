@@ -3,4 +3,4 @@
   enemies
 * ~~Add win and lose conditions~~
 * ~~Add resetting of the map~~
-* Maybe add toggling of the enemies vision 
+* ~Maybe add toggling of the enemies vision~

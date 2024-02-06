@@ -24,6 +24,7 @@ struct Tile
 
     bool weightAffectsPlayer = true;
     bool weightAffectsEnemies = true;
+    float dot = 0.0f;
 
     glm::ivec2 position;
     glm::ivec2 parent;

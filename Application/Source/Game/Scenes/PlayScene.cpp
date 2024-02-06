@@ -77,6 +77,10 @@ void PlayScene::Update(Timestep ts)
             !gameManager->GetEnemiesVisionEnabled()
         );
     }
+    else if (input->IsKeyPressed(Key::B))
+    {
+        gameManager->AttemptSpawnNewEvent(true);
+    }
 }
 
 void PlayScene::GenerateMaze()
@@ -199,6 +203,7 @@ void PlayScene::SetupTilemap()
 {
     auto tilemapSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Tilemap/TX Tileset Grass.png");
     auto waterSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/Ocean_SpriteSheet.png");
+    auto lavaSpritesheet = CreateRef<Texture2D>("Assets/Spritesheets/lava_ground_cracked_tileset.png");
 
     constexpr glm::vec2 tilemapTileSize = glm::vec2(32, 32);
 
@@ -209,6 +214,8 @@ void PlayScene::SetupTilemap()
     auto halfStoneGrassTile = SubTexture2D::CreateFromCoords(tilemapSpritesheet, glm::vec2(1, 0), tilemapTileSize);
     auto waterTile = SubTexture2D::CreateFromCoords(
         waterSpritesheet, glm::vec2(0, 0), tilemapTileSize);
+    auto lavaTile = SubTexture2D::CreateFromCoords(
+        lavaSpritesheet, glm::vec2(1, 1), tilemapTileSize);
 
     tilemapGameObject_ = CreateGameObject(glm::vec3(), glm::identity<glm::quat>(), glm::vec3(1.f));
         tilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/TwentyFiveMap.csv", "Assets/Maps/TwentyFiveMapTypes.csv")
@@ -218,6 +225,7 @@ void PlayScene::SetupTilemap()
         ->PushTexture(fullStoneGrassTile)
         ->PushTexture(waterTile)
         ->PushTexture(halfStoneGrassTile)
+        ->PushTexture(lavaTile)
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(-2);
 
@@ -226,13 +234,15 @@ void PlayScene::SetupTilemap()
     // tilemapGameObject_->GetComponent<Tilemap>()->SetDataBounds({0, 0}, {25, 25});
     auto bounds = tilemap_->GetBounds();
     tilemapGameObject_->GetTransform().SetPosition(glm::vec3(bounds.x * -0.5f, bounds.y * -0.5f, 0));
-    tilemapGameObject_->AddComponent<MazeController>()
-        ->SetTilemap(tilemap_)
+    tilemapGameObject_->AddComponent<Pathfinder>();
+    auto mazeController = tilemapGameObject_->AddComponent<MazeController>();
+    mazeController->SetTilemap(tilemap_)
         ->SetWallTextureIndex(4)
         ->SetEmptyTextureIndex(2)
         ->SetWaterTextureIndex(5)
-        ->SetBrokenWallTextureIndex(6);
-    tilemapGameObject_->AddComponent<Pathfinder>();
+        ->SetBrokenWallTextureIndex(6)
+        ->SetLavaTextureIndex(7);
+    GameManager::Instance()->SetMazeController(mazeController);
     // tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->SetTag("Pathfinder");
 }

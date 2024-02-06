@@ -7,6 +7,8 @@
 #include <stack>
 #include <vector>
 
+#include "Utils/Util.h"
+
 MazeController::MazeController(GameObject &gameObject)
     : Component(gameObject)
 {
@@ -115,7 +117,25 @@ void MazeController::Start()
     }
 }
 
-bool MazeController::TestForExit(const glm::ivec2 &location, glm::ivec2& exitLocation)
+void MazeController::SpawnMeteor()
+{
+    glm::ivec2 randomLocation = glm::ivec2(rand() % Tilemap::MaxHorizontalLength, 
+        rand() % Tilemap::MaxVerticalLength);
+    CC_TRACE("Meteor spawned:", glm::to_string(randomLocation));
+    
+    for (auto& tile : Utility::GetNearbyTileLocations(randomLocation, 2 + (rand() % 2)))
+    {
+        if (tile.x == 0 || tile.x == Tilemap::MaxHorizontalLength - 1 || tile.y == 0 ||
+            tile.y == Tilemap::MaxVerticalLength - 1)
+        {
+            continue;
+        }
+
+        SetTileLava(tilemap_->GetTile(tile));
+    }
+}
+
+bool MazeController::TestForExit(const glm::ivec2 &location, glm::ivec2 &exitLocation)
 {
     if (location.x == 1)
     {
@@ -164,4 +184,13 @@ void MazeController::SetTileBrokenWall(Tile &tile)
     tile.weight = 2;
     tile.textureIndex = brokenWallIndex_;
     tile.weightAffectsPlayer = false;
+}
+
+void MazeController::SetTileLava(Tile &tile)
+{
+    tile.weight = 1;
+    tile.textureIndex = lavaIndex_;
+    tile.weightAffectsEnemies = true;
+    tile.weightAffectsPlayer = true;
+    tile.dot = 2.0f;
 }
