@@ -31,10 +31,12 @@ private:
     Ref<Texture2D> banditSprite_;
     Ref<Texture2D> playerSprite_;
     Ref<Texture2D> enemySprite_;
+    Ref<Texture2D> endFlagSprite_;
 
     const glm::vec2 ppiMultiplier_;
     Ref<GameObject> tilemapGameObject_;
     Ref<GameObject> visibilityTilemapGameObject_;
+    Ref<GameObject> endFlagObject_;
     Ref<EnemyDisplay> enemyDisplay_;
     Ref<MineController> mineController_;
     Ref<Tilemap> tilemap_;
@@ -49,5 +51,6 @@ private:
     void SetupEnemies();
     void SetupVisiblityTilemap();
     void SetupTilemap();
+    void SetupEndFlag();
     void SetupDisplay();
 };

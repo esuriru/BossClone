@@ -48,6 +48,10 @@ void GameManager::StartGame()
     entityQueue_.front()->StartTurn();
 }
 
+void GameManager::NewGame()
+{
+}
+
 std::vector<Ref<TilemapEntity>> GameManager::QueryTiles(
     const std::vector<glm::ivec2>& tilemapLocations)
 {

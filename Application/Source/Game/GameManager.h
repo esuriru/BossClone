@@ -28,6 +28,7 @@ public:
     void AddTilemapEntity(Ref<TilemapEntity> tilemapEntity);
     void OnTurnFinish();
     void StartGame();
+    void NewGame();
 
     std::vector<Ref<TilemapEntity>> QueryTiles(
         const std::vector<glm::ivec2>& tilemapLocations);

@@ -32,8 +32,10 @@ PlayScene::PlayScene()
     , banditSprite_(CreateRef<Texture2D>("Assets/Spritesheets/Idle.png"))
     , playerSprite_(CreateRef<Texture2D>("Assets/Images/rockett-young-pixel-lulu.png"))
     , enemySprite_(CreateRef<Texture2D>("Assets/Images/RemovedBGandShadows.png"))
+    , endFlagSprite_(CreateRef<Texture2D>("Assets/Images/finishflag.png"))
 {
     SetupTilemap();
+    SetupEndFlag();
     SetupVisiblityTilemap();
     SetupPlayer();
     SetupDisplay();
@@ -51,10 +53,12 @@ PlayScene::PlayScene()
 
 void PlayScene::GenerateMaze()
 {
-    tilemapGameObject_->GetComponent<MazeController>()
+    endFlagObject_->GetTransform().SetPosition(
+        tilemap_->LocalToWorld(
+        tilemapGameObject_->GetComponent<MazeController>()
         ->Generate(tilemap_->WorldToLocal(
             playerGameObject_->GetTransform().GetPosition()),
-            10);
+            10)));
 }
 
 void PlayScene::InjectTilemapEntityColor(Ref<TilemapEntity> tilemapEntity)
@@ -149,8 +153,8 @@ void PlayScene::SetupVisiblityTilemap()
     visibilityTilemapGameObject_->AddComponent<Tilemap>("Assets/Maps/VisibilityMap.csv", 
         "Assets/Maps/FillerMap.csv")
         // NOTE - Comment this PushTexture call to see visibility
-        // ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
-        //     glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
+        ->PushTexture(CreateRef<SubTexture2D>(blackTile, glm::vec2(), 
+            glm::vec2(1.0f), blackTile->GetWidth(), blackTile->GetHeight()))
         ->GetGameObject().GetComponent<TilemapRenderer>()
         ->SetSortingOrder(1);
 
@@ -202,6 +206,16 @@ void PlayScene::SetupTilemap()
     tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->AddComponent<Pathfinder>();
     // tilemapGameObject_->SetTag("Pathfinder");
+}
+
+void PlayScene::SetupEndFlag()
+{
+    endFlagObject_ = CreateGameObject();
+    auto spriteRenderer = endFlagObject_->AddComponent<SpriteRenderer>();
+    spriteRenderer->SetTexture(endFlagSprite_);
+    spriteRenderer->SetSortingOrder(20);
+    spriteRenderer->SetNativeSize();
+    endFlagObject_->GetTransform().Scale(0.01f);
 }
 
 void PlayScene::SetupDisplay()

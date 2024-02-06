@@ -30,4 +30,6 @@ public:
         return this;
     }
 
+private:
+    bool TestForWin(const glm::ivec2& location);
 };

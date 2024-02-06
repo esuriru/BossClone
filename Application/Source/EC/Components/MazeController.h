@@ -10,7 +10,7 @@ class MazeController : public Component
 public:
     MazeController(GameObject& gameObject);
 
-    void Generate(const glm::ivec2& startPoint, int percentageWater = 5, int
+    glm::ivec2 Generate(const glm::ivec2& startPoint, int percentageWater = 5, int
         percentageBrokenWall = 10);
     void Start() override;
 

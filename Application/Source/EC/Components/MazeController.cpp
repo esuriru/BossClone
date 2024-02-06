@@ -40,7 +40,7 @@ std::vector<glm::ivec2> MazeController::GetUnvisitedNeighbours(
     return neighbours;
 }
 
-void MazeController::Generate(const glm::ivec2& startPoint, int percentageWater,
+glm::ivec2 MazeController::Generate(const glm::ivec2& startPoint, int percentageWater,
     int percentageBrokenWall)
 {
     tilemap_->ResetAllTiles(wallIndex_);
@@ -102,6 +102,8 @@ void MazeController::Generate(const glm::ivec2& startPoint, int percentageWater,
             SetTileBrokenWall(tile);
         }
     }
+
+    return exitLocation;
     // CC_TRACE(glm::to_string(exitLocation));
 }
 

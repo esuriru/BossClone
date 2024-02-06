@@ -75,12 +75,25 @@ void PlayerController::Update(Timestep ts)
                     tilemapPosition_ = newTilemapPosition; 
                     // SetNearbyTilesVisible(tilemapPosition_, true);
 
-                    isCurrentTurn_ = false;
-                    GameManager::Instance()->OnTurnFinish();
+                    if (TestForWin(tilemapPosition_))
+                    {
+
+                    }
+                    else
+                    {
+                        isCurrentTurn_ = false;
+                        GameManager::Instance()->OnTurnFinish();
+                    }
                     // CC_TRACE(glm::to_string(tilemapPosition_));
                 },
                 tile.weightAffectsPlayer ? tile.weight - 1 : 0);
             break;
         }
     }
+}
+
+bool PlayerController::TestForWin(const glm::ivec2 &location)
+{
+    return (location.x == 0 || location.x == Tilemap::MaxHorizontalLength - 1 ||
+        location.y == 0 || location.y == Tilemap::MaxVerticalLength - 1);
 }
