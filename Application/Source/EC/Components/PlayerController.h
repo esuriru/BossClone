@@ -32,4 +32,8 @@ public:
 
 private:
     bool TestForWin(const glm::ivec2& location);
+    float baseDamage_ = 5.0f;
+
+protected:
+    void OnDeath() override;
 };

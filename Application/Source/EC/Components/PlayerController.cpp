@@ -2,6 +2,7 @@
 
 #include "Utils/Input.h"
 #include "Core/KeyCodes.h"
+#include "EC/GameObject.h"
 
 #include <glm/gtx/string_cast.hpp>
 #include "Game/GameManager.h"
@@ -23,7 +24,17 @@ void PlayerController::Update(Timestep ts)
 
     constexpr uint32_t directionCount = 4;
 
-    constexpr std::array<decltype(Key::Up), directionCount> keys 
+    constexpr std::array<decltype(Key::Up), directionCount> attackKeys 
+    {
+        {
+            Key::I,
+            Key::K,
+            Key::J,
+            Key::L
+        }
+    };
+
+    constexpr std::array<decltype(Key::Up), directionCount> moveKeys 
     {
         {
             Key::Up,
@@ -57,7 +68,7 @@ void PlayerController::Update(Timestep ts)
 
     for (int i = 0; i < directionCount; ++i)
     {
-        if (input->IsKeyPressed(keys[i]))
+        if (input->IsKeyPressed(moveKeys[i]))
         {
             auto newTilemapPosition = tilemapPosition_ + directions[i];
             auto& tile = tilemap_->GetTile(newTilemapPosition);
@@ -77,7 +88,7 @@ void PlayerController::Update(Timestep ts)
 
                     if (TestForWin(tilemapPosition_))
                     {
-
+                        GameManager::Instance()->NewGame();
                     }
                     else
                     {
@@ -89,6 +100,60 @@ void PlayerController::Update(Timestep ts)
                 tile.weightAffectsPlayer ? tile.weight - 1 : 0);
             break;
         }
+        else if (input->IsKeyPressed(attackKeys[i]))
+        {
+            auto newTilemapPosition = tilemapPosition_ + directions[i];
+            auto& tile = tilemap_->GetTile(newTilemapPosition);
+            if (!tilemap_->InBounds(newTilemapPosition) ||
+                tile.weight <= 0)
+            {
+                continue;
+            }
+
+            std::vector<glm::ivec2> tilemapLocations
+            {
+                {
+                    newTilemapPosition
+                }
+            };
+
+            for (auto& entity : GameManager::Instance()->QueryTiles(tilemapLocations))
+            {
+                if (entity->GetGameObject().CompareTag(gameObject_.GetTag()))
+                {
+                    continue;
+                }
+
+                entity->TakeDamage(baseDamage_ + 
+                    static_cast<float>(rand() % 11));
+                isCurrentTurn_ = false;
+                GameManager::Instance()->OnTurnFinish();
+                break;
+            }
+        }
+        else if (input->IsKeyPressed(Key::Space))
+        {
+            std::vector<glm::ivec2> tilemapLocations
+            {
+                {
+                    tilemapPosition_
+                }
+            };
+
+            for (auto& entity : GameManager::Instance()->QueryTiles(tilemapLocations))
+            {
+                if (entity->GetGameObject().CompareTag(gameObject_.GetTag()))
+                {
+                    continue;
+                }
+
+                entity->TakeDamage(baseDamage_ + 
+                    static_cast<float>(rand() % 11));
+                isCurrentTurn_ = false;
+                GameManager::Instance()->OnTurnFinish();
+                break;
+            }
+        }
     }
 }
 
@@ -96,4 +161,9 @@ bool PlayerController::TestForWin(const glm::ivec2 &location)
 {
     return (location.x == 0 || location.x == Tilemap::MaxHorizontalLength - 1 ||
         location.y == 0 || location.y == Tilemap::MaxVerticalLength - 1);
+}
+
+void PlayerController::OnDeath()
+{
+    GameManager::Instance()->NewGame();
 }

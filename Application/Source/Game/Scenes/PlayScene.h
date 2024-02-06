@@ -20,6 +20,9 @@ public:
         return "PlayScene";
     }
 
+    void Start() override;
+    void Update(Timestep ts) override;
+
 private:
     Ref<Texture2D> nareLogoTexture_;
     Ref<Texture2D> terrainSpritesheet_;

@@ -61,6 +61,7 @@ public:
     }
 
 private:
+    void MoveWithDFS();
     void MoveInRandomAvailableDirection();
     void Attack();
 
@@ -72,4 +73,6 @@ protected:
     Ref<TilemapEntity> entityChasing_ = nullptr;
     Scope<StateMachine<>> stateMachine_;
     Scope<DFS> dfs_ = nullptr;
+
+    void OnDeath() override;
 };

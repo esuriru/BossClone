@@ -61,6 +61,68 @@ namespace Utility
 		return glm::normalize(glm::vec2( -lhs.y, lhs.x));
 	}
 
+    inline EightWayDirection DeltaToDirection(const glm::ivec2& delta)
+    {
+        if (delta.x == 0)
+        {
+            return delta.y < 0 ? 
+                EightWayDirection::Up : EightWayDirection::Down;
+        }
+        else
+        {
+            return delta.x < 0 ? 
+                EightWayDirection::Left : EightWayDirection::Right;
+        }    
+    }
+
+    inline std::array<EightWayDirection, 3> GetOppositeAndAccessories(
+        EightWayDirection direction)
+    {
+        switch (direction)
+        {
+            case EightWayDirection::Up:
+                return
+                {
+                    {
+                        EightWayDirection::Down,
+                        EightWayDirection::Left,
+                        EightWayDirection::Right
+                    }
+                };
+            case EightWayDirection::Down:
+                return
+                {
+                    {
+                        EightWayDirection::Up,
+                        EightWayDirection::Left,
+                        EightWayDirection::Right
+                    }
+                };
+            case EightWayDirection::Left:
+                return
+                {
+                    {
+                        EightWayDirection::Right,
+                        EightWayDirection::Up,
+                        EightWayDirection::Down
+                    }
+                };
+            case EightWayDirection::Right:
+                return
+                {
+                    {
+                        EightWayDirection::Left,
+                        EightWayDirection::Up,
+                        EightWayDirection::Down
+                    }
+                };
+            default:
+                CC_ASSERT(false, "Direction not found");
+                break;
+        }
+        return std::array<EightWayDirection, 3>();
+    }
+
 	inline float Cross(const glm::vec2& lhs, const glm::vec2& rhs)
 	{
 		return lhs.x * rhs.y - lhs.y * rhs.x;

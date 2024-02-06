@@ -26,6 +26,7 @@ public:
     auto SetEventCallback(EventCallback eventCallback) -> void { eventCallback_ = eventCallback; }
 
     void AddTilemapEntity(Ref<TilemapEntity> tilemapEntity);
+    void RemoveTilemapEntity(Ref<TilemapEntity> tilemapEntity);
     void OnTurnFinish();
     void StartGame();
     void NewGame();
@@ -37,9 +38,13 @@ public:
         return entityQueue_ ;
     }
 
+    void SetInUpdate(bool inUpdate);
+
 private:
     GameState state_;
     EventCallback eventCallback_;
+    bool inUpdate_ = false;
+    bool wantToRestart_ = false;
 
     std::deque<Ref<TilemapEntity>> entityQueue_;
 };

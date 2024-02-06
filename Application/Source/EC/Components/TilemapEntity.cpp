@@ -88,6 +88,10 @@ void TilemapEntity::UpdateNearbyTilesVisibility()
 void TilemapEntity::TakeDamage(float amount)
 {
     currentHealth_ -= amount;
+    if (currentHealth_ <= 0)
+    {
+        OnDeath();
+    }
 }
 
 void TilemapEntity::SetNearbyTilesVisible(

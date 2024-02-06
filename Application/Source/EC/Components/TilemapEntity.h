@@ -74,6 +74,11 @@ public:
         return colorRepresentation_;
     }
 
+    inline Ref<TilemapEntityColor> GetColorObject() const
+    {
+        return colorObject_;
+    }
+
     void UpdateNearbyTilesVisibility();
     void TakeDamage(float amount);
 
@@ -103,6 +108,8 @@ protected:
     float timer_;
     float moveTime_;
     float inverseMoveTime_;
+
+    virtual void OnDeath() {}
 
     void SetNearbyTilesVisible(const glm::ivec2& location, bool visible = true);
 

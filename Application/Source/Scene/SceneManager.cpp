@@ -11,3 +11,8 @@ Ref<Scene> SceneManager::AddScene(const std::string &name, Ref<Scene> scene)
     sceneMap_[name] = scene;
     return scene;
 }
+
+void SceneManager::RemoveScene(const std::string &name)
+{
+    sceneMap_.erase(name);
+}

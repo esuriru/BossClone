@@ -76,6 +76,15 @@ void Scene::OnDestroy()
             gameObject->OnDestroy();
         }
     }
+
+    sceneObjects_.clear();
+    objectCreations_.clear();
+    while (!objectCreationQueue_.empty())
+    {
+        objectCreationQueue_.pop();
+    }
+    rendererMap_.clear();
+    hasStarted_ = false;
 }
 
 void Scene::OnImGuiRender()

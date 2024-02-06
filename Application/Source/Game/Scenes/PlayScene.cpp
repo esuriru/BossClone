@@ -1,5 +1,7 @@
 #include "PlayScene.h"
 
+#include "Core/KeyCodes.h"
+
 #include "EC/Components/MazeController.h"
 #include "EC/Components/SpriteRenderer.h"
 #include "EC/Components/TriggerCallback.h"
@@ -22,6 +24,7 @@
 #include <array>
 #include "Scene/Scene.h"
 #include "EC/Components/PlayerController.h"
+#include "Utils/Input.h"
 
 PlayScene::PlayScene()
     : Scene("PlayScene")
@@ -34,6 +37,15 @@ PlayScene::PlayScene()
     , enemySprite_(CreateRef<Texture2D>("Assets/Images/RemovedBGandShadows.png"))
     , endFlagSprite_(CreateRef<Texture2D>("Assets/Images/finishflag.png"))
 {
+    // CreateMines();
+    // SetupMiners();
+    // SetupWitches();
+    // SetupKnights();
+    // SetupBandits();
+}
+
+void PlayScene::Start()
+{
     SetupTilemap();
     SetupEndFlag();
     SetupVisiblityTilemap();
@@ -44,11 +56,21 @@ PlayScene::PlayScene()
     GenerateMaze();
 
     GameManager::Instance()->StartGame();
-    // CreateMines();
-    // SetupMiners();
-    // SetupWitches();
-    // SetupKnights();
-    // SetupBandits();
+
+    Scene::Start();
+}
+
+void PlayScene::Update(Timestep ts)
+{
+    static auto gameManager = GameManager::Instance();
+    gameManager->SetInUpdate(true);
+    Scene::Update(ts);
+    gameManager->SetInUpdate(false);
+    static Input* input = Input::Instance();
+    if (input->IsKeyPressed(Key::Enter))
+    {
+        GameManager::Instance()->NewGame();
+    }
 }
 
 void PlayScene::GenerateMaze()
@@ -90,6 +112,7 @@ void PlayScene::SetupPlayer()
 
     auto playerController = 
         playerGameObject_->AddComponent<PlayerController>();
+    playerController->SetStartHealth(100.0f);
     playerController->SetTilemap(tilemap_);
     playerController->SetVisibilityTilemap(visibilityTilemap_);
     playerController->SetVisibilityRange(4); 
@@ -136,7 +159,7 @@ void PlayScene::SetupEnemies()
         enemyController->SetTilemap(tilemap_)
             ->SetVisibilityTilemap(visibilityTilemap_)
             ->SetVisibilityRange(4)
-            ->SetDamage(10.0f)
+            ->SetDamage(3.0f)
             ->SetStartHealth(50.0f);
         InjectTilemapEntityColor(enemyController);
         GameManager::Instance()->AddTilemapEntity(enemyController);

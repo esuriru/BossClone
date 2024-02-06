@@ -13,6 +13,7 @@ public:
 
     Ref<Scene> GetScene(const std::string& name);
     Ref<Scene> AddScene(const std::string& name, Ref<Scene> scene);
+    void RemoveScene(const std::string& name);
 
     template<typename T>
     Ref<T> CreateScene()
@@ -27,9 +28,19 @@ public:
         return activeScene_;
     }
 
-    inline void SetActiveScene(Ref<Scene> scene)
+    inline void SetActiveScene(Ref<Scene> scene, bool start = false)
     {
         activeScene_ = scene;
+        if (start)
+        {
+            activeScene_->Start();
+        }
+    }
+
+    inline void RefreshActiveScene()
+    {
+        activeScene_->OnDestroy();
+        activeScene_->Start();
     }
 
 private:
