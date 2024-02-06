@@ -88,6 +88,7 @@ set(Header_Files
     "Source/Utils/Singleton.h"
     "Source/Utils/Heuristic.h"
     "Source/Utils/Random.h"
+    "Source/Utils/DFS.h"
 
     "Source/Physics/PhysicsWorld.h"
     "Source/Physics/Bounds.h"
@@ -165,6 +166,7 @@ set(Source_Files
     # "Source/ECS/Systems/GameSystem.cpp"
     # "Source/ECS/Systems/GUISystem.cpp"
 
+    "Source/Utils/DFS.cpp"
     "Source/Utils/Input.cpp"
     "Source/Utils/Util.cpp"
 

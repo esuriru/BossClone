@@ -33,10 +33,11 @@ EnemyController::EnemyController(GameObject &gameObject)
     , stateMachine_(CreateScope<StateMachine<>>("Default", false))
 {
     stateMachine_->AddState(CreateScope<State<>>(std::string("Patrol"),
-        ActionEntry("Enter",
+        ActionEntry("Exit",
         [&]()
         {
-
+            // NOTE - If access violation thrown, 
+            // because enemy spawned instantly in chase state
         }),
         ActionEntry("Update",
         [&]()
@@ -53,6 +54,12 @@ EnemyController::EnemyController(GameObject &gameObject)
         [&]()
         {
             turnsInChase_ = 3;
+        }),
+        ActionEntry("Exit",
+        [&]()
+        {
+            dfs_->Reset();
+            dfs_->Init(tilemapPosition_);
         }),
         ActionEntry("Update",
         [&]()
@@ -166,6 +173,7 @@ void EnemyController::Start()
 {
     TilemapEntity::Start();
     pathfinder_ = tilemap_->GetGameObject().GetComponent<Pathfinder>();
+    dfs_->Init(tilemapPosition_);
 }
 
 void EnemyController::Update(Timestep ts)
@@ -188,29 +196,30 @@ void EnemyController::Reset()
 
 void EnemyController::MoveInRandomAvailableDirection()
 {
-    constexpr std::array<glm::ivec2, 4> Directions
-    {
-        {
-            { 0, 1 },
-            { 1, 0 },
-            { 0,-1 },
-            { -1,0 },
-        }
-    };
+    // constexpr std::array<glm::ivec2, 4> Directions
+    // {
+    //     {
+    //         { 0, 1 },
+    //         { 1, 0 },
+    //         { 0,-1 },
+    //         { -1,0 },
+    //     }
+    // };
 
-    std::vector<glm::ivec2> possiblePositions;
-    for (int i = 0; i < 4; ++i)
-    {
-        auto newPosition = tilemapPosition_ + Directions[i];
-        if (tilemap_->InBounds(newPosition) &&
-            tilemap_->GetTile(newPosition).weight >= 1)
-        {
-            possiblePositions.emplace_back(newPosition);     
-        }
-    }
+    // std::vector<glm::ivec2> possiblePositions;
+    // for (int i = 0; i < 4; ++i)
+    // {
+    //     auto newPosition = tilemapPosition_ + Directions[i];
+    //     if (tilemap_->InBounds(newPosition) &&
+    //         tilemap_->GetTile(newPosition).weight >= 1)
+    //     {
+    //         possiblePositions.emplace_back(newPosition);     
+    //     }
+    // }
 
-    auto newTilemapPosition = possiblePositions[
-        rand() % possiblePositions.size()];
+    auto newTilemapPosition = dfs_->Step();
+    // auto newTilemapPosition = possiblePositions[
+    //     rand() % possiblePositions.size()];
     auto& tile = tilemap_->GetTile(newTilemapPosition);
     QueueMove(tilemap_->LocalToWorld(newTilemapPosition),
         movementTime_,

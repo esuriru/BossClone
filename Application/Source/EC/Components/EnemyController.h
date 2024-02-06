@@ -15,6 +15,7 @@
 #include "Game/EightWayDirectionFlags.h"
 
 #include <glm/glm.hpp>
+#include "Utils/DFS.h"
 
 
 class BoxCollider2D;
@@ -34,6 +35,10 @@ public:
     inline EnemyController* SetTilemap(Ref<Tilemap> tilemap) override
     {
         tilemap_ = tilemap;
+        if (!dfs_)
+        {
+            dfs_ = CreateScope<DFS>(tilemap);
+        }
         return this;
     }
 
@@ -66,4 +71,5 @@ private:
 protected:
     Ref<TilemapEntity> entityChasing_ = nullptr;
     Scope<StateMachine<>> stateMachine_;
+    Scope<DFS> dfs_ = nullptr;
 };

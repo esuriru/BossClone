@@ -90,7 +90,7 @@ protected:
 
     glm::ivec2 tilemapPosition_;
     uint8_t visibilityRange_ = 3;
-    float movementTime_ = 0.5f;
+    float movementTime_ = 0.35f;
     Ref<Tilemap> visibilityTilemap_;
 
     std::function<void()> moveCallback_;
